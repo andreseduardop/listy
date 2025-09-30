@@ -1,0 +1,12 @@
+[[redirects]]
+  from = "/*"
+  to = "/404.html"
+  status = 404
+
+[build.environment]
+HUGO_VERSION = "0.150.1"
+TZ = "America/Bogota"
+
+[build]
+publish = "public"
+command = "hugo --gc --minify"
