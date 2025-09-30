@@ -1,0 +1,641 @@
+// 1. Include functions first (so you can manipulate colors, SVGs, calc, etc)
+
+@import "../bootstrap/scss/_functions";
+
+// 2. Include an variable overrides here
+
+$body-color:      #252121;
+// $font-size-root:  20px;
+// $font-size-base:  1rem;
+// $h1-font-size:  $font-size-base * 2.5;
+// $h2-font-size:  $font-size-base * 2;
+// $h3-font-size:  $font-size-base * 1.75;
+// $h4-font-size:  $font-size-base * 1.5;
+// $h5-font-size:  $font-size-base * 1.25;
+// $h6-font-size:  $font-size-base;
+$font-family-sans-serif:  "-apple-system", BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+// $headings-font-family:    "Yanone Kaffeesatz",  system-ui, sans-serif;
+
+
+// $zindex-dropdown:                   1000;
+// $zindex-sticky:                     1020;
+// $zindex-fixed:                      1030;
+// $zindex-offcanvas-backdrop:         1040;
+// $zindex-offcanvas:                  1045;
+// $zindex-modal-backdrop:             1050;
+// $zindex-modal:                      1055;
+// $zindex-popover:                    1070;
+// $zindex-tooltip:                    1080;
+// $zindex-toast:                      1090;
+// $zindex-offcanvas-backdrop:         1027;
+// $zindex-offcanvas:                  1028;
+
+
+
+
+// Colors:
+$white:    #fff;
+$gray-100: #f8f9fa;
+$gray-200: #e9ecef;
+$gray-300: #dee2e6;
+$gray-400: #ced4da;
+$gray-500: #adb5bd;
+$gray-600: #6c757d;
+$gray-700: #495057;
+$gray-800: #343a40;
+$gray-900: #212529;
+$black:    #000;
+
+// $white:    hsl(0, 0%, 100%);
+// $gray-100: hsl(270, 17%, 98%);
+// $gray-200: hsl(270, 16%, 93%);
+// $gray-300: hsl(270, 14%, 89%);
+// $gray-400: hsl(270, 14%, 83%);
+// $gray-500: hsl(270, 11%, 71%);
+// $gray-600: hsl(270,  7%, 46%);
+// $gray-700: hsl(270,  9%, 31%);
+// $gray-800: hsl(270, 10%, 23%);
+// $gray-900: hsl(270, 11%, 15%);
+// $black:    hsl(0, 0%, 0%);
+
+
+$blue:    #0d6efd;
+$indigo:  #6610f2;
+$purple:  #6f42c1;
+$pink:    #d63384;
+$red:     #dc3545;
+$orange:  #fd7e14;
+$yellow:  #ffc107;
+$green:   #198754;
+$teal:    #20c997;
+$cyan:    #0dcaf0;
+// Trainers colors
+$turquesa-old:    #3fd4cf;  // Turquesa Trainers anterior (opaco)
+// El turquesa anterior se reemplaza por uno más brillante para la web
+$turquesa-old-2:  #45ded9;  // Turquesa Trainers
+// Se reemplaza con un turquesa más azulado, que aumenta el contraste
+$lavanda:         #af8dd2;  // Lavanda Trainers
+// El lavanda se reemplaza con uno más saturado
+$turquesa-claro:  #cdf4f2;  // Turquesa Trainers claro
+$turquesa-oscuro: #37a19e;  // Turquesa Trainers oscuro
+$lavanda-oscuro:  #9a6acf;  // Amatista Trainers
+
+// SHOWER•CENTER colors 
+$purple-shower:   #e20ee2;  // Steel pink
+$yellow-shower:   #ffcf30;  // Yellow Shower Center
+$turquesa-shower: #04d4d4;  // Turquesa Shower
+$orange-shower:   #ffa825;  // Orange Shower Center
+$violet-shower:   #a083ff;  // Violet Shower Center
+$shower1:         #FDECFF;  // Púrpura claro
+$shower2:         #FFE9ED;  // Rojo claro
+$shower3:         #FFEAD9;  // Naranja claro
+$shower4:         #FFFBD6;  // Amarillo claro
+$shower5:         #D6FFFD;  // Turquesa claro
+$shower6:         #D2F2FF;  // Azul claro
+
+// Theme colors:
+$primary:       $purple-shower;
+$secondary:     $yellow-shower;
+$tertiary:      $turquesa-shower;  // Required
+$success:       $green;     // Required
+// $info:          $cyan;
+// $warning:       $yellow;
+$danger:        $red;       // Required
+$light:         $gray-300;
+$dark:          $gray-600;
+
+
+// Personalización de variables: 
+
+// Some modal variables
+// $modal-backdrop-bg:                 $black;
+$modal-backdrop-opacity:            .3;
+
+// Style anchor elements.
+$link-color:                        $primary;
+$link-decoration:                   none;
+$link-hover-color:                  $tertiary;
+$link-hover-decoration:             underline;
+
+// Tabs (color of navigation links in menus)
+$nav-link-color:                    $body-color;
+$nav-link-hover-color:              $body-color;
+
+// Nav buttons (pills)
+$nav-pills-link-active-bg:          $gray-600;
+
+// Offcanvas para menú
+$offcanvas-horizontal-width:        300px;
+// $offcanvas-vertical-height:         30vh;
+$offcanvas-transition-duration:     .5s;
+
+// Offcanvas
+// $offcanvas-transition-duration:           0.3s;
+
+// 3. Include remainder of required Bootstrap stylesheets
+
+@import "../bootstrap/scss/_variables";
+@import "../bootstrap/scss/_variables-dark";
+
+
+// 4. Include any default map overrides here
+
+// Modify map color
+$theme-colors: (
+  "secondary":    $secondary,  // Required
+  "primary":  $primary,
+  "success":    $success,  // Required
+  // "info":       $info,
+  // "warning":    $warning,
+  "danger":     $danger,  // Required
+  "light":      $light,
+  "dark":       $dark,
+);
+
+// Create map with my own colors
+$shower-colors: (
+  "tertiary":   $tertiary,
+);
+// Merge the maps
+$theme-colors: map-merge($theme-colors, $shower-colors);
+$theme-colors: map-remove($theme-colors, "info", "warning");
+
+
+// 5. Include remainder of required parts
+
+@import "../bootstrap/scss/_maps";
+@import "../bootstrap/scss/_mixins";
+@import "../bootstrap/scss/root";
+
+
+// 6. Optionally include any other parts as needed
+
+@import "../bootstrap/scss/utilities";
+@import "../bootstrap/scss/reboot";
+@import "../bootstrap/scss/type";
+@import "../bootstrap/scss/images";
+@import "../bootstrap/scss/containers";
+@import "../bootstrap/scss/grid";
+@import "../bootstrap/scss/tables";
+@import "../bootstrap/scss/forms";
+@import "../bootstrap/scss/buttons";
+@import "../bootstrap/scss/transitions";
+// @import "../bootstrap/scss/dropdown";
+@import "../bootstrap/scss/button-group";
+@import "../bootstrap/scss/nav";
+@import "../bootstrap/scss/navbar";
+@import "../bootstrap/scss/card";   // se usa en las /card/ individuales
+@import "../bootstrap/scss/accordion";  // se usa en el ToC y en algunos Tips
+// @import "../bootstrap/scss/breadcrumb";
+// @import "../bootstrap/scss/pagination";
+// @import "../bootstrap/scss/badge";
+@import "../bootstrap/scss/alert";  // se usa en baby-card noscript
+// @import "../bootstrap/scss/progress";
+@import "../bootstrap/scss/list-group";   // se usa en layout List
+@import "../bootstrap/scss/close";  // cierra modales, offcanvas, etc.
+// @import "../bootstrap/scss/toasts";
+@import "../bootstrap/scss/modal";  // ventanas modales, se usa en baby-card
+// @import "../bootstrap/scss/tooltip";
+// @import "../bootstrap/scss/popover";
+@import "../bootstrap/scss/carousel";   // se usa para anuncios
+@import "../bootstrap/scss/spinners";   // se usa en Modal de baby-card. Loading...
+@import "../bootstrap/scss/offcanvas";  // se usa en ToC
+@import "../bootstrap/scss/helpers";  // se usa para stretched links
+
+
+// 7. Optionally include utilities API last to generate classes based on the Sass map in `_utilities.scss`
+
+@import "../bootstrap/scss/utilities/api";  // se usa para colors, display, align, text-, etc
+
+// 8. Add additional custom code here
+
+
+/* Fonts */
+@font-face {
+  font-family: 'Quicksand';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../fonts/quicksand-v1-latin-semibold.woff2') format('woff2'); /* Chrome 26+, Opera 23+, Firefox 39+ */
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+// Configuraciones generales
+
+/* Smooth Scrolling */
+html {
+  scroll-behavior: smooth;
+}
+// Color del texto seleccioando
+::selection {
+  background-color: tint-color($primary, 70%); /* Color de fondo */
+  color: $body-color; /* Color del texto */
+}
+main {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  word-break: normal;
+  overflow-wrap: anywhere;
+}
+// Scroll hasta encabezados
+h1, h2, h3, h4, h5, h6 {
+  scroll-margin-top: 2.5em;
+}
+h1 {
+  font-size: 2rem;
+}
+// Hipervínculos
+body a {
+  overflow-wrap: anywhere;
+  word-break: normal;
+  font-weight: 600;
+}
+
+// FONTS
+.sc-font-alternative {
+  font-family: 'Quicksand', "Arial", "Helvetica", sans-serif;
+}
+
+// CHECKBOX
+.sc-checklist-checkbox {
+
+}
+
+// Remueve el triángulo de los elementos <details>
+// Ver: https://github.com/mdn/browser-compat-data/issues/9869
+// 
+// En Chrome:
+details > summary {
+  list-style: none;
+}
+// En Firefox y Webkit (Safari):
+details summary::marker,
+details summary::-webkit-details-marker {
+  content: "";
+  display: none;
+  margin-inline-end: 0;
+  text-indent: 0;
+}
+// 
+
+// Extender clases de Bootstrap 
+// Fuente más pequeña (16px * .75 = 12px)
+.sc-fs-7 {
+  font-size: 0.75rem;
+}
+
+// Coolors
+.sc-bg-gray-200 {
+  background-color: $gray-200;
+}
+.sc_md_image img {
+  max-width: 70%;
+  // padding-left: 15%;
+  // padding-right: 15%;
+  // max-height: 50vh;
+}
+svg.bi {
+    display: inline-block;
+    vertical-align: -.125em;
+    fill: currentcolor;
+}
+
+// Columnas para carrusel en Planner
+// La acumulación de cards no llena el 100%
+// para generar expectativa, revelación parcial.
+@media (max-width: 575px) {
+  .sc-col-30percent {
+    flex: 0 0 auto;
+    width: 30%;
+  }
+}
+@media (min-width: 576px) {
+  .sc-col-22percent {
+    flex: 0 0 auto;
+    width: 22%;
+  }
+}
+
+// Sombreado de elementos
+// Basado en Material Design
+.sc-elevation-3 {
+  box-shadow: 0px -3px 3px -2px rgba(0, 0, 0, 0.2), 0px -3px 4px 0px rgba(0, 0, 0, 0.14), 0px -1px 8px 0px rgba(0, 0, 0, 0.12);
+}
+.sc-elevation-4 {
+  box-shadow: 0px -2px 4px -1px rgba(0, 0, 0, 0.2), 0px -4px 5px 0px rgba(0, 0, 0, 0.14), 0px -1px 10px 0px rgba(0, 0, 0, 0.12);
+}
+/* Elevación flotante para elementos normales (por ejemplo, botones) */
+// Modificada para generar sombra hacia arriba (para Tab del footer)
+.sc-floating-elevation-1 {
+  box-shadow: 0px -2px 4px -1px rgba(0, 0, 0, 0.2), 0px -4px 5px 0px rgba(0, 0, 0, 0.14), 0px -1px 10px 0px rgba(0, 0, 0, 0.12);
+}
+/* Elevación flotante para elementos más grandes (por ejemplo, tarjetas) */
+.sc-floating-elevation-2 {
+  box-shadow: 0px 3px 6px -1px rgba(0, 0, 0, 0.2), 0px 6px 10px 0px rgba(0, 0, 0, 0.14), 0px 1px 18px 0px rgba(0, 0, 0, 0.12);
+}
+/* Elevación flotante para elementos muy grandes o diálogos */
+.sc-floating-elevation-3 {
+  box-shadow: 0px 4px 8px -1px rgba(0, 0, 0, 0.2), 0px 8px 12px 0px rgba(0, 0, 0, 0.14), 0px 3px 16px 2px rgba(0, 0, 0, 0.12);
+}
+// end sombreado
+
+// FOOTER PLANNER (start)
+.bottom-bar-shadow {
+  box-shadow: 0 -2px 18px 4px rgba(115,135,134,.3);
+}
+// Backdrop para la navbar
+// TODO: eliminar por obsolecencia
+.navbar-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1025;
+  width: 100vw;
+  height: 100vh;
+  opacity: 0.5;
+  background-color: #000;
+}
+// Planner App (offcanvas in footer)
+#plannerApp {
+  background-color: transparent;
+  border: 0;
+  border-radius: 0px;
+  height: 80vh !important;
+  transition-duration: .8s;
+}
+#plannerApp>div {
+  background-color: white;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  height: 100% !important;
+  max-width: 100%;
+  overflow: hidden;
+}
+#plannerApp .offcanvas-body {
+  height: 100% !important;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+#plannerApp button.nav-link {
+  font-weight: 600;
+}
+#plannerApp button.nav-link:not(.active) {
+  background-color: $gray-200;
+}
+#plannerApp button.nav-link:not(.active):hover {
+  background-color: $gray-400;
+}
+// Checkbox for To-Do Lists
+#plannerApp input[type="checkbox"] {
+  background-color: transparent;
+  cursor: pointer;
+  border-radius: 50%;
+  bottom: .1em;
+  height: 1.2em;
+  width: 1.2em;
+  position: relative;
+  border: 2px solid #495057;
+}
+#plannerApp input[type="checkbox"]:focus {
+  border-color: none;
+  outline: 0;
+  box-shadow: none;  
+}
+#plannerApp input[type="checkbox"]:checked {
+  color: white;
+  background-color: $gray-500;
+  border-color: $gray-500;  
+}
+#plannerApp input[type="checkbox"] + label {
+  letter-spacing: .00625em;
+  overflow-wrap: break-word;
+}
+#plannerApp input[type="checkbox"]:checked + label {
+  color: $gray-500; 
+  text-decoration: line-through;
+}
+// Planner icon
+svg#plannerChevronUpIcon {
+  animation: jumpAnimationIcon 10s ease 6.5s infinite;
+}
+@keyframes jumpAnimationIcon {
+  0% { transform: translateY(0); }
+  2% { transform: translateY(-6px); }
+  4% { transform: translateY(0); }
+  6% { transform: translateY(-6px); }
+  8% { transform: translateY(0); }
+  100% { transform: translateY(0); }
+}
+// Prompts in <details>
+details .sc-details-expand-icon {
+  display: inline;
+}
+details[open] .sc-details-expand-icon {
+  display: none;
+}
+details .sc-details-collapse-icon {
+  display: none;
+}
+details[open] .sc-details-collapse-icon {
+  display: inline;
+}
+// FOOTER PLANNER (end)
+// 
+// TIP (start)
+article {
+  h2, h3, h4, h5, h6 {
+    margin: 2rem 0 1rem;
+  }
+}
+
+// Colores para ToC
+// TODO: eliminar por obsolecencia
+main nav a {
+  color: $gray-700 !important;
+  font-weight: 500 !important;
+}
+// TIP (end)
+// 
+// IMAGES (start)
+main img {
+  max-width: 100%;
+  height: auto;
+}
+.sc-carouse-img {
+  width: 100%;
+  height: auto;
+}
+// IMAGES (end)
+
+// APP (start)
+// (before 'baby-car')
+// contenedor para link de evento
+#eventLink:focus-visible {
+  outline-color: transparent;
+}
+// APP (end)
+
+
+// WIDGETS (satart)
+
+// Colores para los widgets
+// .sc-widget-1 al 8. Y para .sc-bg-light-1 al 8
+$shower-backgrounds: ($shower1, $shower2, $shower3, $shower4, $shower5, $shower6, $gray-200, white);
+
+// Widgets zonas de color 
+@for $i from 1 through length($shower-backgrounds) {
+  $color: nth($shower-backgrounds, $i);
+  $selector: ".sc-widget-#{$i}";
+  
+  #{$selector} {
+    background-color: $color;
+    border-radius: 16px;
+    padding: 24px 16px;
+    margin-bottom: 16px;
+  }
+
+  article #{$selector} {
+    margin-bottom: 48px;
+  }
+
+  @each $heading in h1, h2, h3, h4, h5, h6 {
+    #{$selector} > #{$heading} {
+      margin: 0;
+      padding: 0 0 16px;
+    }
+  }
+}
+
+
+// WIDGET: Títulos con Párrafos de color
+// Formato para headings
+:is(h1, h2, h3, h4, h5, h6).sc-card {
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  padding: 24px 16px 16px;
+  margin: 0;
+}
+// Formato para el párrafo adyacente a un heading .sc-card
+:is(h1, h2, h3, h4, h5, h6).sc-card + p {
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 16px;
+  padding: 0 16px 32px;
+  margin-bottom: 48px;
+}
+// Formato para el párrafo adyacenta a un heading .sc-card
+// cuando el siguiente párrafo también es un .sc-card
+:is(h1, h2, h3, h4, h5, h6).sc-card + p:has(+ p.sc-card), 
+p.sc-card:has(+ p.sc-card)
+{
+  border-radius: 0;
+  margin-bottom: 0;
+  padding: 16px 16px 0;
+}
+// Formato para el párrfo final .sc-card
+// (cuanto no lo sigue otro párrafo .sc-card)
+p.sc-card:has(+ :not(p.sc-card)) {
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 16px;
+  padding: 16px 16px 32px;
+  margin-bottom: 48px;
+}
+
+// Coloreado
+@for $i from 1 through length($shower-backgrounds) {
+  $color: nth($shower-backgrounds, $i);
+  $selector: ".sc-bg-light-#{$i}";
+  
+  #{$selector}, #{$selector} + p {
+    background-color: $color;
+  }
+}
+// end WIDGET
+
+// Accordion Widget
+.sc-faq .accordion-collapse.show {
+  background-color: $shower4;
+}
+// Accordion Widget end
+// 
+// Details-Summary Widget
+article details {
+  background-clip: padding-box;
+  background-color: white;
+  border-radius: 6px;
+  border: 1px solid #aaa;
+  padding: 0.5em 0.5em 0;
+  transition: background-color .15s linear;
+}
+article summary {
+  background-clip: padding-box;
+  background-color: white;
+  border-radius: 6px;
+  font-weight: 600;
+  margin: -0.5em -0.5em 0;
+  padding: 0.5em;
+}
+article details[open] {
+  padding: 0.5em;
+  background-color: $shower3;
+}
+article details[open] summary {
+  border-bottom: 1px solid #999;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+  margin-bottom: 0.5em;
+}
+// Accordion widget end;
+// WIDGETS (end)
+
+/* Estilos del contenido del tooltip */
+.sc-tooltip {
+  background-color: $tertiary;
+  border-radius: 6px;
+  bottom: 140%;
+  color: #fff;
+  display: none;
+  left: 50%;
+  opacity: 0;
+  padding: 6px;
+  position: absolute;
+  transform: translateX(-50%);
+  transition: opacity 1s ease-in-out;
+  max-width: 100vw;
+  user-select: none;
+  width: 400px;
+  z-index: 1070;
+}
+.sc-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 95%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 12px;
+  border-style: solid;
+  border-color: $tertiary transparent transparent transparent;
+}
+// end tooltip
+
+// UTILITIES
+// Scroll bar for wider screens
+@media(min-width: 576px) {
+  .sc-scroll-enable::-webkit-scrollbar {
+      width: 12px;
+      height: 12px;
+      border-radius: 6px;
+  }
+  .sc-scroll-enable::-webkit-scrollbar-thumb {
+      border-radius: 6px;
+      -webkit-box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.5);
+      background-color: $gray-500;
+      box-shadow: none;
+  }
+  .sc-scroll-enable::-webkit-scrollbar-track {
+      border-radius: 6px;
+      background-color: $gray-200;
+      margin-left: 8px;
+      margin-right: 8px;
+  }
+}

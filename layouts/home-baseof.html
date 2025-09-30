@@ -1,0 +1,10 @@
+<!-- Layout base para Home -->
+<!DOCTYPE html>
+<html lang="{{ .Site.Language.Lang }}">
+  {{- partial "head.html" . -}}
+  <body onclick>
+    <!-- construye la página -->
+    {{- partial "scripts-main.html" . -}}
+    {{ block "main" . }}{{ end }}
+  </body>
+</html>

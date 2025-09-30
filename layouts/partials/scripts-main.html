@@ -1,0 +1,21 @@
+<!-- Get Bootstrap JS -->
+{{ $bootstrapJs := resources.Get "bootstrap/dist/js/bootstrap.min.js" | resources.Fingerprint "sha384" }}
+<!-- Load Bootstrap JavaScript  -->
+<script src='{{ $bootstrapJs.RelPermalink }}' integrity='{{ $bootstrapJs.Data.Integrity }}' defer></script>
+
+<!-- Options for build -->
+{{ $buildOptions := (dict 
+  "bundle" true
+  "format" "iife"
+  "targetPath" "js/main.min.js" 
+  "minify" true) }}
+{{ if hugo.IsServer }}
+  {{ $buildOptions = (dict
+    "bundle" true
+    "format" "iife"
+    "targetPath" "js/main.min.js"
+    "minify" false
+    "sourceMap" "inline") }}
+{{ end }}
+{{- $script := resources.Get "js/main.js" | js.Build $buildOptions | resources.Fingerprint "sha384" -}}
+<script src='{{ $script.RelPermalink  }}' integrity='{{ $script.Data.Integrity }}' defer></script>

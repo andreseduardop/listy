@@ -1,0 +1,34 @@
+<!-- Get webp images -->
+{{- $featuredWebp := .Resources.GetMatch "*featured*.webp" -}}
+{{ $webpLink := "" }}
+<!-- Processing images -->
+{{ $webp := $featuredWebp.Resize "390x q85" }}
+<!-- Fallback to default images -->
+{{ with $webp }}
+  {{ $webpLink = .RelPermalink }}
+{{ else }}
+  {{ $webpLink = "images/featured-default.webp" | relURL }}
+{{ end }}
+<!-- Generating HTML -->
+<div class="col">
+  <div class="card border-0 h-100">
+    <picture>
+      <source srcset="{{ $webpLink }}" type="image/webp">
+      <img src="{{ $webpLink }}" 
+        width="{{ $webp.Width  }}" 
+        height="{{ $webp.Height }}" 
+        alt='Feature image'
+        loading="lazy">
+    </picture>
+    <div class="card-body border-0 px-2 px-md-1 pt-2 pb-4">
+      <p class="fs-6 mb-2">{{ .Title | plainify }}</p>
+      <a class="link-dark stretched-link text-decoration-none small" 
+        href="{{ .RelPermalink }}">
+        {{ T "read_more" }} 
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-right" viewBox="0 0 16 16">
+          <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,41 @@
+<!-- Encabezado con botones ( < y ••• ) -->
+<header class="bg-white border-bottom sticky-top">
+
+  <!-- Header container NAVBAR -->
+  <nav id="headerContainer" 
+    class="{{ partial "container-sizes.html" . }}">
+    <div class="navbar bg-white py-0">
+
+      {{ if .IsHome }}
+        <div>
+          <span class="fw-semibold">
+            SHOWER•CENTER
+          </span>
+        </div>
+      {{ end }}
+    
+      {{ if not .IsHome }}
+        <!-- BUTTON RETURN (left arrow) -->
+        <a id="headerBackButton" 
+          href="{{ relLangURL "/" }}"
+          class="sc-vibrate p-1 text-decoration-none text-body" role="button" aria-label="Navigate back">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24" >
+            <path d="m 17.489839,2.9937491 a 0.997,0.997 0 0 1 -0.293,0.707 l -8.2959996,8.2929999 8.2959996,8.293 a 1,1 0 1 1 -1.414,1.414 l -9.0039996,-9 a 1.03,1.03 0 0 1 0,-1.414 L 15.782839,2.2867491 a 1,1 0 0 1 1.707,0.707 z" />
+          </svg>
+        </a>
+      {{ end }}
+
+      <!-- BUTTON MENU -->
+      <a class="btn ms-auto p-1" role="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavheaderMenu" aria-controls="offcanvasNavheaderMenu" aria-label="Main menu button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="1.5"></circle><circle cx="6" cy="12" r="1.5"></circle><circle cx="18" cy="12" r="1.5"></circle>
+        </svg>
+      </a>
+
+    </div>
+  </nav>
+
+  <!-- Offcanvas menu -->
+  {{ partial "header-menu" . }}
+
+</header>

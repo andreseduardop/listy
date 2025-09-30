@@ -1,0 +1,103 @@
+baseURL: 'https://listy.app/'
+title: 'LISTY • APP'
+languageCode: en
+defaultContentLanguage: en
+defaultContentLanguageInSubdir: false
+enableMissingTranslationPlaceholders: true
+enableGitInfo: true
+enableInlineShortcodes: true
+removePathAccents: true
+pluralizeListTitles: false
+summaryLength: 35
+
+services:
+  googleAnalytics:
+    # id: "G-29T0EDBP67"
+
+taxonomies:
+  topic: topics
+  # tag: tags
+
+permalinks:
+  list: /:slug/
+  topics: /:slug/
+
+disableKinds:
+- taxonomy
+- term
+
+languages:
+  en:
+    weight: 1
+    languageName: English
+  es:
+    weight: 2
+    languageName: Español
+
+params:
+  description: '"Planea actividades con listas de tareas."'
+  footer: '&copy; 2025 All Rights Reserved, Listy App&#8482;'
+  dateFormat: 'Jan 2, 2006'
+  author: Listy App
+  images:
+    - images/site-featured-image.jpg
+  katex: false
+  darkThemeAsDefault: false
+  headingLinks: false
+  facebook: ''
+  twitter: ''
+  linkedin: ''
+
+related:
+  includeNewer: true
+  toLower: true
+  threshold: 80
+  indices:
+  - name: tags
+    weight: 100
+  - name: date
+    weight: 10
+
+markup:
+  goldmark:
+    extensions:
+      definitionList: true
+      footnote: true
+      linkify: true
+      strikethrough: true
+      table: true
+      taskList: true
+      typographer: true
+    parser:
+      autoHeadingID: true
+      autoHeadingIDType: github
+      attribute:
+        block: true
+        title: true
+    renderer:
+      hardWraps: false
+      unsafe: true
+      xHTML: false
+  tableOfContents:
+    startLevel: 2
+    endLevel: 3
+    ordered: false
+
+module:
+  mounts:
+  - source: content
+    target: content
+  - source: static
+    target: static
+  - source: layouts
+    target: layouts
+  - source: data
+    target: data
+  - source: node_modules
+    target: assets
+  - source: assets
+    target: assets
+  - source: i18n
+    target: i18n
+  - source: archetypes
+    target: archetypes

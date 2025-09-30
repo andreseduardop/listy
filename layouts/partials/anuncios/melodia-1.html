@@ -1,0 +1,71 @@
+<aside>
+  <div id="melodia-1">
+    <h1 class="fs-3 text-center text-primary fw-bold">
+        ¿Ya sabes qué obsequiar en el baby shower?
+    </h1>
+    <p class="text-center fw-bold mt-3 mb-2">
+      Te recomendamos el SET de desarrollo infantil, de BABY&nbsp;Trainers<sup>®</sup>
+    </p>
+    <p class="">
+      El mejor obsequio para la diversión y el desarrollo del bebé.
+    </p>
+    <div id="carouselAnuncio1" class="carousel slide" data-bs-ride="carousel">
+      <div class="carousel-indicators">
+        <button type="button" data-bs-target="#carouselAnuncio1" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+        <button type="button" data-bs-target="#carouselAnuncio1" data-bs-slide-to="1" aria-label="Slide 2"></button>
+        <button type="button" data-bs-target="#carouselAnuncio1" data-bs-slide-to="2" aria-label="Slide 3"></button>
+        <button type="button" data-bs-target="#carouselAnuncio1" data-bs-slide-to="3" aria-label="Slide 4"></button>
+      </div>               
+      <div class="carousel-inner">
+      {{ $images := resources.Match "/images/anuncios/1-set-melodia/*.jpg" }}
+      {{ range $index, $imagen := $images }}
+        {{ if eq $index 0 }}
+          <div class="carousel-item active" data-bs-interval="2500">
+            {{ $alt := print "Imagen " $imagen.Name }}
+            <a href="https://www.shop.babytrainers.co/MCO-883503079-set-regalo-para-baby-shower-instrumentos-libro-videoguias-_JM" target="anuncio">
+              <img
+                class="d-block w-100"
+                src="{{ $imagen.RelPermalink }}"
+                width="{{ $imagen.Width }}"
+                height="{{ $imagen.Height }}"
+                alt="{{ $alt }}"/>
+            </a>
+            <div class="carousel-caption user-select-none">
+              <p>&nbsp;Disponible solo en Colombia. 🇨🇴</p>
+            </div>            
+          </div>
+        {{ else }}
+          <div class="carousel-item" data-bs-interval="2500">
+          {{ $alt := print "Imagen " $imagen.Name }}
+            <a href="https://www.shop.babytrainers.co/MCO-883503079-set-regalo-para-baby-shower-instrumentos-libro-videoguias-_JM" target="anuncio">
+              <img
+                class="d-block w-100"
+                src="{{ $imagen.RelPermalink }}"
+                width="{{ $imagen.Width }}"
+                height="{{ $imagen.Height }}"
+                alt="{{ $alt }}"/>
+            </a>
+            <div class="carousel-caption user-select-none">
+              <p>&nbsp;Disponible solo en Colombia. 🇨🇴</p>
+            </div>               
+          </div>
+          
+        {{ end }}
+      {{ end }}
+      </div>
+      <button class="carousel-control-prev" type="button" data-bs-target="#carouselAnuncio1" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#carouselAnuncio1" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+      </button>
+    </div>
+
+    <div class="text-center mt-3">
+      <a class="btn btn-outline-primary fw-bold w-100" href="https://www.shop.babytrainers.co/MCO-883503079-set-regalo-para-baby-shower-instrumentos-libro-videoguias-_JM" target="anuncio">Consíguelo aquí</a>
+    </div>
+
+  </div>
+</aside>

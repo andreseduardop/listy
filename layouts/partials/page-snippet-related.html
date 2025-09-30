@@ -1,0 +1,27 @@
+<!-- Get webp images -->
+{{- $thumbnailWebp := .Resources.GetMatch "*thumbnail*.webp" -}}
+{{ $thumbnailWebpLink := "" }}
+<!-- Fallback to default images -->
+{{ with $thumbnailWebp }}
+  {{ $thumbnailWebpLink = .RelPermalink }}
+{{ else }}
+  {{ $thumbnailWebpLink = "images/thumbnail-default.webp" | relURL }}
+  {{ errorf "Falta thumbnail webp en: %s" .Path }}
+{{ end }}
+<!-- Generating HTML -->
+<div class="d-flex align-items-start">
+  <div class="bg-light flex-shrink-0 me-3">
+    <img src="{{ $thumbnailWebpLink }}" 
+      alt='{{ T "decorative_image" }}'
+      width="150" 
+      height="100"
+      loading="lazy">
+  </div>
+  <div>
+    <h2 class="fs-3 fw-light text-start mt-0">{{ .Title | plainify }}</h2>
+  </div>
+</div>
+<div class="mt-2 mb-3">
+  <small class="text-muted fw-normal">{{ .Param "description" | plainify | truncate 180 }} 
+  </small>
+</div>

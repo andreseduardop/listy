@@ -1,0 +1,158 @@
+<!-- Screen Info -->
+<section id="screenInfo"
+  class="container py-3 my-5 fade d-none">
+  <!-- Encabezado -->
+  <h2 
+    class="h6 fw-medium text-uppercase text-center bg-white border-bottom fixed-top user-select-none py-3">
+    {{ T "customize" }}
+  </h2>
+  <!-- Ingresar info del evento -->
+  <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5 pt-2 pb-3 mx-auto">
+    <!-- MINIATURA DE LA CARD -->
+    <div class="text-center">
+      <img src=""
+        width="120" 
+        height="120" 
+        alt='{{ T "invitation_card" }}'>
+    </div>
+    <!-- FORMULARIO -->
+    <form class="row g-3 needs-validation mt-3" novalidate>
+      <!-- Nombre -->
+      <div class="col-12">
+        <div class="form-floating">
+          <input id="eventName" 
+            class="form-control" type="text" required>
+          <label for="eventName">{{ T "mothers_or_babys_name" }} *</label>
+          <div class="invalid-feedback">
+            {{ T "remember_to_write_a_name" }}.
+          </div>        
+        </div>
+      </div>
+      <!-- País -->
+      <div class="col-12">
+        <div class="form-floating">
+          <select id="eventCountry" class="form-select" aria-label="Select a country" required>
+            <!-- Opción inicial en blanco -->
+            <option value="" selected></option>
+            <optgroup label="{{ T "north_america" }}">
+              <!-- Lista de países -->
+              <option value="Canadá">{{ T "canada" }}</option>
+              <option value="Estados Unidos">{{ T "united_states" }}</option>
+            </optgroup>
+            <optgroup label="{{ T "latin_america" }}">
+              <option value="No especificado">{{ T "do_not_specify" }}</option>
+              <option value="Argentina">{{ T "argentina" }}</option>
+              <option value="Bolivia">{{ T "bolivia" }}</option>
+              <option value="Brasil">{{ T "brazil" }}</option>
+              <option value="Chile">{{ T "chile" }}</option>
+              <option value="Colombia">{{ T "colombia" }}</option>
+              <option value="Costa Rica">{{ T "costa_rica" }}</option>
+              <option value="Ecuador">{{ T "ecuador" }}</option>
+              <option value="El Salvador">{{ T "el_salvador" }}</option>
+              <option value="Guatemala">{{ T "guatemala" }}</option>
+              <option value="Honduras">{{ T "honduras" }}</option>
+              <option value="México">{{ T "mexico" }}</option>
+              <option value="Nicaragua">{{ T "nicaragua" }}</option>
+              <option value="Panamá">{{ T "panama" }}</option>
+              <option value="Paraguay">{{ T "paraguay" }}</option>
+              <option value="Perú">{{ T "peru" }}</option>
+              <option value="Puerto Rico">{{ T "puerto_rico" }}</option>
+              <option value="República Dominicana">{{ T "dominican_republic" }}</option>
+              <option value="Uruguay">{{ T "uruguay" }}</option>
+              <option value="Venezuela">{{ T "venezuela" }}</option>
+            </optgroup>
+            <optgroup label="{{ T "others" }}">
+              <option value="Australia">{{ T "australia" }}</option>
+              <option value="España">{{ T "spain" }}</option>
+              <option value="Francia">{{ T "france" }}</option>
+              <option value="Italia">{{ T "italy" }}</option>
+              <option value="Otro país">{{ T "other_country" }}</option>
+            </optgroup>
+          </select>      
+          <label for="eventPlace">{{ T "coutry" }} *</label>
+          <div class="invalid-feedback">
+            {{ T "please_choose_an_option" }}.
+          </div>             
+        </div>
+      </div>
+    </form>
+    <form class="row g-3 mt-1" novalidate>
+      <!-- Lugar -->
+      <div class="col-12">
+        <div class="form-floating">
+          <input id="eventPlace" 
+            class="form-control" type="text">
+          <label for="eventPlace">{{ T "place_or_address" }}</label>
+          <div class="invalid-feedback">
+            {{ T "remember_to_write_a_place" }}.
+          </div>             
+        </div>
+      </div>
+      <!-- Fecha -->
+      <div class="col-8">
+        <div class="form-floating">
+          <input id="eventDate" 
+            class="form-control" type="date">
+          <label for="eventDate">{{ T "date" }}</label>
+        </div>
+      </div>
+      <!-- Hora -->
+      <div class="col-4">
+        <div class="form-floating">
+          <input id="eventHour" 
+            class="form-control" type="time">
+          <label for="eventHour">{{ T "time" }}</label>
+        </div>
+      </div>
+      <!-- Enlace -->
+      <div class="col-12">      
+        <div class="form-floating">
+          <input id="eventLink" 
+            class="form-control" type="url" >
+          <label for="eventLink">{{ T "link_to_videocall" }}</label>
+        </div>
+      </div>
+
+      <!-- Mensaje -->
+      <div class="col-12">
+        <div class="d-flex justify-content-between rounded rounded-bottom-0 w-100 bg-light p-2">
+          <span class="fw-semibold p-1">{{ T "message" }}</span>
+          <div class="btn-group">
+            <button id="aiPreviousMessageButton" class="btn active bg-white py-1 px-2 d-none" type="button" >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+              </svg>            
+            </button>
+            <button id="aiGeneratedMessageButton" class="btn active bg-white py-1 px-2" type="button" >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-stars" viewBox="0 0 16 16">
+                <path d="M7.657 6.247c.11-.33.576-.33.686 0l.645 1.937a2.89 2.89 0 0 0 1.829 1.828l1.936.645c.33.11.33.576 0 .686l-1.937.645a2.89 2.89 0 0 0-1.828 1.829l-.645 1.936a.361.361 0 0 1-.686 0l-.645-1.937a2.89 2.89 0 0 0-1.828-1.828l-1.937-.645a.361.361 0 0 1 0-.686l1.937-.645a2.89 2.89 0 0 0 1.828-1.828l.645-1.937zM3.794 1.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387A1.734 1.734 0 0 0 4.593 5.69l-.387 1.162a.217.217 0 0 1-.412 0L3.407 5.69A1.734 1.734 0 0 0 2.31 4.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387A1.734 1.734 0 0 0 3.407 2.31l.387-1.162zM10.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.156 1.156 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.156 1.156 0 0 0-.732-.732L9.1 2.137a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732L10.863.1z"/>
+              </svg>
+              <span> {{ T "generate_with_ai" }} </span>   
+            </button>
+          </div>
+        </div>
+        <div class="form">
+          <textarea id="eventMessage" class="form-control rounded rounded-top-0 pt-2" style="height: calc(20rem + 2px)" placeholder="{{ T "write_here" }}"></textarea>
+        </div>
+
+        <!-- Loading animation -->
+        <!-- Indicando que se está cargando... -->
+        <div id="loadingAImessage" class="d-flex justify-content-center border rounded py-5 d-none" style="height: calc(20rem + 2px)">
+          <span class="visually-hidden">{{ T "loading" }}...</span>
+          <div class="spinner-grow spinner-grow-sm" role="status" style="background-color:#ffa825;color:#ffa825;">
+          </div>
+          <div class="spinner-grow spinner-grow-sm ms-3" role="status" style="background-color:#ff8a56;color:#ff8a56;">
+          </div>
+          <div class="spinner-grow spinner-grow-sm ms-3" role="status" style="background-color:#ff74a2;color:#ff74a2;">
+          </div>
+          <div class="spinner-grow spinner-grow-sm ms-3" role="status" style="background-color:#c878f3;color:#c878f3;">
+          </div>
+          <div class="spinner-grow spinner-grow-sm ms-3" role="status" style="background-color:#a083ff;color:#a083ff;">
+          </div>
+        </div>   
+
+      </div>
+    </form>
+  </div>
+
+</section>

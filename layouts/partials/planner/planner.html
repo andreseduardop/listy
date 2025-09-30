@@ -1,0 +1,48 @@
+<!-- Planner (offcanvas) for footer -->
+<div id="plannerApp" 
+  class="offcanvas offcanvas-bottom" tabindex="-1" aria-labelledby="plannerOffcanvasTopButton">
+  <div id="plannerAppContainer" class="pb-5 {{ partial "container-sizes.html" . -}}">
+
+    <!-- HEADER -->
+    <div class="offcanvas-header flex-column justify-content-center px-0 pt-3 pb-1">
+
+      <div class="position-absolute lh-1 bottom-100 text-center bg-transparent {{ partial "container-sizes.html" . -}}" data-bs-dismiss="offcanvas" data-bs-target="#plannerApp">
+      <!-- Title button -->
+        <button id="plannerOffcanvasTopButton" class="btn btn-primary text-white user-select-none rounded-top-4 rounded-bottom-0 py-2 lh-1" type="button" data-bs-dismiss="offcanvas" data-bs-target="#plannerApp" aria-hidden="true" tabindex="-1">
+          <span class="fw-medium sc-fs-7 text-uppercase">{{ T "my_baby_shower_planner" }}</span>
+        </button>
+
+      <!-- Close button -->
+        <span class="position-absolute top-50 end-0 translate-middle" data-bs-theme="dark">
+          <button class="btn-close" type="button" data-bs-dismiss="offcanvas" data-bs-target="#plannerApp" aria-label='{{ T "close" }}'></button>
+        </span>
+      </div>
+
+      <!-- Define los páneles a presentar y el orden -->
+      {{ $topics := slice "planning" "invitations" "decor" "food" "gifts" "games" }}
+      <!-- Current topic in Front Mater -->
+      {{ $currentTopic := index .Params.topics 0 }}
+      {{ with $currentTopic }}
+      {{ else }}
+        {{ $currentTopic = "planning" }}
+      {{ end }}
+        <menu class="nav nav-pills row row-cols-3 user-select-none small g-2" id="plannerAppTablist" role="tablist">
+          {{ range $index, $topic := $topics }}
+            <li class="col" role="presentation">
+              <button class="nav-link focus-ring focus-ring-light w-100 p-1{{ if eq $currentTopic $topic }} active{{ end }}" id="{{ $topic }}-planner-tab" data-bs-toggle="tab" data-bs-target="#{{ $topic }}-planner-container" type="button" aria-controls="{{ $topic }}-planner-container" aria-selected="{{ if eq $currentTopic . }}true{{ else }}false{{ end }}" role="tab">{{ T $topic }}</button>
+            </li>
+          {{ end }}
+        </menu>
+    </div>
+
+    <!-- BODY -->
+    <div class="offcanvas-body px-0 pt-0 pb-5">
+      <div class="tab-content fs-6 lh-sm my-3 pb-5" id="plannerAppContent">
+        {{ range $index, $topic := $topics }}
+          {{ $partialToRender := print "planner/panes/" $topic "-pane.html" }}
+          <div id="{{ $topic }}-planner-container" class="tab-pane fade{{ if eq $currentTopic $topic }} show active{{ end }}" aria-labelledby="{{ $topic }}-planner-tab" tabindex="0" role="tabpanel">{{ partial $partialToRender $topic }}</div>
+        {{ end }}
+      </div>
+    </div>
+  </div>
+</div>

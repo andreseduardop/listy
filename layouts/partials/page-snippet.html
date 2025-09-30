@@ -1,0 +1,41 @@
+<!-- Get webp images -->
+{{ $thumbnailWebp := .Resources.GetMatch "*thumbnail*.webp" }}
+{{ $thumbnailWebpLink := "" }}
+<!-- Fallback to default images -->
+{{ with $thumbnailWebp }}
+  {{ $thumbnailWebpLink = .RelPermalink }}
+{{ else }}
+  {{ $thumbnailWebpLink = "images/thumbnail-default-v2.en.webp" | relURL }}
+  {{ errorf "Falta thumbnail webp en: %s" .Path }}
+{{ end }}
+<!-- Generating HTML -->
+<div class="card rounded-4" type="button" >
+  <div class="row g-0">
+    <div class="col-3">
+        <img class="rounded-start-4 w-100 h-auto" 
+          src="{{ $thumbnailWebpLink }}" 
+          width="{{ $thumbnailWebp.Width }}" 
+          height="{{ $thumbnailWebp.Height }}"
+          alt='{{ .Title | plainify }}' 
+          >
+    </div>
+    <div class="col-8 d-flex">
+      <div class="card-body my-auto py-0">
+        <a class="stretched-link text-decoration-none text-body fw-medium lh-sm" href="{{ .RelPermalink }}">
+          <p class="card-text d-block d-md-none m-0">{{ .Title | plainify | truncate 60  }}</p>
+          <p class="card-text fs-5 d-none d-md-block m-0">{{ .Title | plainify | truncate 70 }}</p>
+          <!-- <small class="d-none d-md-block text-muted fw-normal">{{ .Param "description" | plainify | truncate 40 "" }}</small> -->
+        </a>
+      </div>
+    </div>
+    <div class="col-1">
+      <div class="card-footer border-0 rounded-end-4 h-100 d-flex justify-content-center align-items-center p-2">
+        <div class="text-dark my-auto">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-chevron-compact-right" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M6.776 1.553a.5.5 0 0 1 .671.223l3 6a.5.5 0 0 1 0 .448l-3 6a.5.5 0 1 1-.894-.448L9.44 8 6.553 2.224a.5.5 0 0 1 .223-.671z"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

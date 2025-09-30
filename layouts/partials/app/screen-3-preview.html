@@ -1,0 +1,53 @@
+<!-- Screen Preview -->
+<section id="screenPreview"
+  class="container py-3 my-5 fade d-none">
+  <!-- Encabezado -->
+  <h2 
+    class="h6 fw-medium text-uppercase text-center bg-white border-bottom fixed-top user-select-none py-3">
+    {{ T "preview" }}
+  </h2> 
+  <!-- Card preview-->
+  <div id="cardPreview"
+    class="card col-10 col-sm-8 col-md-5 col-xl-4 border-0 mx-auto"
+    style='background-color:#ccc; color:#111'>
+
+    <!-- Card Header: Title -->
+    <div id="cardHeader" 
+      class="card-header text-center border-0 py-3 pb-1">
+      <h3 id="cardTitle" class="fs-4 fw-semibold sc-font-alternative mb-0">
+        {{ T "join_us_for_a_baby_shower" }}</h3>
+    </div>
+
+    <!-- Card Body: Image -->
+    <div id="cardBody"
+      class="card-body border-0 p-0">
+      <!-- Card image -->
+      {{- $imageSrc := .Resources.GetMatch "creating_card.svg" }}
+      <img 
+        id = "cardImageSrc"
+        src = "{{ $imageSrc.RelPermalink }}"
+        alt = '{{ T "invitation_card" }}'
+        width = "1080"
+        height = "1080">
+    </div>
+
+    <!-- Card Footer: Event details -->
+    <div id="cardFooter" 
+      class="card-footer text-center border-0 pt-2 pb-5">
+      <h2 class="card-title">
+        {{ T "see_you_there" }} <span class="fs-4">👶 💝</span>
+      </h2>
+      <p class="card-text">
+        {{ T "lets_create_wonderful_memories" }}.
+      </p>
+    </div>
+  </div>
+
+  <div class="col-10 col-sm-8 col-md-5 col-xl-4 border-0 mx-auto">
+    <div class="form-check form-switch my-4">
+      <input class="form-check-input" type="checkbox" role="switch" id="showConfettiCheckbox" checked>
+      <label class="form-check-label" for="showConfettiCheckbox">{{ T "show_confetti" }}.</label>
+    </div>
+  </div>
+
+</section>
