@@ -26,14 +26,6 @@ disableKinds:
 - taxonomy
 - term
 
-languages:
-  en:
-    weight: 1
-    languageName: English
-  es:
-    weight: 2
-    languageName: Español
-
 params:
   description: '"Planea actividades con listas de tareas."'
   footer: '&copy; 2025 All Rights Reserved, Listy App&#8482;'

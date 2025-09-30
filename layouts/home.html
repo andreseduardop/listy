@@ -1,17 +1,46 @@
 {{ define "main" }}
-<main class="bg-white overflow-hidden min-vh-100">
-<button class="btn btn-primary d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasResponsive" aria-controls="offcanvasResponsive">Toggle offcanvas</button>
-
-<div class="alert alert-info d-none d-lg-block">Resize your browser to show the responsive offcanvas toggle.</div>
-
-<div class="offcanvas-md offcanvas-start" tabindex="-1" id="offcanvasResponsive" aria-labelledby="offcanvasResponsiveLabel">
-  <div class="offcanvas-header">
-    <h5 class="offcanvas-title" id="offcanvasResponsiveLabel">Responsive offcanvas</h5>
-    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#offcanvasResponsive" aria-label="Close"></button>
-  </div>
-  <div class="offcanvas-body">
-    <p class="mb-0">This is content within an <code>.offcanvas-lg</code>.</p>
-  </div>
+<header class="bg-white border-bottom sticky-top">
+  <nav id="headerContainer" class="mx-auto">
+    <div class="navbar p-0">
+      <a class="btn d-block d-md-none" role="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu" aria-controls="sideMenu" aria-label="Side menu button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-menu-up" viewBox="0 0 16 16">
+          <path d="M7.646 15.854a.5.5 0 0 0 .708 0L10.207 14H14a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3.793zM1 9V6h14v3zm14 1v2a1 1 0 0 1-1 1h-3.793a1 1 0 0 0-.707.293l-1.5 1.5-1.5-1.5A1 1 0 0 0 5.793 13H2a1 1 0 0 1-1-1v-2zm0-5H1V3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1zM2 11.5a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 0-1h-8a.5.5 0 0 0-.5.5m0-4a.5.5 0 0 0 .5.5h11a.5.5 0 0 0 0-1h-11a.5.5 0 0 0-.5.5m0-4a.5.5 0 0 0 .5.5h6a.5.5 0 0 0 0-1h-6a.5.5 0 0 0-.5.5"/>
+        </svg>
+      </a>
+      <span class="fw-semibold my-md-1 ms-md-3 me-auto">LISTY • APP</span>
+    </div>
+  </nav>
+</header>
+<div class="row">
+  <aside class="offcanvas-md offcanvas-start col-3 m-0" tabindex="-1" id="sideMenu" aria-label="Menu">
+    <div class="offcanvas-header ms-auto p-0">
+      <a class="btn d-block" role="button" data-bs-dismiss="offcanvas" data-bs-target="#sideMenu" aria-label="Close">
+        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-arrow-bar-left" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M12.5 15a.5.5 0 0 1-.5-.5v-13a.5.5 0 0 1 1 0v13a.5.5 0 0 1-.5.5M10 8a.5.5 0 0 1-.5.5H3.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L3.707 7.5H9.5a.5.5 0 0 1 .5.5"/>
+        </svg>
+      </a>
+    </div>
+    <div class="offcanvas-body pt-0">
+      <menu class="list-group list-group-flush col-12 mt-0">
+        <li class="list-group-item list-group-item-action border border-0">
+          <a href="/#lista-1" class="text-decoration-none text-body fw-normal">
+            <span>Lista 1</span>
+          </a>
+        </li>
+        <li class="list-group-item list-group-item-action border border-0">
+          <a href="/#lista-2" class="text-decoration-none text-body fw-normal">
+            <span>Lista 2</span>
+          </a>
+        </li>
+        <li class="list-group-item list-group-item-action border border-0">
+          <a href="/#lista-3" class="text-decoration-none text-body fw-normal">
+            <span>Lista n</span>
+          </a>
+        </li>
+      </menu>
+    </div>
+  </aside>
+<div class="col m-3">
+  {{ .Content }}
 </div>
-</main>
+</div>
 {{ end }}
