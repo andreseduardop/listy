@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Home on LISTY • APP</title>
+    <title>LISTY • APP</title>
     <link>http://localhost:30004/</link>
-    <description>Recent content in Home on LISTY • APP</description>
+    <description>Recent content on LISTY • APP</description>
     <generator>Hugo</generator>
     <language>en</language>
     <lastBuildDate>Tue, 30 Sep 2025 01:32:34 -0500</lastBuildDate>

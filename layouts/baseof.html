@@ -2,15 +2,11 @@
 <html lang="{{ site.Language.LanguageCode }}" dir="{{ or site.Language.LanguageDirection `ltr` }}">
 <head>
     {{- partial "head.html" . -}}
-  </head>
+</head>
 
-  <body onclick>
-
-    {{- partial "scripts-main.html" . -}}
-    {{- partial "css-load-error.html" . -}}
-    <main class="bg-white overflow-hidden min-vh-100">
-      {{ block "main" . }}
-      {{ end }}
-    </main>
-  </body>
+<body class="bg-white" onclick>
+  {{- partial "scripts-main.html" . -}}
+  {{- partial "css-load-error.html" . -}}
+  {{ block "main" . }}{{ end }}
+</body>
 </html>

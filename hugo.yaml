@@ -10,18 +10,6 @@ removePathAccents: true
 pluralizeListTitles: false
 summaryLength: 35
 
-services:
-  googleAnalytics:
-    # id: "G-29T0EDBP67"
-
-taxonomies:
-  topic: topics
-  # tag: tags
-
-permalinks:
-  list: /:slug/
-  topics: /:slug/
-
 disableKinds:
 - taxonomy
 - term
