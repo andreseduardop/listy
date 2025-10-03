@@ -1,5 +1,5 @@
 {{ define "main" }}
-<main class="container p-0">
+<div class="container p-0">
   <div class="row g-0 overflow-y-hidden mx-0 vh-100">
     <nav class="offcanvas-md offcanvas-start border-end col-3 col-xxl-2 m-0 h-100" data-bs-scroll="true" data-bs-backdrop="true" tabindex="-1" id="sideMenu" aria-label="Side Menu">
       <div class="offcanvas-header p-1">
@@ -46,8 +46,8 @@
         </menu>
       </div>
     </nav>
-    <div class="col mb-3 p-0">
-      <header class="bg-white border-bottom user-select-none sticky-top">
+    <main class="col mb-3 p-0">
+      <header class="bg-secondary border-bottom user-select-none sticky-top">
         <div class="navbar py-1">
           <a class="btn d-block d-md-none ms-2" role="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu" aria-controls="sideMenu" aria-label="Side menu button">
             <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-layout-sidebar" viewBox="0 0 16 16">
@@ -58,13 +58,12 @@
           <h1 class="fw-semibold fs-6 my-0 my-md-1 ms-md-3 me-auto">LISTY • APP</h1>
         </div>
       </header>
-      <div class="">
-        <div class="overflow-y-auto p-3 pb-5 vh-100">
-          {{ .Content }}
-        </div>
-      </div>
-    </div>
+      <section class="overflow-y-auto p-3 pb-5 vh-100">
+        {{ partial "app/checklist" . }}
+        {{ .Content }}
+      </section>
+    </main>
   </div>
-</main>
+</div>
 {{ end }}
 

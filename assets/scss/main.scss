@@ -4,8 +4,8 @@
 
 // 2. Include an variable overrides here
 
-$body-color:      #252121;
-// $font-size-root:  20px;
+// $body-color:      #5054ef;
+$font-size-root:    16px;
 // $font-size-base:  1rem;
 // $h1-font-size:  $font-size-base * 2.5;
 // $h2-font-size:  $font-size-base * 2;
@@ -13,7 +13,7 @@ $body-color:      #252121;
 // $h4-font-size:  $font-size-base * 1.5;
 // $h5-font-size:  $font-size-base * 1.25;
 // $h6-font-size:  $font-size-base;
-$font-family-sans-serif:  "-apple-system", BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+$font-family-sans-serif:  "Geist Mono", Roboto, Helvetica, Arial, sans-serif;
 // $headings-font-family:    "Yanone Kaffeesatz",  system-ui, sans-serif;
 
 
@@ -34,7 +34,7 @@ $font-family-sans-serif:  "-apple-system", BlinkMacSystemFont, "Segoe UI", Robot
 
 
 // Colors:
-$white:    #fff;
+$white:    #faf7f2;
 $gray-100: #f8f9fa;
 $gray-200: #e9ecef;
 $gray-300: #dee2e6;
@@ -69,12 +69,7 @@ $yellow:  #ffc107;
 $green:   #198754;
 $teal:    #20c997;
 $cyan:    #0dcaf0;
-// Trainers colors
-$turquesa-old:    #3fd4cf;  // Turquesa Trainers anterior (opaco)
-// El turquesa anterior se reemplaza por uno más brillante para la web
-$turquesa-old-2:  #45ded9;  // Turquesa Trainers
-// Se reemplaza con un turquesa más azulado, que aumenta el contraste
-$lavanda:         #af8dd2;  // Lavanda Trainers
+
 // El lavanda se reemplaza con uno más saturado
 $turquesa-claro:  #cdf4f2;  // Turquesa Trainers claro
 $turquesa-oscuro: #37a19e;  // Turquesa Trainers oscuro
@@ -93,9 +88,19 @@ $shower4:         #FFFBD6;  // Amarillo claro
 $shower5:         #D6FFFD;  // Turquesa claro
 $shower6:         #D2F2FF;  // Azul claro
 
+// Listy
+$listy-blue-1:    #3e43f0;  // Azul Listy
+$listy-blue-2:    #2a30df;  // Azul Listy
+$listy-blue-3:    #1b1e8c;  // Azul Listy
+$listy-blue-4:    #3d3daf;  // Azul Listy
+$listy-blue-5:    #2e32b0;  // Azul Listy
+$listy-blue-6:    #3432b3;  // Azul Listy
+$listy-ivory:     #f6efe4;  // Marfil listy
+
 // Theme colors:
-$primary:       $purple-shower;
-$secondary:     $yellow-shower;
+$body-color:    $listy-blue-6;
+$primary:       $listy-blue-1;
+$secondary:     $listy-ivory;
 $tertiary:      $turquesa-shower;  // Required
 $success:       $green;     // Required
 // $info:          $cyan;
@@ -212,13 +217,21 @@ $theme-colors: map-remove($theme-colors, "info", "warning");
 
 
 /* Fonts */
+/* geist-mono-regular - latin */
 @font-face {
-  font-family: 'Quicksand';
+  font-family: 'Geist Mono';
   font-style: normal;
-  font-weight: 700;
+  font-weight: 400;
   font-display: swap;
-  src: url('../fonts/quicksand-v1-latin-semibold.woff2') format('woff2'); /* Chrome 26+, Opera 23+, Firefox 39+ */
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  src: url('../fonts/geist-mono-v4-latin-regular.woff2') format('woff2'); 
+}
+/* geist-mono-600 - latin */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../fonts/geist-mono-v4-latin-600.woff2') format('woff2');
 }
 
 // Configuraciones generales
@@ -242,6 +255,7 @@ main {
 // Scroll hasta encabezados
 h1, h2, h3, h4, h5, h6 {
   scroll-margin-top: 2.5em;
+  font-weight: 600;
 }
 h1 {
   font-size: 2rem;
@@ -255,7 +269,7 @@ body a {
 
 // FONTS
 .sc-font-alternative {
-  font-family: 'Quicksand', "Arial", "Helvetica", sans-serif;
+  font-family: "Arial", "Helvetica", sans-serif;
 }
 
 // CHECKBOX

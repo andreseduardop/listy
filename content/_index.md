@@ -6,8 +6,7 @@ description: "Listy app"
 ---
 
 
-## Contenido del home en markdonwn _index.en.md
-
+## Contenido del home en markdonwn
 
 A checklist is a type of job aid used in repetitive tasks to reduce failure by compensating for potential limits of human memory and attention. Checklists are used both to ensure that safety-critical system preparations are carried out completely and in the correct order,[1] and in less critical applications to ensure that no step is left out of a procedure. They help to ensure consistency and completeness in carrying out a task. A basic example is the "to do list".[2] A more advanced checklist would be a schedule, which lays out tasks to be done according to time of day or other factors, or a pre-flight checklist for an airliner, which should ensure a safe take-off.[3]
 
