@@ -95,12 +95,13 @@ $listy-blue-3:    #1b1e8c;  // Azul Listy
 $listy-blue-4:    #3d3daf;  // Azul Listy
 $listy-blue-5:    #2e32b0;  // Azul Listy
 $listy-blue-6:    #3432b3;  // Azul Listy
-$listy-ivory:     #f6efe4;  // Marfil listy
+$listy-linen:     #f4ebdd;  // Marfil listy
+$listy-linen-2:   #F9F3EB;  // Marfil listy
 
 // Theme colors:
 $body-color:    $listy-blue-6;
 $primary:       $listy-blue-1;
-$secondary:     $listy-ivory;
+$secondary:     $listy-linen;
 $tertiary:      $turquesa-shower;  // Required
 $success:       $green;     // Required
 // $info:          $cyan;
@@ -371,15 +372,14 @@ svg.bi {
   opacity: 0.5;
   background-color: #000;
 }
-// Planner App (offcanvas in footer)
-#plannerApp {
+// Checklists
+#checklist {
   background-color: transparent;
   border: 0;
   border-radius: 0px;
-  height: 80vh !important;
   transition-duration: .8s;
 }
-#plannerApp>div {
+#checklist>div {
   background-color: white;
   border-top-left-radius: 16px;
   border-top-right-radius: 16px;
@@ -387,48 +387,51 @@ svg.bi {
   max-width: 100%;
   overflow: hidden;
 }
-#plannerApp .offcanvas-body {
+#checklist .offcanvas-body {
   height: 100% !important;
   max-width: 100%;
   overflow-x: hidden;
 }
-#plannerApp button.nav-link {
+#checklist button.nav-link {
   font-weight: 600;
 }
-#plannerApp button.nav-link:not(.active) {
-  background-color: $gray-200;
-}
-#plannerApp button.nav-link:not(.active):hover {
-  background-color: $gray-400;
-}
 // Checkbox for To-Do Lists
-#plannerApp input[type="checkbox"] {
+#checklist input[type="checkbox"] {
   background-color: transparent;
+  margin-left: -1.75em;
   cursor: pointer;
   border-radius: 50%;
   bottom: .1em;
   height: 1.2em;
   width: 1.2em;
   position: relative;
-  border: 2px solid #495057;
+  border: 1px solid $listy-blue-5;
 }
-#plannerApp input[type="checkbox"]:focus {
+#checklist input[type="checkbox"]:focus {
   border-color: none;
   outline: 0;
   box-shadow: none;  
 }
-#plannerApp input[type="checkbox"]:checked {
+/* Fondo gris cuando el mouse pase por encima */
+#checklist li:hover {
+  background-color: $listy-linen-2;
+}
+#checklist input[type="checkbox"]:checked {
   color: white;
-  background-color: $gray-500;
-  border-color: $gray-500;  
+  background-color: $listy-blue-5;
+  // border-color: $gray-500;
 }
-#plannerApp input[type="checkbox"] + label {
-  letter-spacing: .00625em;
+#checklist li:has(input[type="checkbox"]:checked) {
+  background-color: $listy-linen;
+}
+// #checklist input[type="checkbox"]:checked + label {
+//   color: $gray-500; 
+//   text-decoration: line-through;
+// }
+#checklist input[type="checkbox"] + label {
+  // letter-spacing: .00625em;
   overflow-wrap: break-word;
-}
-#plannerApp input[type="checkbox"]:checked + label {
-  color: $gray-500; 
-  text-decoration: line-through;
+  cursor: pointer;
 }
 // Planner icon
 svg#plannerChevronUpIcon {
