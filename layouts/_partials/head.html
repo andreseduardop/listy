@@ -53,24 +53,8 @@
 {{ end }}
 <!-- end thumbnail  -->
 
-<!--   INICIO: Styles   -->
-<!-- para producción, cambair "expanded" por "compressed" y enableSourceMap false -->
-{{ $customStyles := resources.Get "scss/main.scss" }}
-{{ $optionsScss := (dict 
-  "transpiler" "dartsass"
-  "targetPath" "css/styles.min.css" 
-  "outputStyle" "compressed" 
-  "enableSourceMap" false) 
-}}
-<!-- Habilita autoprefixer sin map (tamaño reducido) -->
-{{ $optionsPost := (dict 
-  "use" "autoprefixer"
-  "noMap" "true") }}
-<!-- construir CSS main -->
-{{ $styles := $customStyles | css.Sass $optionsScss | css.PostCSS $optionsPost | resources.Fingerprint "sha384" }}
-<!-- Load styles -->
-<link rel="stylesheet" href="{{ $styles.RelPermalink }}" integrity='{{ $styles.Data.Integrity }}' crossorigin="anonymous">
-<!--   END Styles    -->
+<!-- Styles   -->
+{{ partial "head/styles.html" . }}
 
 <!-- Favicons -->
 {{ partial "head/favicons.html" . }}

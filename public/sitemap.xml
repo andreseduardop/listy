@@ -2,10 +2,10 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>http://localhost:30004/app/</loc>
+    <loc>http://localhost:1313/app/</loc>
     <lastmod>2025-09-30T01:32:34-05:00</lastmod>
   </url><url>
-    <loc>http://localhost:30004/</loc>
+    <loc>http://localhost:1313/</loc>
     <lastmod>2025-10-02T23:26:08-05:00</lastmod>
   </url>
 </urlset>

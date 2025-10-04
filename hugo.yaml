@@ -14,6 +14,10 @@ disableKinds:
 - taxonomy
 - term
 
+build:
+  buildStats:
+    enable: true
+
 params:
   description: '"Planea actividades con listas de tareas."'
   footer: '&copy; 2025 All Rights Reserved, Listy App&#8482;'
@@ -24,19 +28,6 @@ params:
   katex: false
   darkThemeAsDefault: false
   headingLinks: false
-  facebook: ''
-  twitter: ''
-  linkedin: ''
-
-related:
-  includeNewer: true
-  toLower: true
-  threshold: 80
-  indices:
-  - name: tags
-    weight: 100
-  - name: date
-    weight: 10
 
 markup:
   goldmark:
@@ -65,6 +56,8 @@ markup:
 
 module:
   mounts:
+  - source: assets
+    target: assets
   - source: content
     target: content
   - source: static
@@ -75,9 +68,9 @@ module:
     target: data
   - source: node_modules
     target: assets
-  - source: assets
-    target: assets
   - source: i18n
     target: i18n
   - source: archetypes
     target: archetypes
+  - source: hugo_stats.json
+    target: assets/watching/hugo_stats.json

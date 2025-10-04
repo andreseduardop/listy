@@ -46,19 +46,6 @@ $gray-800: #343a40;
 $gray-900: #212529;
 $black:    #000;
 
-// $white:    hsl(0, 0%, 100%);
-// $gray-100: hsl(270, 17%, 98%);
-// $gray-200: hsl(270, 16%, 93%);
-// $gray-300: hsl(270, 14%, 89%);
-// $gray-400: hsl(270, 14%, 83%);
-// $gray-500: hsl(270, 11%, 71%);
-// $gray-600: hsl(270,  7%, 46%);
-// $gray-700: hsl(270,  9%, 31%);
-// $gray-800: hsl(270, 10%, 23%);
-// $gray-900: hsl(270, 11%, 15%);
-// $black:    hsl(0, 0%, 0%);
-
-
 $blue:    #0d6efd;
 $indigo:  #6610f2;
 $purple:  #6f42c1;
@@ -148,8 +135,8 @@ $offcanvas-transition-duration:     .5s;
 
 // Modify map color
 $theme-colors: (
-  "secondary":    $secondary,  // Required
-  "primary":  $primary,
+  "primary":    $primary,
+  "secondary":  $secondary,  // Required
   "success":    $success,  // Required
   // "info":       $info,
   // "warning":    $warning,
@@ -179,7 +166,7 @@ $theme-colors: map-remove($theme-colors, "info", "warning");
 @import "../bootstrap/scss/utilities";
 @import "../bootstrap/scss/reboot";
 @import "../bootstrap/scss/type";
-@import "../bootstrap/scss/images";
+// @import "../bootstrap/scss/images";
 @import "../bootstrap/scss/containers";
 @import "../bootstrap/scss/grid";
 @import "../bootstrap/scss/tables";
@@ -190,21 +177,21 @@ $theme-colors: map-remove($theme-colors, "info", "warning");
 @import "../bootstrap/scss/button-group";
 @import "../bootstrap/scss/nav";
 @import "../bootstrap/scss/navbar";
-@import "../bootstrap/scss/card";   // se usa en las /card/ individuales
-@import "../bootstrap/scss/accordion";  // se usa en el ToC y en algunos Tips
+// @import "../bootstrap/scss/card";
+// @import "../bootstrap/scss/accordion";
 // @import "../bootstrap/scss/breadcrumb";
 // @import "../bootstrap/scss/pagination";
 // @import "../bootstrap/scss/badge";
-@import "../bootstrap/scss/alert";  // se usa en baby-card noscript
+// @import "../bootstrap/scss/alert";
 // @import "../bootstrap/scss/progress";
 @import "../bootstrap/scss/list-group";   // se usa en layout List
 @import "../bootstrap/scss/close";  // cierra modales, offcanvas, etc.
 // @import "../bootstrap/scss/toasts";
-@import "../bootstrap/scss/modal";  // ventanas modales, se usa en baby-card
+// @import "../bootstrap/scss/modal";  // ventanas modales, se usa en baby-card
 // @import "../bootstrap/scss/tooltip";
 // @import "../bootstrap/scss/popover";
-@import "../bootstrap/scss/carousel";   // se usa para anuncios
-@import "../bootstrap/scss/spinners";   // se usa en Modal de baby-card. Loading...
+// @import "../bootstrap/scss/carousel";
+// @import "../bootstrap/scss/spinners";
 @import "../bootstrap/scss/offcanvas";  // se usa en ToC
 @import "../bootstrap/scss/helpers";  // se usa para stretched links
 @import "../bootstrap/scss/placeholders";

@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>LISTY • APP</title>
-    <link>http://localhost:30004/</link>
+    <link>http://localhost:1313/</link>
     <description>Recent content on LISTY • APP</description>
     <generator>Hugo</generator>
     <language>en</language>
     <lastBuildDate>Tue, 30 Sep 2025 01:32:34 -0500</lastBuildDate>
-    <atom:link href="http://localhost:30004/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>App</title>
-      <link>http://localhost:30004/app/</link>
+      <link>http://localhost:1313/app/</link>
       <pubDate>Sun, 28 Sep 2025 00:00:00 +0000</pubDate>
-      <guid>http://localhost:30004/app/</guid>
+      <guid>http://localhost:1313/app/</guid>
       <description>&lt;p&gt;Contenido página app&lt;/p&gt;</description>
     </item>
   </channel>
