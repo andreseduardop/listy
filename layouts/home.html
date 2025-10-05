@@ -1,66 +1,83 @@
 {{ define "main" }}
 <div class="container p-0">
   <div class="row g-0 overflow-y-hidden mx-0 vh-100">
-    <nav class="offcanvas-md offcanvas-start border-end col-3 col-xxl-2 m-0 h-100" data-bs-scroll="true" data-bs-backdrop="true" tabindex="-1" id="sideMenu" aria-label="Side Menu">
-      <div class="offcanvas-header p-1">
-        <a class="btn d-block ms-auto px-0" role="button" data-bs-dismiss="offcanvas" data-bs-target="#sideMenu" aria-label="Close">
-          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-arrow-bar-left" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M12.5 15a.5.5 0 0 1-.5-.5v-13a.5.5 0 0 1 1 0v13a.5.5 0 0 1-.5.5M10 8a.5.5 0 0 1-.5.5H3.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L3.707 7.5H9.5a.5.5 0 0 1 .5.5"/>
-          </svg>
-        </a>
-      </div>
-      <div class="offcanvas-body p-0">
-        <menu class="list-group list-group-flush fw-bold col-12 mt-0">
-          <li class="list-group-item list-group-item-action border border-0">
-            <a href="/#lista-1" class="text-decoration-none text-body">
-              <svg  width="16" height="16" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 21">
-                <path d="M16.975 11H10V4.025a1 1 0 0 0-1.066-.998 8.5 8.5 0 1 0 9.039 9.039.999.999 0 0 0-1-1.066h.002Z"/>
-                <path d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z"/>
-              </svg>            
-              <span class="ms-2">Lista 1</span>
-            </a>
-          </li>
-          <li class="list-group-item list-group-item-action border border-0">
-            <a href="/#lista-2" class="text-decoration-none text-body">
-              <svg  width="16" height="16" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 21">
-                <path d="M6.143 0H1.857A1.857 1.857 0 0 0 0 1.857v4.286C0 7.169.831 8 1.857 8h4.286A1.857 1.857 0 0 0 8 6.143V1.857A1.857 1.857 0 0 0 6.143 0Zm10 0h-4.286A1.857 1.857 0 0 0 10 1.857v4.286C10 7.169 10.831 8 11.857 8h4.286A1.857 1.857 0 0 0 18 6.143V1.857A1.857 1.857 0 0 0 16.143 0Zm-10 10H1.857A1.857 1.857 0 0 0 0 11.857v4.286C0 17.169.831 18 1.857 18h4.286A1.857 1.857 0 0 0 8 16.143v-4.286A1.857 1.857 0 0 0 6.143 10Zm10 0h-4.286A1.857 1.857 0 0 0 10 11.857v4.286c0 1.026.831 1.857 1.857 1.857h4.286A1.857 1.857 0 0 0 18 16.143v-4.286A1.857 1.857 0 0 0 16.143 10Z"/>
-              </svg>            
-              <span class="ms-2">Lista 2</span>
-            </a>
-          </li>
-          <li class="list-group-item list-group-item-action border border-0">
-            <a href="/#lista-3" class="text-decoration-none text-body">
-              <svg  width="16" height="16" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 21">
-                <path d="M14 2a3.963 3.963 0 0 0-1.4.267 6.439 6.439 0 0 1-1.331 6.638A4 4 0 1 0 14 2Zm1 9h-1.264A6.957 6.957 0 0 1 15 15v2a2.97 2.97 0 0 1-.184 1H19a1 1 0 0 0 1-1v-1a5.006 5.006 0 0 0-5-5ZM6.5 9a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM8 10H5a5.006 5.006 0 0 0-5 5v2a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-2a5.006 5.006 0 0 0-5-5Z"/>
-              </svg>            
-              <span class="ms-2">Lista 3</span>
-            </a>
-          </li>
-          <li class="list-group-item list-group-item-action border border-0">
-            <a href="/#lista-4" class="text-decoration-none text-body">
-              <svg  width="16" height="16" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 21">
-                <path d="M17 5.923A1 1 0 0 0 16 5h-3V4a4 4 0 1 0-8 0v1H2a1 1 0 0 0-1 .923L.086 17.846A2 2 0 0 0 2.08 20h13.84a2 2 0 0 0 1.994-2.153L17 5.923ZM7 9a1 1 0 0 1-2 0V7h2v2Zm0-5a2 2 0 1 1 4 0v1H7V4Zm6 5a1 1 0 1 1-2 0V7h2v2Z"/>
-              </svg>            
-              <span class="ms-2">Lista 4</span>
-            </a>
-          </li>
-        </menu>
+    <nav class="offcanvas-md offcanvas-start col-5 col-lg-4 col-xxl-3 m-0 h-100" data-bs-scroll="true" data-bs-backdrop="true" tabindex="-1" id="sideMenu" aria-label="Side Menu">
+      <div class="app-sidebar app-scroll-enable app-card m-3">
+        <div class="offcanvas-header p-1">
+          <a class="btn d-block ms-auto px-0" role="button" data-bs-dismiss="offcanvas" data-bs-target="#sideMenu" aria-label="Close">
+            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentcolor" class="bi bi-arrow-bar-left" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M12.5 15a.5.5 0 0 1-.5-.5v-13a.5.5 0 0 1 1 0v13a.5.5 0 0 1-.5.5M10 8a.5.5 0 0 1-.5.5H3.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L3.707 7.5H9.5a.5.5 0 0 1 .5.5"/>
+            </svg>
+          </a>
+        </div>
+        <div class="offcanvas-body p-1">
+          <menu class="list-group list-group-flush fw-bold col-12 mt-0">
+            <li class="list-group-item list-group-item-action border border-0">
+              <a href="/#lista-1" class="text-decoration-none text-body">
+                <svg  width="16" height="16" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentcolor" viewBox="0 0 22 21">
+                  <path d="M16.975 11H10V4.025a1 1 0 0 0-1.066-.998 8.5 8.5 0 1 0 9.039 9.039.999.999 0 0 0-1-1.066h.002Z"/>
+                  <path d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z"/>
+                </svg>            
+                <span class="ms-2">Lista 1</span>
+              </a>
+            </li>
+            <li class="list-group-item list-group-item-action border border-0">
+              <a href="/#lista-2" class="text-decoration-none text-body">
+                <svg  width="16" height="16" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentcolor" viewBox="0 0 22 21">
+                  <path d="M6.143 0H1.857A1.857 1.857 0 0 0 0 1.857v4.286C0 7.169.831 8 1.857 8h4.286A1.857 1.857 0 0 0 8 6.143V1.857A1.857 1.857 0 0 0 6.143 0Zm10 0h-4.286A1.857 1.857 0 0 0 10 1.857v4.286C10 7.169 10.831 8 11.857 8h4.286A1.857 1.857 0 0 0 18 6.143V1.857A1.857 1.857 0 0 0 16.143 0Zm-10 10H1.857A1.857 1.857 0 0 0 0 11.857v4.286C0 17.169.831 18 1.857 18h4.286A1.857 1.857 0 0 0 8 16.143v-4.286A1.857 1.857 0 0 0 6.143 10Zm10 0h-4.286A1.857 1.857 0 0 0 10 11.857v4.286c0 1.026.831 1.857 1.857 1.857h4.286A1.857 1.857 0 0 0 18 16.143v-4.286A1.857 1.857 0 0 0 16.143 10Z"/>
+                </svg>            
+                <span class="ms-2">Lista 2</span>
+              </a>
+            </li>
+            <li class="list-group-item list-group-item-action border border-0">
+              <a href="/#lista-3" class="text-decoration-none text-body">
+                <svg  width="16" height="16" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentcolor" viewBox="0 0 22 21">
+                  <path d="M14 2a3.963 3.963 0 0 0-1.4.267 6.439 6.439 0 0 1-1.331 6.638A4 4 0 1 0 14 2Zm1 9h-1.264A6.957 6.957 0 0 1 15 15v2a2.97 2.97 0 0 1-.184 1H19a1 1 0 0 0 1-1v-1a5.006 5.006 0 0 0-5-5ZM6.5 9a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM8 10H5a5.006 5.006 0 0 0-5 5v2a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-2a5.006 5.006 0 0 0-5-5Z"/>
+                </svg>            
+                <span class="ms-2">Lista 3</span>
+              </a>
+            </li>
+            <li class="list-group-item list-group-item-action border border-0">
+              <a href="/#lista-4" class="text-decoration-none text-body">
+                <svg  width="16" height="16" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentcolor" viewBox="0 0 22 21">
+                  <path d="M17 5.923A1 1 0 0 0 16 5h-3V4a4 4 0 1 0-8 0v1H2a1 1 0 0 0-1 .923L.086 17.846A2 2 0 0 0 2.08 20h13.84a2 2 0 0 0 1.994-2.153L17 5.923ZM7 9a1 1 0 0 1-2 0V7h2v2Zm0-5a2 2 0 1 1 4 0v1H7V4Zm6 5a1 1 0 1 1-2 0V7h2v2Z"/>
+                </svg>            
+                <span class="ms-2">Lista 4</span>
+              </a>
+            </li>
+          </menu>
+        </div>
       </div>
     </nav>
     <main class="col mb-3 p-0">
-      <header class="bg-secondary border-bottom user-select-none sticky-top">
-        <div class="navbar py-1">
-          <a class="btn d-block d-md-none ms-2" role="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu" aria-controls="sideMenu" aria-label="Side menu button">
-            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-layout-sidebar" viewBox="0 0 16 16">
-              <path d="M12.5 3a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1zm0 3a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1zm.5 3.5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h5a.5.5 0 0 0 .5-.5m-.5 2.5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1z"/>
-              <path d="M16 2a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2zM4 1v14H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zm1 0h9a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H5z"/>
-            </svg>
-          </a>
-          <h1 class="fw-semibold fs-6 my-0 my-md-1 ms-md-3 me-auto">LISTY • APP</h1>
+      <header class="user-select-none sticky-top p-3 pe-lg-0">
+        <div class="app-card col p-3 py-1">
+          <div class="navbar">
+            <a class="btn d-block d-md-none ps-0" role="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu" aria-controls="sideMenu" aria-label="Side menu button">
+              <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentcolor" class="bi bi-layout-sidebar" viewBox="0 0 16 16">
+                <path d="M12.5 3a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1zm0 3a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1zm.5 3.5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h5a.5.5 0 0 0 .5-.5m-.5 2.5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1z"/>
+                <path d="M16 2a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2zM4 1v14H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zm1 0h9a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H5z"/>
+              </svg>
+            </a>
+            <h1 class="fw-semibold fs-6 my-0 my-lg-1 ms-auto">DYNAMIC PLANNER</h1>
+          </div>
         </div>
       </header>
-      <section class="overflow-y-auto p-3 pb-5 vh-100">
-        {{ partial "app/checklist" . }}
-        {{ .Content }}
+      <section class="app-scroll-enable overflow-y-auto p-3 vh-100">
+        <div class="row row-cols-1 row-cols-lg-2 g-4 mb-5">
+          <div class="col">
+            {{ partial "app/checklist" . }}
+          </div>
+          <div class="col">
+            {{ partial "app/form" . }}
+          </div>
+          <div class="col">
+            <div class="app-card col p-3 h-100">
+              {{ .Content }}
+            </div>
+          </div>
+        </div>
+        <div class="row my-5 py-5"><br>
+        </div>
       </section>
     </main>
   </div>

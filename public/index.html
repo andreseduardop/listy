@@ -57,6 +57,10 @@
 <link rel="canonical" href="http://localhost:1313/">
 
 
+<link rel="preload" href='http://localhost:1313/fonts/geist-mono-v4-latin-regular.woff2' as="font" type="font/woff2" crossorigin>
+<link rel="preload" href='http://localhost:1313/fonts/geist-mono-v4-latin-600.woff2' as="font" type="font/woff2" crossorigin>
+
+
 
   <link rel="alternate" hreflang="en" href="http://localhost:1313/" />
 
@@ -79,7 +83,9 @@
 
 
   
-    <link rel="stylesheet" href="/css/main.css">
+    
+      <link rel="stylesheet" href="/css/main.min.08044662872214c2ea60a7036df795981b0bf998de5fba9bf69854188e08ba9a.css" integrity="sha256-CARGYociFMLqYKcDbfeVmBsL+ZjeX7qb9phUGI4Iupo=" crossorigin="anonymous">
+    
   
 
 
@@ -120,7 +126,7 @@
 
 </head>
 
-<body class="bg-white" onclick>
+<body onclick>
 
 
 <script src='/bootstrap/dist/js/bootstrap.min.1bf115fb88f674dbfeb443e8dfefba2c281d09139a7a306a7d478d8ee2808ae5db8ebc6295c09d0f3e990157c759ed58.js' integrity='sha384-G/EV&#43;4j2dNv&#43;tEPo3&#43;&#43;6LCgdCROaejBqfUeNjuKAiuXbjrxilcCdDz6ZAVfHWe1Y' defer></script>
@@ -144,146 +150,165 @@
 
 <div class="container p-0">
   <div class="row g-0 overflow-y-hidden mx-0 vh-100">
-    <nav class="offcanvas-md offcanvas-start border-end col-3 col-xxl-2 m-0 h-100" data-bs-scroll="true" data-bs-backdrop="true" tabindex="-1" id="sideMenu" aria-label="Side Menu">
-      <div class="offcanvas-header p-1">
-        <a class="btn d-block ms-auto px-0" role="button" data-bs-dismiss="offcanvas" data-bs-target="#sideMenu" aria-label="Close">
-          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-arrow-bar-left" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M12.5 15a.5.5 0 0 1-.5-.5v-13a.5.5 0 0 1 1 0v13a.5.5 0 0 1-.5.5M10 8a.5.5 0 0 1-.5.5H3.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L3.707 7.5H9.5a.5.5 0 0 1 .5.5"/>
-          </svg>
-        </a>
-      </div>
-      <div class="offcanvas-body p-0">
-        <menu class="list-group list-group-flush fw-bold col-12 mt-0">
-          <li class="list-group-item list-group-item-action border border-0">
-            <a href="/#lista-1" class="text-decoration-none text-body">
-              <svg  width="16" height="16" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 21">
-                <path d="M16.975 11H10V4.025a1 1 0 0 0-1.066-.998 8.5 8.5 0 1 0 9.039 9.039.999.999 0 0 0-1-1.066h.002Z"/>
-                <path d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z"/>
-              </svg>            
-              <span class="ms-2">Lista 1</span>
-            </a>
-          </li>
-          <li class="list-group-item list-group-item-action border border-0">
-            <a href="/#lista-2" class="text-decoration-none text-body">
-              <svg  width="16" height="16" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 21">
-                <path d="M6.143 0H1.857A1.857 1.857 0 0 0 0 1.857v4.286C0 7.169.831 8 1.857 8h4.286A1.857 1.857 0 0 0 8 6.143V1.857A1.857 1.857 0 0 0 6.143 0Zm10 0h-4.286A1.857 1.857 0 0 0 10 1.857v4.286C10 7.169 10.831 8 11.857 8h4.286A1.857 1.857 0 0 0 18 6.143V1.857A1.857 1.857 0 0 0 16.143 0Zm-10 10H1.857A1.857 1.857 0 0 0 0 11.857v4.286C0 17.169.831 18 1.857 18h4.286A1.857 1.857 0 0 0 8 16.143v-4.286A1.857 1.857 0 0 0 6.143 10Zm10 0h-4.286A1.857 1.857 0 0 0 10 11.857v4.286c0 1.026.831 1.857 1.857 1.857h4.286A1.857 1.857 0 0 0 18 16.143v-4.286A1.857 1.857 0 0 0 16.143 10Z"/>
-              </svg>            
-              <span class="ms-2">Lista 2</span>
-            </a>
-          </li>
-          <li class="list-group-item list-group-item-action border border-0">
-            <a href="/#lista-3" class="text-decoration-none text-body">
-              <svg  width="16" height="16" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 21">
-                <path d="M14 2a3.963 3.963 0 0 0-1.4.267 6.439 6.439 0 0 1-1.331 6.638A4 4 0 1 0 14 2Zm1 9h-1.264A6.957 6.957 0 0 1 15 15v2a2.97 2.97 0 0 1-.184 1H19a1 1 0 0 0 1-1v-1a5.006 5.006 0 0 0-5-5ZM6.5 9a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM8 10H5a5.006 5.006 0 0 0-5 5v2a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-2a5.006 5.006 0 0 0-5-5Z"/>
-              </svg>            
-              <span class="ms-2">Lista 3</span>
-            </a>
-          </li>
-          <li class="list-group-item list-group-item-action border border-0">
-            <a href="/#lista-4" class="text-decoration-none text-body">
-              <svg  width="16" height="16" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 21">
-                <path d="M17 5.923A1 1 0 0 0 16 5h-3V4a4 4 0 1 0-8 0v1H2a1 1 0 0 0-1 .923L.086 17.846A2 2 0 0 0 2.08 20h13.84a2 2 0 0 0 1.994-2.153L17 5.923ZM7 9a1 1 0 0 1-2 0V7h2v2Zm0-5a2 2 0 1 1 4 0v1H7V4Zm6 5a1 1 0 1 1-2 0V7h2v2Z"/>
-              </svg>            
-              <span class="ms-2">Lista 4</span>
-            </a>
-          </li>
-        </menu>
+    <nav class="offcanvas-md offcanvas-start col-5 col-lg-4 col-xxl-3 m-0 h-100" data-bs-scroll="true" data-bs-backdrop="true" tabindex="-1" id="sideMenu" aria-label="Side Menu">
+      <div class="app-sidebar app-scroll-enable app-card m-3">
+        <div class="offcanvas-header p-1">
+          <a class="btn d-block ms-auto px-0" role="button" data-bs-dismiss="offcanvas" data-bs-target="#sideMenu" aria-label="Close">
+            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentcolor" class="bi bi-arrow-bar-left" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M12.5 15a.5.5 0 0 1-.5-.5v-13a.5.5 0 0 1 1 0v13a.5.5 0 0 1-.5.5M10 8a.5.5 0 0 1-.5.5H3.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L3.707 7.5H9.5a.5.5 0 0 1 .5.5"/>
+            </svg>
+          </a>
+        </div>
+        <div class="offcanvas-body p-1">
+          <menu class="list-group list-group-flush fw-bold col-12 mt-0">
+            <li class="list-group-item list-group-item-action border border-0">
+              <a href="/#lista-1" class="text-decoration-none text-body">
+                <svg  width="16" height="16" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentcolor" viewBox="0 0 22 21">
+                  <path d="M16.975 11H10V4.025a1 1 0 0 0-1.066-.998 8.5 8.5 0 1 0 9.039 9.039.999.999 0 0 0-1-1.066h.002Z"/>
+                  <path d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z"/>
+                </svg>            
+                <span class="ms-2">Lista 1</span>
+              </a>
+            </li>
+            <li class="list-group-item list-group-item-action border border-0">
+              <a href="/#lista-2" class="text-decoration-none text-body">
+                <svg  width="16" height="16" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentcolor" viewBox="0 0 22 21">
+                  <path d="M6.143 0H1.857A1.857 1.857 0 0 0 0 1.857v4.286C0 7.169.831 8 1.857 8h4.286A1.857 1.857 0 0 0 8 6.143V1.857A1.857 1.857 0 0 0 6.143 0Zm10 0h-4.286A1.857 1.857 0 0 0 10 1.857v4.286C10 7.169 10.831 8 11.857 8h4.286A1.857 1.857 0 0 0 18 6.143V1.857A1.857 1.857 0 0 0 16.143 0Zm-10 10H1.857A1.857 1.857 0 0 0 0 11.857v4.286C0 17.169.831 18 1.857 18h4.286A1.857 1.857 0 0 0 8 16.143v-4.286A1.857 1.857 0 0 0 6.143 10Zm10 0h-4.286A1.857 1.857 0 0 0 10 11.857v4.286c0 1.026.831 1.857 1.857 1.857h4.286A1.857 1.857 0 0 0 18 16.143v-4.286A1.857 1.857 0 0 0 16.143 10Z"/>
+                </svg>            
+                <span class="ms-2">Lista 2</span>
+              </a>
+            </li>
+            <li class="list-group-item list-group-item-action border border-0">
+              <a href="/#lista-3" class="text-decoration-none text-body">
+                <svg  width="16" height="16" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentcolor" viewBox="0 0 22 21">
+                  <path d="M14 2a3.963 3.963 0 0 0-1.4.267 6.439 6.439 0 0 1-1.331 6.638A4 4 0 1 0 14 2Zm1 9h-1.264A6.957 6.957 0 0 1 15 15v2a2.97 2.97 0 0 1-.184 1H19a1 1 0 0 0 1-1v-1a5.006 5.006 0 0 0-5-5ZM6.5 9a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM8 10H5a5.006 5.006 0 0 0-5 5v2a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-2a5.006 5.006 0 0 0-5-5Z"/>
+                </svg>            
+                <span class="ms-2">Lista 3</span>
+              </a>
+            </li>
+            <li class="list-group-item list-group-item-action border border-0">
+              <a href="/#lista-4" class="text-decoration-none text-body">
+                <svg  width="16" height="16" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentcolor" viewBox="0 0 22 21">
+                  <path d="M17 5.923A1 1 0 0 0 16 5h-3V4a4 4 0 1 0-8 0v1H2a1 1 0 0 0-1 .923L.086 17.846A2 2 0 0 0 2.08 20h13.84a2 2 0 0 0 1.994-2.153L17 5.923ZM7 9a1 1 0 0 1-2 0V7h2v2Zm0-5a2 2 0 1 1 4 0v1H7V4Zm6 5a1 1 0 1 1-2 0V7h2v2Z"/>
+                </svg>            
+                <span class="ms-2">Lista 4</span>
+              </a>
+            </li>
+          </menu>
+        </div>
       </div>
     </nav>
     <main class="col mb-3 p-0">
-      <header class="bg-secondary border-bottom user-select-none sticky-top">
-        <div class="navbar py-1">
-          <a class="btn d-block d-md-none ms-2" role="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu" aria-controls="sideMenu" aria-label="Side menu button">
-            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-layout-sidebar" viewBox="0 0 16 16">
-              <path d="M12.5 3a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1zm0 3a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1zm.5 3.5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h5a.5.5 0 0 0 .5-.5m-.5 2.5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1z"/>
-              <path d="M16 2a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2zM4 1v14H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zm1 0h9a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H5z"/>
-            </svg>
-          </a>
-          <h1 class="fw-semibold fs-6 my-0 my-md-1 ms-md-3 me-auto">LISTY • APP</h1>
+      <header class="user-select-none sticky-top p-3 pe-lg-0">
+        <div class="app-card col p-3 py-1">
+          <div class="navbar">
+            <a class="btn d-block d-md-none ps-0" role="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu" aria-controls="sideMenu" aria-label="Side menu button">
+              <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentcolor" class="bi bi-layout-sidebar" viewBox="0 0 16 16">
+                <path d="M12.5 3a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1zm0 3a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1zm.5 3.5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h5a.5.5 0 0 0 .5-.5m-.5 2.5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1z"/>
+                <path d="M16 2a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2zM4 1v14H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zm1 0h9a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H5z"/>
+              </svg>
+            </a>
+            <h1 class="fw-semibold fs-6 my-0 my-lg-1 ms-auto">DYNAMIC PLANNER</h1>
+          </div>
         </div>
       </header>
-      <section class="overflow-y-auto p-3 pb-5 vh-100">
-        <ul class="list-group mb-4" id="checklist">
-  <li class="list-group-item">
-    <div class="form-check">
-      <input class="form-check-input" type="checkbox" value="" id="check-1">
-      <label class="form-check-label stretched-link" for="check-1">
-        Default checkbox
-      </label>
-    </div>
-  </li>
-  <li class="list-group-item">
-    <div class="form-check">
-      <input class="form-check-input" type="checkbox" value="" id="check-2">
-      <label class="form-check-label stretched-link" for="check-2">
-        Default checkbox
-      </label>
-    </div>
-  </li>
-  <li class="list-group-item">
-    <div class="form-check">
-      <input class="form-check-input" type="checkbox" value="" id="check-3">
-      <label class="form-check-label stretched-link" for="check-3">
-        Default checkbox
-      </label>
-    </div>
-  </li>
-  <li class="list-group-item">
-    <div class="form-check">
-      <input class="form-check-input" type="checkbox" value="" id="check-4">
-      <label class="form-check-label stretched-link" for="check-4">
-        Default checkbox
-      </label>
-    </div>
-  </li>
-  <li class="list-group-item">
-    <div class="form-check">
-      <input class="form-check-input" type="checkbox" value="" id="check-5">
-      <label class="form-check-label stretched-link" for="check-5">
-        Default checkbox
-      </label>
-    </div>
-  </li>
-  <li class="list-group-item">
-    <div class="form-check">
-      <input class="form-check-input" type="checkbox" value="" id="check-6">
-      <label class="form-check-label stretched-link" for="check-6">
-        Default checkbox
-      </label>
-    </div>
-  </li>
-</ul>
+      <section class="app-scroll-enable overflow-y-auto p-3 vh-100">
+        <div class="row row-cols-1 row-cols-lg-2 g-4 mb-5">
+          <div class="col">
+            <div class="app-card col p-3 nh-100">
+  <ul class="app-checklist list-group">
+    <li class="list-group-item">
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="" id="check-1">
+        <label class="form-check-label stretched-link" for="check-1">
+          Default checkbox
+        </label>
+      </div>
+    </li>
+    <li class="list-group-item">
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="" id="check-2">
+        <label class="form-check-label stretched-link" for="check-2">
+          Default checkbox
+        </label>
+      </div>
+    </li>
+    <li class="list-group-item">
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="" id="check-3">
+        <label class="form-check-label stretched-link" for="check-3">
+          Default checkbox
+        </label>
+      </div>
+    </li>
+    <li class="list-group-item">
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="" id="check-4">
+        <label class="form-check-label stretched-link" for="check-4">
+          Default checkbox
+        </label>
+      </div>
+    </li>
+    <li class="list-group-item">
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="" id="check-5">
+        <label class="form-check-label stretched-link" for="check-5">
+          Default checkbox
+        </label>
+      </div>
+    </li>
+    <li class="list-group-item">
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="" id="check-6">
+        <label class="form-check-label stretched-link" for="check-6">
+          Default checkbox
+        </label>
+      </div>
+    </li>
+    <li class="list-group-item">
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="" id="check-7">
+        <label class="form-check-label stretched-link" for="check-7">
+          Default checkbox
+        </label>
+      </div>
+    </li>
+  </ul>
+</div>
 
+          </div>
+          <div class="col">
+            <div class="app-card col p-3 h-100">
+  <form class="row g-3">
+    <div class="col-md-6">
+      <label for="inputEmail4" class="form-label">Email</label>
+      <input type="email" class="form-control" id="inputEmail4">
+    </div>
+    <div class="col-md-6">
+      <label for="inputPassword4" class="form-label">Password</label>
+      <input type="password" class="form-control" id="inputPassword4">
+    </div>
+    <div class="col-12">
+      <label for="inputAddress" class="form-label">Address</label>
+      <input type="text" class="form-control" id="inputAddress" placeholder="1234 Main St">
+    </div>
+    <div class="col-12">
+      <button type="submit" class="btn btn-outline-primary">Sign in</button>
+    </div>
+  </form>
+</div>
 
-        <h2 id="contenido-del-home-en-markdonwn" class=''>Contenido del home en markdonwn</h2>
-<p>A checklist is a type of job aid used in repetitive tasks to reduce failure by compensating for potential limits of human memory and attention. Checklists are used both to ensure that safety-critical system preparations are carried out completely and in the correct order,[1] and in less critical applications to ensure that no step is left out of a procedure. They help to ensure consistency and completeness in carrying out a task. A basic example is the &ldquo;to do list&rdquo;.[2] A more advanced checklist would be a schedule, which lays out tasks to be done according to time of day or other factors, or a pre-flight checklist for an airliner, which should ensure a safe take-off.[3]</p>
+          </div>
+          <div class="col">
+            <div class="app-card col p-3 h-100">
+              <h2 id="summary" class=''>Summary</h2>
 <p>A primary function of a checklist is documentation of the task and auditing against the documentation.[4] Use of a well designed checklist can reduce any tendency to avoid, omit or neglect important steps in any task.[5] For efficiency and acceptance, the checklist should easily readable, include only necessary checks, and be as short as reasonably practicable.[6]</p>
-<p>History
-It is widely accepted that checklists appeared after the crash of the Boeing B-17 plane on October 30, 1935.[7] Possibly, the source of such common knowledge is The Checklist Manifesto book by Atul Gawande. However, the Oxford English Dictionary states that the word appeared in 1853.[8]</p>
-<p>The earliest discovered evidence of the “check-list” usage is seen in the “Journal of the House of Representatives of the State of New Hampshire at Their Session Holden at the Capitol in Concord” issued in 1841 and describing the elections-related events of the autumn of 1840.[9]</p>
-<p>Purpose
-In general, a checklist is a quality management tool, an aid to completing a complex task correctly and completely. It is an aid to recall, provides a reminder of the correct sequence, and uses the operator&rsquo;s knowledge and skill efficiently to ensure that no critical steps are omitted, even when the operator is under stress or has degraded attention due to fatigue or other distractions, It allows cross checking, keeps team members informed of the status of readiness, and can provide a legal record of a sequence of events to indicate due diligence.[10][3] It differs from an instruction manual or operating manual in that it does not normally provide details on how to perform the steps, as it assumes that the operator is competent and familiar with each step.</p>
-<p>Applications</p>
-<p>A pilot of a DC-10 consulting his checklist
-Safety critical systems
-Checklists are used to help avoid accidental omission of important preparation of equipment and systems. These may be routine operations like pre-flight checks on an airliner or relatively infrequent occasions like commissioning a nuclear power station or launching a spacecraft. The value of checklists is proportional to the complexity of the system and the consequences of a system failure. They may also aid in mitigating claims of negligence in public liability claims by providing evidence of a risk management system being in place. A signed off checklist with a document describing the listed checks may be accepted as evidence of due diligence. Conversely, the absence of a mandatory checklist may be considered evidence of negligence.[citation needed]</p>
-<p>Aviation and space flight safety
-Checklists have long been a feature of aviation safety to ensure that critical items are not overlooked.[1] The best known example is the cockpit preflight checklist, which is intended to ensure that the crew correctly configures the aircraft for flight on every flight. A normal checklist is used before critical flight segments, such as takeoff, approach and landing, which are the phases in which the highest incidence of accidents occur due to procedural error. Checklists are also used for troubleshooting, to identify and where practicable, correct malfunctions. They cannot substitute for pilot skill and learned and practiced immediate response to critical malfunctions, but are useful for mitigation attempts when time allows.[3]</p>
-<p>Health care
-In health care, particularly surgery, checklists may be used to ensure that the correct procedure is carried out on each patient.[11] Checklists have been used in healthcare practice to ensure that clinical practice guidelines are followed. An example is the WHO Surgical Safety Checklist developed for the World Health Organization and found to have a large effect on improving patient safety.[11] According to a meta-analysis after introduction of the checklist mortality dropped by 23% and all complications by 40%, but higher-quality studies are required to make the meta-analysis more robust.[12] Checklist use in healthcare has not always met with success and transferability between settings has been questioned.[13] A survey found them to have no statistical effect in a cohort of hospitals in the Province of Ontario in Canada.[14] In the UK, a study on the implementation of a checklist for provision of medical care to elderly patients admitting to hospital found that the checklist highlighted limitations with frailty assessment in acute care and motivated teams to review routine practices, but that work is needed to understand whether and how checklists can be embedded in complex multidisciplinary care.[15]</p>
-<p>Underwater diving
-In professional diving, checklists are used in the preparation of equipment for a dive, and to ensure that the diver and life support systems are fully prepared before they enter the water. To a lesser extent, checklists are used by a minority of recreational divers, and by a larger proportion of technical divers during pre-dive checks.[5][16] Studies have shown checklists to be effective at reducing the number of errors and consequent incidents.[16]</p>
-<p>Quality assurance applications
-Used in quality assurance of software engineering, to check process compliance, code standardization and error prevention, and others.[citation needed]
-Often used in industry in operations procedures[clarification needed][citation needed]
-In civil litigation to deal with the complexity of discovery and motions practice. An example is the open-source litigation checklist.[citation needed]
-Used by some investors as a critical part of their investment process,[citation needed]
-The creation of emergency survival kits, first aid kits and other collections of diverse apparatus, to ensure that the set is complete.[citation needed]
-Janitorial checklists are used for quality control.[17]
-For information
-An ornithological checklist (Category:Ornithological checklists), a list of birds with standardized names that helps ornithologists communicate with the public without the use of Latinised scientific names.[citation needed]
-A biodiversity checklist is a list of organisms recorded from a given geographical region or taxon. These include worldwide lists indicating the continued existence of species within specified taxa, and are also used to record the species found in countries, bioregions, or specific protected areas. They may be a form of database.[18][19]
-A popular tool for tracking sports card collections. Randomly inserted in packs, checklist cards provide information on the contents of sports card set.</p>
+<p>A primary function of a checklist is documentation of the task and auditing against the documentation.[4] Use of a well designed checklist can reduce any tendency to avoid, omit or neglect important steps in any task.[5] For efficiency and acceptance, the checklist should easily readable, include only necessary checks, and be as short as reasonably practicable.[6]</p>
 
+            </div>
+          </div>
+        </div>
+        <div class="row my-5 py-5"><br>
+        </div>
       </section>
     </main>
   </div>
