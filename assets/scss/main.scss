@@ -293,6 +293,12 @@ svg.bi {
     width: 22%;
   }
 }
+
+// CONTAINER
+.app-container {
+  height: 95vh;
+}
+
 // CARD (start)
 .app-card {
   border: 1px solid $body-color;
@@ -315,14 +321,13 @@ svg.bi {
 
 // APP CHECKLIST (start)
 // Checklists
-.app-container {
-  height: 95vh;
-}
 .app-checklist {
   background-color: transparent;
   border-radius: 0px;
   transition-duration: .8s;
 }
+
+// List item
 /* Resaltado cuando el mouse pase por encima */
 .app-checklist li:has(input[type="checkbox"]):hover {
   background-color: $highlight-subtle;
@@ -333,6 +338,17 @@ svg.bi {
     background-color: $highlight-subtle;
   }
 }
+// Resaltado cuando checked
+.app-checklist li:has(input[type="checkbox"]:checked) {
+  background-color: $app-bg;
+  & div,
+  & button,
+  & i,
+  & label {
+    background-color: $app-bg;
+  }
+}
+
 // Checkbox
 .app-checklist input[type="checkbox"] {
   background-color: transparent;
@@ -352,43 +368,20 @@ svg.bi {
 .app-checklist input[type="checkbox"]:checked {
   color: $app-bg-subtle;
   background-color: $body-color;
-  // border-color: $gray-500;
+}
+
+// Label
+.app-checklist input[type="checkbox"] + label {
+  overflow-wrap: break-word;
+  cursor: pointer;
+  padding-left: 2px;
 }
 .app-checklist input[type="checkbox"]:checked+label {
   color: $body-color-subtle-3;
 }
-.app-checklist li:has(input[type="checkbox"]:checked) {
-  background-color: $app-bg;
-  & div,
-  & button,
-  & i,
-  & label {
-    background-color: $app-bg;
-  }
-}
-.app-checklist input[type="checkbox"] + label {
-  // letter-spacing: .00625em;
-  overflow-wrap: break-word;
-  cursor: pointer;
-}
-.app-checklist li:has(button.app-btn-add:active) {
-  background-color: $highlight;
-  & div,
-  & button,
-  & i,
-  & label {
-    background-color: $highlight;
-  }
-}
-.app-btn-move {
-  border-color: transparent;
-  border: 0px;
-  color: $body-color-subtle-5;
-  margin: 2px 8px 2px 0px;
-  padding: 4px;
-  outline: 0;
-  box-shadow: transparent;  
-}
+
+// Buttons
+// Edit 
 .app-btn-edit {
   border-color: transparent;
   border: 0px;
@@ -396,20 +389,21 @@ svg.bi {
   margin: 2px 0px 2px 12px;
   padding: 4px;
 }
-.app-btn-add input[type="checkbox"]:focus {
-  border-color: $body-color;
-  outline: 0;
-  box-shadow: none;  
-}
+// Add new task
 .app-btn-add {
-  // border-color: transparent;
-  // border: 0px;
-  margin: 2px 0px 2px 2px;
-  padding: 0px;
-  color: $body-color-subtle-5;
   background-color: $app-bg-subtle;
-  // background-color: $app-bg-subtle;
-
+  border-color: transparent;
+  border: 0px;
+  box-shadow: transparent;  
+  color: $body-color-subtle-5;
+  margin: 2px 0px 2px 2px;
+  outline: 0;
+  padding: 0px;
+}
+.app-checklist button.app-btn-add:active {
+  background-color: $app-bg-subtle;
+  border-color: transparent;
+  border: 0px;
 }
 // APP CHECKLIST (end)
 // 

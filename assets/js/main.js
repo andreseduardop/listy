@@ -189,7 +189,8 @@ class ChecklistView {
     btnAdd.type = "button";
     btnAdd.className = "btn app-btn-add";
     btnAdd.innerHTML = `<i class="bi bi-plus-square-fill fs-3" aria-hidden="true"></i>`;
-    btnAdd.title = "Ok";
+    btnAdd.title = "Add new task";
+    btnAdd.setAttribute("aria-label", "Add new task");
 
     li.appendChild(input);
     li.appendChild(btnAdd);
