@@ -63,7 +63,6 @@
       "col-md-6",
       "col-xxl-3",
       "container",
-      "d-bloc",
       "d-block",
       "d-flex",
       "d-md-none",
@@ -97,7 +96,6 @@
       "ms-2",
       "ms-auto",
       "mt-0",
-      "mt-3",
       "mx-0",
       "mx-auto",
       "my-0",
@@ -137,16 +135,11 @@
     ],
     "ids": [
       "check-1",
-      "check-2",
-      "check-3",
-      "check-4",
-      "check-5",
-      "check-6",
-      "check-7",
       "error-message-1",
       "inputAddress",
       "inputEmail4",
       "inputPassword4",
+      "list-container-1",
       "sideMenu",
       "summary"
     ]

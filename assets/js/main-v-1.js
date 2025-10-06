@@ -1,4 +1,4 @@
-// Simple MVC checklist with drag & drop reordering (no move button)
+// Simple MVC checklist (vanilla JS + Bootstrap 5.3 classes)
 // NOTE: Code in English, comentarios en español.
 
 // -------------------------------
@@ -6,7 +6,7 @@
 // -------------------------------
 class ChecklistModel extends EventTarget {
   // Clave de almacenamiento en localStorage
-  static STORAGE_KEY = "checklist-mvc";
+  static STORAGE_KEY = "checklist-mvc-v1";
 
   constructor() {
     super();
@@ -28,13 +28,6 @@ class ChecklistModel extends EventTarget {
   #write() {
     localStorage.setItem(ChecklistModel.STORAGE_KEY, JSON.stringify(this.items));
     this.dispatchEvent(new CustomEvent("change", { detail: { items: this.items } }));
-  }
-
-  // Remueve el elemento (tarea) de la lista
-  remove(id) {
-    // Elimina la tarea por id y persiste
-    this.items = this.items.filter(i => i.id !== id);
-    this.#write();
   }
 
   // Genera un id único para cada tarea
@@ -75,23 +68,21 @@ class ChecklistModel extends EventTarget {
     this.#write();
   }
 
-  // Mueve una tarea a un índice exacto (0..length)
-  moveToIndex(id, toIndex) {
+  // Mueve una tarea por desplazamiento (offset), con wrap-around
+  moveBy(id, offset = 1) {
     const len = this.items.length;
     if (len <= 1) return;
     const from = this.items.findIndex(i => i.id === id);
     if (from === -1) return;
+    // Calcula índice destino con wrap
+    let to = (from + offset) % len;
+    if (to < 0) to = len + to;
+    if (to === from) return;
 
-    // Normaliza destino (permitimos insertar al final con toIndex === len)
-    let dest = Math.max(0, Math.min(len, Number(toIndex)));
-    if (dest === from || dest === from + 1) return; // Sin cambio efectivo
-
+    // Reordena de forma simple
     const clone = [...this.items];
-    const [moved] = clone.splice(from, 1); // quita elemento
-    // Si quitamos antes del destino, éste se desplaza una posición hacia la izquierda
-    if (dest > from) dest -= 1;
-    clone.splice(dest, 0, moved); // inserta en destino normalizado
-
+    const [moved] = clone.splice(from, 1);
+    clone.splice(to, 0, moved);
     this.items = clone;
     this.#write();
   }
@@ -105,11 +96,8 @@ class ChecklistView {
     // root: contenedor principal (ej. #list-container-1)
     this.root = root;
     this.list = root.querySelector(".app-checklist");
-    this.dnd = {
-      draggingId: null,   // id del <li> que se arrastra
-      overId: null,       // id del <li> objetivo actual
-      overPos: null       // "before" | "after" | "after-end"
-    };
+    // Plantillas de item y de "nuevo"
+    // (Se generan dinámicamente para mantener los ids únicos accesibles)
   }
 
   // Render principal: reemplaza el contenido de la lista
@@ -129,14 +117,21 @@ class ChecklistView {
     this.list.appendChild(frag);
   }
 
-  // Crea un <li> para una tarea (sin botón mover)
+  // Crea un <li> para una tarea
   #renderItem(item, index) {
     const li = document.createElement("li");
-    li.className = "list-group-item p-1 ps-2 d-flex flex-wrap align-items-center";
+    li.className = "list-group-item p-1 d-flex flex-wrap align-items-center";
     li.dataset.id = item.id;
-    li.draggable = true; // ← habilita arrastrar/soltar
+    li.setAttribute("draggable", "true"); // Nota: Reordenamiento por botón, no DnD
 
     const checkId = `check-${index + 1}`;
+
+    // Botón mover
+    const btnMove = document.createElement("button");
+    btnMove.type = "button";
+    btnMove.className = "btn app-btn-move";
+    btnMove.innerHTML = `<i class="bi bi-arrow-down-up" aria-hidden="true"></i>`;
+    btnMove.title = "Move (Shift+Click: up, Click: down)"; // Sugerencia de uso
 
     // Form-check (checkbox + label)
     const form = document.createElement("div");
@@ -162,9 +157,8 @@ class ChecklistView {
     btnEdit.className = "btn app-btn-edit";
     btnEdit.innerHTML = `<i class="bi bi-pencil-fill" aria-hidden="true"></i>`;
     btnEdit.title = "Edit";
-    btnEdit.setAttribute("aria-label", "Edit")
 
-    // Orden final: [form-check | btn-edit]
+    li.appendChild(btnMove);
     li.appendChild(form);
     li.appendChild(btnEdit);
 
@@ -176,7 +170,6 @@ class ChecklistView {
     const li = document.createElement("li");
     li.className = "list-group-item p-2 d-flex gap-2 align-items-center bg-body-tertiary";
     li.dataset.role = "new-entry";
-    li.draggable = false; // ← entrada no es arrastrable
 
     const input = document.createElement("input");
     input.type = "text";
@@ -184,20 +177,33 @@ class ChecklistView {
     input.placeholder = "Add new task and press Enter";
     input.setAttribute("aria-label", "Add new task");
 
-    // Botón "Ok" (definición del usuario)
-    const btnAdd = document.createElement("button");
-    btnAdd.type = "button";
-    btnAdd.className = "btn app-btn-add";
-    btnAdd.innerHTML = `<i class="bi bi-plus-square-fill fs-3" aria-hidden="true"></i>`;
-    btnAdd.title = "Ok";
+    const addBtn = document.createElement("button");
+    addBtn.type = "button";
+    addBtn.className = "btn btn-outline-primary app-btn-add";
+    addBtn.innerHTML = `<i class="bi bi-square-fill" aria-hidden="true"></i>`;    
+    addBtn.title = "Ok";
 
     li.appendChild(input);
-    li.appendChild(btnAdd);
+    li.appendChild(addBtn);
 
     return li;
   }
 
   // -------- Delegación de eventos de la vista --------
+
+  // Maneja el click en botón mover
+  onMove(handler) {
+    // handler(id, directionOffset)
+    this.list.addEventListener("click", (e) => {
+      const btn = e.target.closest(".app-btn-move");
+      if (!btn) return;
+      const li = btn.closest("li.list-group-item");
+      if (!li || !li.dataset.id) return;
+      // Shift+Click: movimiento hacia arriba; Click normal: hacia abajo
+      const offset = e.shiftKey ? -1 : 1;
+      handler(li.dataset.id, offset);
+    });
+  }
 
   // Maneja el cambio de checkbox (toggle completed)
   onToggle(handler) {
@@ -220,30 +226,34 @@ class ChecklistView {
       const li = btn.closest("li.list-group-item");
       if (!li || !li.dataset.id) return;
 
+      // Sustituye el label por un input temporal
       const form = li.querySelector(".form-check");
       const label = form.querySelector("label");
       const currentText = label.textContent.trim();
 
+      // Evita múltiples editores simultáneos en el mismo ítem
       if (form.querySelector("input[type='text']")) return;
 
+      // Crea input de edición
       const editor = document.createElement("input");
       editor.type = "text";
       editor.className = "form-control";
       editor.value = currentText;
       editor.setAttribute("aria-label", "Edit task text");
 
+      // Oculta label mientras se edita
       label.style.display = "none";
       form.appendChild(editor);
       editor.focus();
       editor.select();
 
+      // Guardar con Enter, cancelar con Escape, o guardar con blur
       const commit = () => {
         const next = editor.value.trim();
         form.removeChild(editor);
         label.style.display = "";
-        // Importante: notificar incluso si está vacío (dispara borrado en el controller)
-        if (next !== currentText) {
-          handler(li.dataset.id, next); // next puede ser "" → delete
+        if (next && next !== currentText) {
+          handler(li.dataset.id, next);
         }
       };
       const cancel = () => {
@@ -259,7 +269,7 @@ class ChecklistView {
     });
   }
 
-  // Maneja la creación de nuevas tareas (Enter o botón Ok)
+  // Maneja la creación de nuevas tareas (Enter o botón Add)
   onCreate(handler) {
     // handler(text)
     this.list.addEventListener("keydown", (e) => {
@@ -270,6 +280,9 @@ class ChecklistView {
       const text = input.value.trim();
       if (!text) return;
       handler(text);
+      input.value = "";
+      // Opcional: devuelve el foco al input para flujo rápido
+      input.focus();
     });
 
     this.list.addEventListener("click", (e) => {
@@ -281,114 +294,9 @@ class ChecklistView {
       const text = input.value.trim();
       if (!text) return;
       handler(text);
+      input.value = "";
+      input.focus();
     });
-  }
-
-  // Enfoca el input para nueva tarea
-  focusNewEntryInput() {
-    // Busca el input de la fila "nueva tarea" tras el render y aplica foco
-    const entry = this.list.querySelector("li[data-role='new-entry'] input[type='text']");
-    if (entry) {
-      entry.focus({ preventScroll: true }); // evita saltos de scroll
-      // entry.select(); // opcional: selecciona el texto si lo hubiera
-    }
-  }
-
-
-  // -------------------------------
-  // Drag & Drop (arrastrar y soltar) — reordenar sin botón mover
-  // -------------------------------
-  onReorder(handler) {
-    // handler(draggedId, toIndex)
-
-    // dragstart: inicia arrastre
-    this.list.addEventListener("dragstart", (e) => {
-      const li = e.target.closest("li.list-group-item");
-      if (!li || !li.dataset.id || li.dataset.role === "new-entry") return;
-      this.dnd.draggingId = li.dataset.id;
-      li.classList.add("opacity-50"); // feedback visual ligero
-      e.dataTransfer.effectAllowed = "move";
-      e.dataTransfer.setData("text/plain", this.dnd.draggingId);
-    });
-
-    // dragover: permite soltar y decide si antes o después
-    this.list.addEventListener("dragover", (e) => {
-      if (!this.dnd.draggingId) return;
-      const li = e.target.closest("li.list-group-item");
-      if (!li || !li.dataset.id || li.dataset.role === "new-entry") {
-        // Permitir soltar al final (sobre la UL o entrada nueva)
-        e.preventDefault();
-        this.#clearDndMarkers();
-        this.dnd.overId = null;
-        this.dnd.overPos = "after-end"; // bandera especial para insertar al final
-        return;
-      }
-
-      e.preventDefault(); // necesario para permitir drop
-      const rect = li.getBoundingClientRect();
-      const offsetY = e.clientY - rect.top;
-      const before = offsetY < rect.height / 2;
-
-      this.#clearDndMarkers();
-      this.dnd.overId = li.dataset.id;
-      this.dnd.overPos = before ? "before" : "after";
-
-      // Añade marcas simples (requiere estilos si quieres verlas)
-      li.classList.add(before ? "border-top" : "border-bottom");
-      li.classList.add("border-primary");
-    });
-
-    // dragleave: limpia marcas al salir del elemento
-    this.list.addEventListener("dragleave", (e) => {
-      const li = e.target.closest("li.list-group-item");
-      if (!li) return;
-      li.classList.remove("border-top", "border-bottom", "border-primary");
-    });
-
-    // drop: calcula índice destino y notifica
-    this.list.addEventListener("drop", (e) => {
-      if (!this.dnd.draggingId) return;
-      e.preventDefault();
-
-      const itemsDom = [...this.list.querySelectorAll("li.list-group-item[data-id]")];
-
-      let toIndex;
-      if (this.dnd.overPos === "after-end" || this.dnd.overId === null) {
-        // Insertar al final
-        toIndex = itemsDom.length; // insertar al final (índice len)
-      } else {
-        const targetLi = itemsDom.find(li => li.dataset.id === this.dnd.overId);
-        const targetIndex = itemsDom.indexOf(targetLi);
-        toIndex = this.dnd.overPos === "before" ? targetIndex : targetIndex + 1;
-      }
-
-      // Llama al handler con el id arrastrado y el índice destino
-      handler(this.dnd.draggingId, toIndex);
-
-      this.#clearDndState();
-    });
-
-    // dragend: limpieza visual y estado
-    this.list.addEventListener("dragend", () => {
-      this.#clearDndState();
-    });
-  }
-
-  // Limpia marcas visuales de DnD
-  #clearDndMarkers() {
-    this.list.querySelectorAll("li.list-group-item").forEach(li => {
-      li.classList.remove("border-top", "border-bottom", "border-primary");
-    });
-  }
-
-  // Limpia estado completo de DnD
-  #clearDndState() {
-    this.#clearDndMarkers();
-    const draggingEl = this.list.querySelector(`li.list-group-item.opacity-50`);
-    if (draggingEl) draggingEl.classList.remove("opacity-50");
-    this.dnd.draggingId = null;
-    this.dnd.overId = null;
-    this.dnd.overPos = null;
   }
 }
 
@@ -407,23 +315,13 @@ class ChecklistController {
     // Suscripción a cambios del modelo
     this.model.addEventListener("change", () => {
       this.view.render(this.model.getAll());
-      this.view.focusNewEntryInput();
     });
 
     // Conecta eventos de la vista a acciones del modelo
+    this.view.onMove((id, offset) => this.model.moveBy(id, offset));
     this.view.onToggle((id) => this.model.toggle(id));
-    this.view.onEdit((id, text) => {
-      // Si el texto está vacío, eliminamos la tarea; si no, actualizamos
-      if (String(text).trim() === "") {
-        this.model.remove(id);
-      } else {
-        this.model.updateText(id, text);
-      }
-    });
+    this.view.onEdit((id, text) => this.model.updateText(id, text));
     this.view.onCreate((text) => this.model.add(text));
-
-    // Reordenamiento por arrastrar y soltar
-    this.view.onReorder((draggedId, toIndex) => this.model.moveToIndex(draggedId, toIndex));
   }
 }
 

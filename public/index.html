@@ -83,9 +83,7 @@
 
 
   
-    
-      <link rel="stylesheet" href="/css/main.min.89c35ee79265eeeb595de8162cecc37fd10971a6ba016077a2152d98808b6f43.css" integrity="sha256-icNe55Jl7utZXegWLOzDf9EJcaa6AWB3ohUtmICLb0M=" crossorigin="anonymous">
-    
+    <link rel="stylesheet" href="/css/main.css">
   
 
 
@@ -135,7 +133,7 @@
 
 
   
-<script src='/js/main.min.a6ef037d650b59f7f4751b7915594372847989760646d76ce3279aedf1c3dbd9247fc752d803de2d1c7bb4aab6ae0bd9.js' integrity='sha384-pu8DfWULWff0dRt5FVlDcoR5iXYGRtds4yea7fHD29kkf8dS2APeLRx7tKq2rgvZ' defer></script>
+<script src='/js/main.min.732f7a813bf546ab5717e1d5de8024f5a687e7c0252c1624379a9138bb11c124a4765709eb6625c442d6f33be11e724f.js' integrity='sha384-cy96gTv1RqtXF&#43;HV3oAk9aaH58AlLBYkN5qROLsRwSSkdlcJ62YlxELW8zvhHnJP' defer></script>
 <aside class="d-none invisible" id="error-message-1" aria-hidden="true" style="color:#fafafa;background-color:#166cdc;position:relative;padding:1rem 1rem;margin-bottom:1rem;text-align:center;margin-top:2em;">
   <p style="font-size:1.5em;">
     <strong>
@@ -200,110 +198,18 @@
       <section class="app-scroll-enable overflow-y-auto p-3 vh-100">
         <div class="row row-cols-1 row-cols-lg-2 g-4 mb-5">
           <div class="col">
-            <div class="app-card col p-3 nh-100">
+            <div id="list-container-1" class="app-card col p-3 nh-100">
   <ul class="app-checklist list-group">
-    <li class="list-group-item p-1 d-flex align-items-center">
-      <button type="button" class="btn app-btn-move">
-        <i class="bi bi-arrow-down-up"></i>
-      </button>
+    <li class="list-group-item p-1 d-flex flex-wrap align-items-center" draggable="true">
       <div class="form-check position-relative flex-grow-1">
         <input class="form-check-input" type="checkbox" value="" id="check-1">
         <label class="form-check-label stretched-link" for="check-1">
           Example of task text
         </label>
       </div>
-      <button type="button" class="btn app-btn-edit">
+      <button type="button" class="btn app-btn-edit" aria-label="Edit" title="Edit">
         <i class="bi bi-pencil-fill"></i>
       </button>
-    </li>
-    <li class="list-group-item p-1 d-flex align-items-center">
-      <button type="button" class="btn app-btn-move">
-        <i class="bi bi-arrow-down-up"></i>
-      </button>
-      <div class="form-check position-relative flex-grow-1">
-        <input class="form-check-input" type="checkbox" value="" id="check-2">
-        <label class="form-check-label stretched-link" for="check-2">
-          Example of task text
-        </label>
-      </div>
-      <button type="button" class="btn app-btn-edit">
-        <i class="bi bi-pencil-fill"></i>
-      </button>
-    </li>
-    <li class="list-group-item p-1 d-flex align-items-center">
-      <button type="button" class="btn app-btn-move">
-        <i class="bi bi-arrow-down-up"></i>
-      </button>
-      <div class="form-check position-relative flex-grow-1">
-        <input class="form-check-input" type="checkbox" value="" id="check-3">
-        <label class="form-check-label stretched-link" for="check-3">
-          Example of task text
-        </label>
-      </div>
-      <button type="button" class="btn app-btn-edit">
-        <i class="bi bi-pencil-fill"></i>
-      </button>
-    </li>
-    <li class="list-group-item p-1 d-flex align-items-center">
-      <button type="button" class="btn app-btn-move">
-        <i class="bi bi-arrow-down-up"></i>
-      </button>
-      <div class="form-check position-relative flex-grow-1">
-        <input class="form-check-input" type="checkbox" value="" id="check-4">
-        <label class="form-check-label stretched-link" for="check-4">
-          Example of task text
-        </label>
-      </div>
-      <button type="button" class="btn app-btn-edit">
-        <i class="bi bi-pencil-fill"></i>
-      </button>
-    </li>
-    <li class="list-group-item p-1 d-flex align-items-center">
-      <button type="button" class="btn app-btn-move">
-        <i class="bi bi-arrow-down-up"></i>
-      </button>
-      <div class="form-check position-relative flex-grow-1">
-        <input class="form-check-input" type="checkbox" value="" id="check-5">
-        <label class="form-check-label stretched-link" for="check-5">
-          Example of task text
-        </label>
-      </div>
-      <button type="button" class="btn app-btn-edit">
-        <i class="bi bi-pencil-fill"></i>
-      </button>
-    </li>
-    <li class="list-group-item p-1 d-flex align-items-center">
-      <button type="button" class="btn app-btn-move">
-        <i class="bi bi-arrow-down-up"></i>
-      </button>
-      <div class="form-check position-relative flex-grow-1">
-        <input class="form-check-input" type="checkbox" value="" id="check-6">
-        <label class="form-check-label stretched-link" for="check-6">
-          Example of task text
-        </label>
-      </div>
-      <button type="button" class="btn app-btn-edit">
-        <i class="bi bi-pencil-fill"></i>
-      </button>
-    </li>
-    <li class="list-group-item p-1 d-flex flex-wrap align-items-center">
-      <button type="button" class="btn app-btn-move invisible">
-        <i class="bi bi-arrow-down-up"></i>
-      </button>
-      <div class="form-check position-relative flex-grow-1">
-        <input class="form-check-input invisible" type="checkbox" value="" id="check-7">
-        <label class="form-check-label stretched-link " for="check-7">
-          Example of task text
-        </label>
-      </div>
-      <button type="button" class="btn app-btn-edit invisible">
-        <i class="bi bi-pencil-fill"></i>
-      </button>
-      <div class="d-bloc mt-3">
-        <a class="btn btn-outline-primary p-1" href="#" role="button">Rewrite</a>
-        <a class="btn btn-outline-primary p-1" href="#" role="button">Divide into subtasks</a>
-        <a class="btn btn-outline-primary p-1" href="#" role="button">Delete</a>
-      </div>
     </li>
   </ul>
 </div>

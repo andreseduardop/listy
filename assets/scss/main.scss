@@ -324,7 +324,7 @@ svg.bi {
   transition-duration: .8s;
 }
 /* Resaltado cuando el mouse pase por encima */
-.app-checklist li:hover {
+.app-checklist li:has(input[type="checkbox"]):hover {
   background-color: $highlight-subtle;
   & div,
   & button,
@@ -350,7 +350,7 @@ svg.bi {
   box-shadow: none;  
 }
 .app-checklist input[type="checkbox"]:checked {
-  color: white;
+  color: $app-bg-subtle;
   background-color: $body-color;
   // border-color: $gray-500;
 }
@@ -371,7 +371,7 @@ svg.bi {
   overflow-wrap: break-word;
   cursor: pointer;
 }
-.app-checklist li:has(button.app-btn-move:active) {
+.app-checklist li:has(button.app-btn-add:active) {
   background-color: $highlight;
   & div,
   & button,
@@ -395,6 +395,21 @@ svg.bi {
   color: $body-color-subtle-5;
   margin: 2px 0px 2px 12px;
   padding: 4px;
+}
+.app-btn-add input[type="checkbox"]:focus {
+  border-color: $body-color;
+  outline: 0;
+  box-shadow: none;  
+}
+.app-btn-add {
+  // border-color: transparent;
+  // border: 0px;
+  margin: 2px 0px 2px 2px;
+  padding: 0px;
+  color: $body-color-subtle-5;
+  background-color: $app-bg-subtle;
+  // background-color: $app-bg-subtle;
+
 }
 // APP CHECKLIST (end)
 // 

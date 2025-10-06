@@ -1,4 +1,4 @@
-// Simple MVC checklist with drag & drop reordering (no move button)
+// Simple MVC checklist with drag & drop reordering (vanilla JS + Bootstrap 5.3)
 // NOTE: Code in English, comentarios en español.
 
 // -------------------------------
@@ -6,7 +6,7 @@
 // -------------------------------
 class ChecklistModel extends EventTarget {
   // Clave de almacenamiento en localStorage
-  static STORAGE_KEY = "checklist-mvc";
+  static STORAGE_KEY = "checklist-mvc-v2-dnd";
 
   constructor() {
     super();
@@ -28,13 +28,6 @@ class ChecklistModel extends EventTarget {
   #write() {
     localStorage.setItem(ChecklistModel.STORAGE_KEY, JSON.stringify(this.items));
     this.dispatchEvent(new CustomEvent("change", { detail: { items: this.items } }));
-  }
-
-  // Remueve el elemento (tarea) de la lista
-  remove(id) {
-    // Elimina la tarea por id y persiste
-    this.items = this.items.filter(i => i.id !== id);
-    this.#write();
   }
 
   // Genera un id único para cada tarea
@@ -75,6 +68,23 @@ class ChecklistModel extends EventTarget {
     this.#write();
   }
 
+  // Mueve una tarea por desplazamiento (offset), con wrap-around (sigue disponible)
+  moveBy(id, offset = 1) {
+    const len = this.items.length;
+    if (len <= 1) return;
+    const from = this.items.findIndex(i => i.id === id);
+    if (from === -1) return;
+    let to = (from + offset) % len;
+    if (to < 0) to = len + to;
+    if (to === from) return;
+
+    const clone = [...this.items];
+    const [moved] = clone.splice(from, 1);
+    clone.splice(to, 0, moved);
+    this.items = clone;
+    this.#write();
+  }
+
   // Mueve una tarea a un índice exacto (0..length)
   moveToIndex(id, toIndex) {
     const len = this.items.length;
@@ -108,7 +118,7 @@ class ChecklistView {
     this.dnd = {
       draggingId: null,   // id del <li> que se arrastra
       overId: null,       // id del <li> objetivo actual
-      overPos: null       // "before" | "after" | "after-end"
+      overPos: null       // "before" | "after"
     };
   }
 
@@ -129,14 +139,21 @@ class ChecklistView {
     this.list.appendChild(frag);
   }
 
-  // Crea un <li> para una tarea (sin botón mover)
+  // Crea un <li> para una tarea
   #renderItem(item, index) {
     const li = document.createElement("li");
-    li.className = "list-group-item p-1 ps-2 d-flex flex-wrap align-items-center";
+    li.className = "list-group-item p-1 d-flex flex-wrap align-items-center";
     li.dataset.id = item.id;
     li.draggable = true; // ← habilita arrastrar/soltar
 
     const checkId = `check-${index + 1}`;
+
+    // Botón mover (sigue disponible además del DnD)
+    const btnMove = document.createElement("button");
+    btnMove.type = "button";
+    btnMove.className = "btn app-btn-move";
+    btnMove.innerHTML = `<i class="bi bi-arrow-down-up" aria-hidden="true"></i>`;
+    btnMove.title = "Move (Shift+Click: up, Click: down)";
 
     // Form-check (checkbox + label)
     const form = document.createElement("div");
@@ -162,9 +179,8 @@ class ChecklistView {
     btnEdit.className = "btn app-btn-edit";
     btnEdit.innerHTML = `<i class="bi bi-pencil-fill" aria-hidden="true"></i>`;
     btnEdit.title = "Edit";
-    btnEdit.setAttribute("aria-label", "Edit")
 
-    // Orden final: [form-check | btn-edit]
+    li.appendChild(btnMove);
     li.appendChild(form);
     li.appendChild(btnEdit);
 
@@ -184,20 +200,33 @@ class ChecklistView {
     input.placeholder = "Add new task and press Enter";
     input.setAttribute("aria-label", "Add new task");
 
-    // Botón "Ok" (definición del usuario)
-    const btnAdd = document.createElement("button");
-    btnAdd.type = "button";
-    btnAdd.className = "btn app-btn-add";
-    btnAdd.innerHTML = `<i class="bi bi-plus-square-fill fs-3" aria-hidden="true"></i>`;
-    btnAdd.title = "Ok";
+    // Botón según modificación previa del usuario
+    const addBtn = document.createElement("button");
+    addBtn.type = "button";
+    addBtn.className = "btn btn-outline-primary app-btn-add";
+    addBtn.innerHTML = `<i class="bi bi-square-fill" aria-hidden="true"></i>`;
+    addBtn.title = "Ok";
 
     li.appendChild(input);
-    li.appendChild(btnAdd);
+    li.appendChild(addBtn);
 
     return li;
   }
 
   // -------- Delegación de eventos de la vista --------
+
+  // Maneja el click en botón mover (mantener funcionalidad previa)
+  onMove(handler) {
+    // handler(id, directionOffset)
+    this.list.addEventListener("click", (e) => {
+      const btn = e.target.closest(".app-btn-move");
+      if (!btn) return;
+      const li = btn.closest("li.list-group-item");
+      if (!li || !li.dataset.id) return;
+      const offset = e.shiftKey ? -1 : 1;
+      handler(li.dataset.id, offset);
+    });
+  }
 
   // Maneja el cambio de checkbox (toggle completed)
   onToggle(handler) {
@@ -241,9 +270,8 @@ class ChecklistView {
         const next = editor.value.trim();
         form.removeChild(editor);
         label.style.display = "";
-        // Importante: notificar incluso si está vacío (dispara borrado en el controller)
-        if (next !== currentText) {
-          handler(li.dataset.id, next); // next puede ser "" → delete
+        if (next && next !== currentText) {
+          handler(li.dataset.id, next);
         }
       };
       const cancel = () => {
@@ -270,6 +298,8 @@ class ChecklistView {
       const text = input.value.trim();
       if (!text) return;
       handler(text);
+      input.value = "";
+      input.focus();
     });
 
     this.list.addEventListener("click", (e) => {
@@ -281,30 +311,22 @@ class ChecklistView {
       const text = input.value.trim();
       if (!text) return;
       handler(text);
+      input.value = "";
+      input.focus();
     });
   }
 
-  // Enfoca el input para nueva tarea
-  focusNewEntryInput() {
-    // Busca el input de la fila "nueva tarea" tras el render y aplica foco
-    const entry = this.list.querySelector("li[data-role='new-entry'] input[type='text']");
-    if (entry) {
-      entry.focus({ preventScroll: true }); // evita saltos de scroll
-      // entry.select(); // opcional: selecciona el texto si lo hubiera
-    }
-  }
-
-
   // -------------------------------
-  // Drag & Drop (arrastrar y soltar) — reordenar sin botón mover
+  // Drag & Drop (arrastrar y soltar)
   // -------------------------------
   onReorder(handler) {
     // handler(draggedId, toIndex)
+    // Nota: Insertamos ANTES o DESPUÉS del li sobre el que pasamos, según posición del puntero.
 
     // dragstart: inicia arrastre
     this.list.addEventListener("dragstart", (e) => {
       const li = e.target.closest("li.list-group-item");
-      if (!li || !li.dataset.id || li.dataset.role === "new-entry") return;
+      if (!li || !li.dataset.id || li.matches("[data-role='new-entry']")) return;
       this.dnd.draggingId = li.dataset.id;
       li.classList.add("opacity-50"); // feedback visual ligero
       e.dataTransfer.effectAllowed = "move";
@@ -407,19 +429,12 @@ class ChecklistController {
     // Suscripción a cambios del modelo
     this.model.addEventListener("change", () => {
       this.view.render(this.model.getAll());
-      this.view.focusNewEntryInput();
     });
 
     // Conecta eventos de la vista a acciones del modelo
+    this.view.onMove((id, offset) => this.model.moveBy(id, offset));
     this.view.onToggle((id) => this.model.toggle(id));
-    this.view.onEdit((id, text) => {
-      // Si el texto está vacío, eliminamos la tarea; si no, actualizamos
-      if (String(text).trim() === "") {
-        this.model.remove(id);
-      } else {
-        this.model.updateText(id, text);
-      }
-    });
+    this.view.onEdit((id, text) => this.model.updateText(id, text));
     this.view.onCreate((text) => this.model.add(text));
 
     // Reordenamiento por arrastrar y soltar
