@@ -1,18 +1,25 @@
 // 1. Include functions first (so you can manipulate colors, SVGs, calc, etc)
 @import "../bootstrap/scss/_functions";
+// Icons
+$bootstrap-icons-font-dir: "../fonts";
+@import "../bootstrap-icons/font/bootstrap-icons";
 
+// Import the Sass files as usual
 // 2. Include an variable overrides here
+
 
 // $body-color:      #5054ef;
 $font-size-root:    16px;
-// $font-size-base:  1rem;
+$font-size-base:  1rem;
 $h1-font-size:  2rem;
-// $h2-font-size:  $font-size-base * 2;
-// $h3-font-size:  $font-size-base * 1.75;
-// $h4-font-size:  $font-size-base * 1.5;
-// $h5-font-size:  $font-size-base * 1.25;
-// $h6-font-size:  $font-size-base;
-$font-family-sans-serif:  "Geist Mono", Roboto, Helvetica, Arial, sans-serif;
+$h2-font-size:  $font-size-base * 1.5;
+$h3-font-size:  $font-size-base * 1.2;
+$h4-font-size:  $font-size-base * 1.2;
+$h5-font-size:  $font-size-base * 1.1;
+$h6-font-size:  $font-size-base;
+$font-family-sans-serif:  "Roboto Slab", Roboto, Helvetica, Arial, sans-serif;
+// $font-family-sans-serif:  "Geist Mono", Roboto, Helvetica, Arial, sans-serif;
+// $font-family-sans-serif:  "Roboto Slab", Roboto, Helvetica, Arial, sans-serif;
 // $headings-font-family:    "Yanone Kaffeesatz",  system-ui, sans-serif;
 
 // $zindex-dropdown:                   1000;
@@ -55,6 +62,7 @@ $cyan:    #0dcaf0;
 // App colors
 $blue-v0:           #3e43f0;  // Blue sketchpad-v0
 $app-blue:          #3C39CC;  // Blue 
+$app-pink:          #FF3392;  // Deep pink
 $app-white:         #f8f9fa;  // White 
 $app-gray-100:      #f2f6fd;  // Lavender
 $app-gray-200:      #edf3fc;  // Lavender 
@@ -65,7 +73,7 @@ $highlight-subtle:  #FAF7EB;  // Marfil
 
 // Theme colors:
 $primary:       $app-blue;
-$secondary:     $highlight;
+$secondary:     $app-pink;
 $tertiary:      $orange;  // Required
 $success:       $green;   // Required
 $info:          $yellow;
@@ -80,10 +88,10 @@ $app-bg-subtle: $app-gray-100;
 
 $enable-dark-mode:          false !default;
 
-$body-color:                $app-blue !default;
-$body-color-subtle-3:         tint-color($app-blue, 30%) !default;
-$body-color-subtle-5:         tint-color($app-blue, 50%) !default;
-$body-bg:                   $app-bg !default;
+$body-color:            $app-blue !default;
+$body-color-subtle-3:   tint-color($app-blue, 30%) !default;
+$body-color-subtle-5:   tint-color($app-blue, 50%) !default;
+$body-bg:               $app-bg !default;
 
 // Some modal variables
 // $modal-backdrop-bg:                 $black;
@@ -207,8 +215,22 @@ $theme-colors: map-remove($theme-colors, "info", "warning");
   font-display: swap;
   src: url('../fonts/geist-mono-v4-latin-600.woff2') format('woff2');
 }
-
-// Configuraciones generales
+/* roboto-slab-regular - latin */
+@font-face {
+  font-family: 'Roboto Slab';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/roboto-slab-v36-latin-regular.woff2') format('woff2'); 
+}
+/* roboto-slab-500 - latin */
+@font-face {
+  font-family: 'Roboto Slab';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../fonts/roboto-slab-v36-latin-500.woff2') format('woff2');
+}
 
 /* Smooth Scrolling */
 html {
@@ -223,25 +245,29 @@ html {
   color: $body-color; /* Color del texto */
 }
 body {
-  margin: 0;
-  height: 100%;
-  width: 100%;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  word-break: normal;
+  -webkit-font-smoothing: antialiased;
+  font-weight: 400;
+  height: 100%;
+  margin: 0;
   overflow-wrap: anywhere;
+  text-rendering: optimizeLegibility;
+  width: 100%;
+  word-break: normal;
 }
 // Scroll hasta encabezados
 h1, h2, h3, h4, h5, h6 {
   scroll-margin-top: 2.5em;
-  font-weight: 600;
+  font-weight: 500;
+}
+h1.title {
+  letter-spacing: .05rem;
 }
 // Hipervínculos
 a {
   overflow-wrap: anywhere;
   word-break: normal;
-  font-weight: 600;
+  font-weight: 500;
 }
 // Extender clases de Bootstrap 
 .app-fs-7 {
@@ -300,14 +326,17 @@ svg.bi {
 /* Resaltado cuando el mouse pase por encima */
 .app-checklist li:hover {
   background-color: $highlight-subtle;
-  & * {
+  & div,
+  & button,
+  & i,
+  & label {
     background-color: $highlight-subtle;
   }
 }
 // Checkbox
 .app-checklist input[type="checkbox"] {
   background-color: transparent;
-  margin-left: -1.75em;
+  margin-left: -1.6em;
   cursor: pointer;
   border-radius: 50%;
   bottom: .1em;
@@ -316,7 +345,7 @@ svg.bi {
   position: relative;
 }
 .app-checklist input[type="checkbox"]:focus {
-  border-color: none;
+  border-color: $body-color;
   outline: 0;
   box-shadow: none;  
 }
@@ -331,6 +360,8 @@ svg.bi {
 .app-checklist li:has(input[type="checkbox"]:checked) {
   background-color: $app-bg;
   & div,
+  & button,
+  & i,
   & label {
     background-color: $app-bg;
   }
@@ -339,6 +370,31 @@ svg.bi {
   // letter-spacing: .00625em;
   overflow-wrap: break-word;
   cursor: pointer;
+}
+.app-checklist li:has(button.app-btn-move:active) {
+  background-color: $highlight;
+  & div,
+  & button,
+  & i,
+  & label {
+    background-color: $highlight;
+  }
+}
+.app-btn-move {
+  border-color: transparent;
+  border: 0px;
+  color: $body-color-subtle-5;
+  margin: 2px 8px 2px 0px;
+  padding: 4px;
+  outline: 0;
+  box-shadow: transparent;  
+}
+.app-btn-edit {
+  border-color: transparent;
+  border: 0px;
+  color: $body-color-subtle-5;
+  margin: 2px 0px 2px 12px;
+  padding: 4px;
 }
 // APP CHECKLIST (end)
 // 
@@ -360,4 +416,20 @@ main img {
     scrollbar-color: $body-color-subtle-5 $app-bg-subtle;
     scrollbar-width: thin;
   }
+}
+// Blinking animation
+@keyframes blink-animation {
+  0% {
+    opacity: 1; /* Fully visible at the start */
+  }
+  50% {
+    opacity: 0; /* Fully transparent at 50% through the animation */
+  }
+  100% {
+    opacity: 1; /* Fully visible again at the end */
+  }
+}
+.blink-text {
+  // color: $orange;
+  animation: blink-animation 1s infinite; /* Apply the animation */
 }
