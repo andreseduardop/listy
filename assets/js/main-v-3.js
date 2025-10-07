@@ -129,10 +129,10 @@ class ChecklistView {
     this.list.appendChild(frag);
   }
 
-  // Crea un <li> para una tarea
+  // Crea un <li> para una tarea (sin botón mover)
   #renderItem(item, index) {
     const li = document.createElement("li");
-    li.className = "list-group-item p-1 ps-2 d-flex align-items-center";
+    li.className = "list-group-item p-1 ps-2 d-flex flex-wrap align-items-center";
     li.dataset.id = item.id;
     li.draggable = true; // habilita arrastrar/soltar
 
@@ -225,7 +225,6 @@ class ChecklistView {
       const label = form.querySelector("label");
       const currentText = label.textContent.trim();
 
-      // Avoid multiple editors in the same item
       if (form.querySelector("input[type='text']")) return;
 
       const editor = document.createElement("input");
@@ -239,43 +238,25 @@ class ChecklistView {
       editor.focus();
       // editor.select(); // selecciona el texto de la tarea que se está editando
 
-      // --- Make commit/cancel idempotent ---
-      let finished = false; // evita doble ejecución (Enter + blur)
-
-      const finalize = (mode /* 'commit' | 'cancel' */) => {
-        // si ya se ejecutó, salir
-        if (finished) return;
-        finished = true;
-
-        // limpia listeners para evitar fugas
-        editor.removeEventListener("keydown", onKeyDown);
-        editor.removeEventListener("blur", onBlur);
-
-        // restaura la UI de forma segura
-        if (editor.parentNode === form) {
-          editor.remove(); // más seguro que removeChild; no lanza si ya no es hijo
-        }
+      const commit = () => {
+        const next = editor.value.trim();
+        form.removeChild(editor);
         label.style.display = "";
-
-        // sólo notificar cambios si es commit
-        if (mode === "commit") {
-          const next = editor.value.trim();
-          if (next !== currentText) {
-            // next puede ser "" → el controller decidirá eliminar
-            handler(li.dataset.id, next);
-          }
+        // Importante: notificar incluso si está vacío (dispara borrado en el controller)
+        if (next !== currentText) {
+          handler(li.dataset.id, next); // next puede ser "" → delete
         }
       };
-
-      const onKeyDown = (ke) => {
-        if (ke.key === "Enter") finalize("commit");
-        else if (ke.key === "Escape") finalize("cancel");
+      const cancel = () => {
+        form.removeChild(editor);
+        label.style.display = "";
       };
 
-      const onBlur = () => finalize("commit");
-
-      editor.addEventListener("keydown", onKeyDown, { once: false });
-      editor.addEventListener("blur", onBlur, { once: true }); // blur sólo una vez
+      editor.addEventListener("keydown", (ke) => {
+        if (ke.key === "Enter") commit();
+        if (ke.key === "Escape") cancel();
+      });
+      editor.addEventListener("blur", commit);
     });
   }
 
@@ -410,15 +391,6 @@ class ChecklistView {
     this.dnd.overId = null;
     this.dnd.overPos = null;
   }
-
-  // actualiza el contenedor del resumen de forma segura
-  setSummary(text) {
-    const box = document.getElementById("summary-container-1");
-    if (!box) return;
-    // Usamos textContent para evitar inyección de HTML ya que el input de tareas proviene del usuario
-    box.textContent = text || "";
-  }
-
 }
 
 // -------------------------------
@@ -430,17 +402,11 @@ class ChecklistController {
     this.model = new ChecklistModel();
     this.view = new ChecklistView(root);
 
-    // --- SUMMARIZER STATE ---
-    this.summarizer = null;   // instancia reutilizable
-    this.summarizerReady = false;   // bandera de disponibilidad
-    this.summarizerInitError = null;  // guarda error (si ocurre)
-    // bandera para saber si debemos devolver el foco tras el próximo render: 
-    this.shouldRefocusNewEntry = false; // se activa sólo al crear una nueva tarea
+    // bandera para saber si debemos devolver el foco tras el próximo render
+    this.shouldRefocusNewEntry = false; // se activa sólo al crear
 
     // Render inicial
     this.view.render(this.model.getAll());
-    // Nota: no intentamos resumir aún; esperamos a la primera interacción del usuario
-    this.view.setSummary("Tips: Type tasks and press Enter/OK. Use a gesture (click/Enter) to enable the summary if your browser supports it.");
 
     // Suscripción a cambios del modelo
     this.model.addEventListener("change", () => {
@@ -450,166 +416,28 @@ class ChecklistController {
         this.view.focusNewEntryInput();
         this.shouldRefocusNewEntry = false; // consumir bandera
       }
-      // después de cada render, intentamos actualizar el resumen:
-      this.updateSummary();
     });
 
     // Conecta eventos de la vista a acciones del modelo
-    this.view.onToggle(async (id) => {
-      await this.ensureSummarizerOnGesture(); // gesto del usuario
-      this.model.toggle(id);
-    });
-
-    this.view.onEdit(async (id, text) => {
-      await this.ensureSummarizerOnGesture(); // gesto del usuario
+    this.view.onToggle((id) => this.model.toggle(id));
+    this.view.onEdit((id, text) => {
       // Si el texto está vacío, eliminamos la tarea; si no, actualizamos
-      if (String(text).trim() === "") this.model.remove(id);
-      else this.model.updateText(id, text);
+      if (String(text).trim() === "") {
+        this.model.remove(id);
+      } else {
+        this.model.updateText(id, text);
+      }
     });
-
 
     // Al crear una tarea, marcamos que en el próximo render se recupere el foco
-    this.view.onCreate(async (text) => {
-      await this.ensureSummarizerOnGesture(); // gesto del usuario
-      this.shouldRefocusNewEntry = true; // señalamos que se acaba de crear una nueva tarea y, por tanto, hay que enfocar el input para crear otra
+    this.view.onCreate((text) => {
+      this.shouldRefocusNewEntry = true; // señalamos que hay que enfocar
       this.model.add(text);
     });
 
     // Reordenamiento por arrastrar y soltar
-    this.view.onReorder?.(async (draggedId, toIndex) => {
-      await this.ensureSummarizerOnGesture(); // gesto del usuario
-      this.model.moveToIndex(draggedId, toIndex);
-    });
+    this.view.onReorder((draggedId, toIndex) => this.model.moveToIndex(draggedId, toIndex));
   }
-
-  // -------- Summarizer helpers --------
-
-  async ensureSummarizerOnGesture() {
-    // crea el summarizer únicamente tras un gesto del usuario
-    if (this.summarizer || this.summarizerInitError) return;
-
-    try {
-      // 1) Detección de soporte
-      if (!("Summarizer" in self)) {
-        this.summarizerInitError = new Error("Summarizer API not supported");
-        return;
-      }
-
-      // 2) Comprobar disponibilidad (puede estar descargable)
-      const availability = await Summarizer.availability();
-      if (availability === "unavailable") {
-        this.summarizerInitError = new Error("Summarizer unavailable");
-        return;
-      }
-
-      // 3) Requerir gesto de usuario para crear (API guideline)
-      if (!navigator.userActivation.isActive) {
-        // No crear sin gesto; salimos silenciosamente
-        return;
-      }
-
-      // 4) Crear y almacenar instancia con opciones adecuadas
-      this.summarizer = await Summarizer.create({
-
-        // forzamos idioma de salida a español
-        outputLanguage: 'es',
-
-        // Cf. https://developer.chrome.com/docs/ai/summarizer-api#api-functions
-        type: "teaser",  // key-points (default), tldr, teaser, and headline
-        length: "short",  // short, medium (default), and long
-        format: "plain-text",  // markdown (default) and plain-text
-
-        // monitor opcional para mostrar progreso de descarga del modelo
-        monitor(m) {
-          m.addEventListener("downloadprogress", (e) => {
-            // reflejar progreso en UI si deseas
-            console.log(`Downloaded ${Math.round(e.loaded * 100)}%`);
-          });
-        },
-        // contexto compartido opcional, puede ayudar a la calidad
-        sharedContext: "Summarize a to-do list with completed and pending items."
-      });
-      this.summarizerReady = true;
-    } catch (err) {
-      this.summarizerInitError = err;
-    }
-  }
-
-  async updateSummary() {
-    // se llama después de CADA render
-    const items = this.model.getAll();
-    const emptyMsg = "No tasks yet.";
-
-    // 1) Si no hay soporte o error previo, mostramos fallback simple
-    if (this.summarizerInitError || !("Summarizer" in self)) {
-      const summary = this.buildPlainSummary(items);
-      this.view.setSummary(summary || emptyMsg);
-      return;
-    }
-
-    // 2) Si aún no hemos creado summarizer (sin gesto), usa fallback breve
-    if (!this.summarizer) {
-      const hint = "(Click/Enter to enable on-device summary if available.)";
-      const summary = this.buildPlainSummary(items);
-      this.view.setSummary(summary ? `${summary}\n\n${hint}` : `${emptyMsg}\n\n${hint}`);
-      return;
-    }
-
-    // 3) Tenemos summarizer: generamos texto de entrada y resumimos
-    try {
-      const input = this.buildSummarizableText(items); // texto base
-      if (!input.trim()) {
-        this.view.setSummary(emptyMsg);
-        return;
-      }
-
-      const result = await this.summarizer.summarize(input, {
-        // contexto que ayuda a la intención de salida
-        context: "Summarize as concise key points highlighting counts and priorities."
-      });
-
-      // result es texto plano (format: 'plain-text'); pintamos seguro
-      this.view.setSummary(result || emptyMsg);
-    } catch (err) {
-      // Fallback si algo falla en runtime
-      const summary = this.buildPlainSummary(items);
-      this.view.setSummary(summary ? `${summary}\n\n(Note: summarizer error)` : emptyMsg);
-    }
-  }
-
-  buildSummarizableText(items) {
-    // construye un bloque de texto con el estado de la lista
-    // Ejemplo:
-    // Todo List (3 items; 1 completed)
-    // - [ ] Buy milk
-    // - [x] Send report
-    // - [ ] Book flights
-    const total = items.length;
-    const done = items.filter(i => i.completed).length;
-    const lines = [
-      `Todo List (${total} items; ${done} completed)`,
-      ...items.map(i => `- [${i.completed ? "x" : " "}] ${i.text}`)
-    ];
-    return lines.join("\n");
-  }
-
-  buildPlainSummary(items) {
-    // resumen básico sin IA (por si la API no existe)
-    if (!items.length) return "";
-    const total = items.length;
-    const done = items.filter(i => i.completed).length;
-    const pending = total - done;
-    const top3 = items
-      .filter(i => !i.completed)
-      .slice(0, 3)
-      .map(i => `• ${i.text}`)
-      .join("\n");
-    const parts = [
-      `Tasks: ${total}  |  Done: ${done}  |  Pending: ${pending}`,
-      top3 ? `Next up:\n${top3}` : ""
-    ].filter(Boolean);
-    return parts.join("\n");
-  }  
 }
 
 // -------------------------------

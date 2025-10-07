@@ -49,17 +49,21 @@
         </div>
       </header>
       <section class="app-scroll-enable overflow-y-auto p-3 vh-100">
+        <div class="row mb-3">
+          <div class="col-12">
+            <div class="app-card col p-3 h-100">
+              <h2 id="summary" class="">Summary</h2>
+                <div id="summary-container-1"></div>
+              {{/* .Content */}}
+            </div>
+          </div>
+        </div>
         <div class="row row-cols-1 row-cols-lg-2 g-4 mb-5">
           <div class="col">
             {{ partial "app/checklist" . }}
           </div>
           <div class="col">
             {{ partial "app/form" . }}
-          </div>
-          <div class="col">
-            <div class="app-card col p-3 h-100">
-              {{ .Content }}
-            </div>
           </div>
         </div>
         <div class="row my-5 py-5"><br>

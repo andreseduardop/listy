@@ -126,6 +126,7 @@
       "row",
       "row-cols-1",
       "row-cols-lg-2",
+      "rowg-4",
       "small",
       "sticky-top",
       "stretched-link",
@@ -140,13 +141,17 @@
     ],
     "ids": [
       "check-1",
+      "container-1",
+      "container-summary",
+      "container-summary-1",
       "error-message-1",
       "inputAddress",
       "inputEmail4",
       "inputPassword4",
       "list-container-1",
       "sideMenu",
-      "summary"
+      "summary",
+      "summary-container-1"
     ]
   }
 }
