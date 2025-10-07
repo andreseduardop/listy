@@ -281,7 +281,7 @@ class ChecklistView {
 
   // Maneja la creación de nuevas tareas (Enter o botón Ok)
   onCreate(handler) {
-    // Enter en el input
+    // handler(text)
     this.list.addEventListener("keydown", (e) => {
       const entry = e.target.closest("li[data-role='new-entry']");
       if (!entry) return;
@@ -290,7 +290,6 @@ class ChecklistView {
       const text = input.value.trim();
       if (!text) return;
       handler(text);
-      // No enfocamos aquí; el controller lo hará tras el render
     });
 
     this.list.addEventListener("click", (e) => {
@@ -435,12 +434,6 @@ class ChecklistController {
     this.summarizer = null;   // instancia reutilizable
     this.summarizerReady = false;   // bandera de disponibilidad
     this.summarizerInitError = null;  // guarda error (si ocurre)
-
-    // control de creación y resumen
-    this.createInFlight = false;   // evita Enter repetidos (duplicados)
-    this._summaryDebounce = null;  // debounce para no saturar la API
-    this._summaryToken = 0;        // last-write-wins para descartar respuestas viejas
-
     // bandera para saber si debemos devolver el foco tras el próximo render: 
     this.shouldRefocusNewEntry = false; // se activa sólo al crear una nueva tarea
 
@@ -449,7 +442,7 @@ class ChecklistController {
     // Nota: no intentamos resumir aún; esperamos a la primera interacción del usuario
     this.view.setSummary("Tips: Type tasks and press Enter/OK. Use a gesture (click/Enter) to enable the summary if your browser supports it.");
 
-    // Suscripción a cambios del modelo (optimista: NUNCA await aquí)
+    // Suscripción a cambios del modelo
     this.model.addEventListener("change", () => {
       this.view.render(this.model.getAll());
       // sólo si venimos de 'add' devolvemos el foco
@@ -457,104 +450,44 @@ class ChecklistController {
         this.view.focusNewEntryInput();
         this.shouldRefocusNewEntry = false; // consumir bandera
       }
-      // Libera el lock de creación después de renderizar
-      this.createInFlight = false;
-
-      // Programa el resumen (no bloquea UI)
-      this.scheduleSummary();
+      // después de cada render, intentamos actualizar el resumen:
+      this.updateSummary();
     });
 
-
-    // ====== Eventos de vista → acciones ======
-
-    // IMPORTANTE: quitar cualquier 'await' antes de mutar el modelo
-    this.view.onCreate((text) => {
-      if (this.createInFlight) return;  // evita duplicados por tecleo repetido
-      this.createInFlight = true;
-
-      // 1) Mutación optimista (UI responde YA)
-      this.shouldRefocusNewEntry = true; // señalamos que se acaba de crear una nueva tarea y, por tanto, hay que enfocar el input para crear otra
-      this.model.add(text);
-
-      // 2) Prepara summarizer sin bloquear y agenda resumen
-      this.ensureSummarizerOnGesture().then(() => this.scheduleSummary());
-    });
-
-    this.view.onToggle((id) => {
+    // Conecta eventos de la vista a acciones del modelo
+    this.view.onToggle(async (id) => {
+      await this.ensureSummarizerOnGesture(); // gesto del usuario
       this.model.toggle(id);
-      this.ensureSummarizerOnGesture().then(() => this.scheduleSummary());  // gesto del usuario
     });
 
-    this.view.onEdit((id, text) => {
+    this.view.onEdit(async (id, text) => {
+      await this.ensureSummarizerOnGesture(); // gesto del usuario
       // Si el texto está vacío, eliminamos la tarea; si no, actualizamos
       if (String(text).trim() === "") this.model.remove(id);
       else this.model.updateText(id, text);
-      this.ensureSummarizerOnGesture().then(() => this.scheduleSummary());    // gesto del usuario
+    });
+
+
+    // Al crear una tarea, marcamos que en el próximo render se recupere el foco
+    this.view.onCreate(async (text) => {
+      await this.ensureSummarizerOnGesture(); // gesto del usuario
+      this.shouldRefocusNewEntry = true; // señalamos que se acaba de crear una nueva tarea y, por tanto, hay que enfocar el input para crear otra
+      this.model.add(text);
     });
 
     // Reordenamiento por arrastrar y soltar
-    this.view.onReorder?.((draggedId, toIndex) => {
+    this.view.onReorder?.(async (draggedId, toIndex) => {
+      await this.ensureSummarizerOnGesture(); // gesto del usuario
       this.model.moveToIndex(draggedId, toIndex);
-      this.ensureSummarizerOnGesture().then(() => this.scheduleSummary());
     });
   }
 
-
-  // ====== Resumen: debounce + last-write-wins ======
-
-  // Programa la ejecución del resumen sin bloquear (debounce ~250ms)
-  scheduleSummary() {
-    clearTimeout(this._summaryDebounce);
-    this._summaryDebounce = setTimeout(() => this._runSummarize(), 250);
-  }
-
-  async _runSummarize() {
-    const items = this.model.getAll();
-
-    // Token para descartar respuestas antiguas (race-safe)
-    const myToken = ++this._summaryToken;
-
-    // Fallback inmediato si no hay soporte o no hay summarizer aún
-    if (this.summarizerInitError || !("Summarizer" in self) || !this.summarizer) {
-      const basic = this.buildPlainSummary?.(items) || "";
-      if (myToken === this._summaryToken) {
-        this.view.setSummary?.(basic || "No tasks.");
-      }
-      return;
-    }
-
-    try {
-      const input = this.buildSummarizableText(items);
-      if (!input.trim()) {
-        if (myToken === this._summaryToken) this.view.setSummary?.("No tasks.");
-        return;
-      }
-
-      console.log("Resumiendo...");
-      const result = await this.summarizer.summarize(input, {
-        context: "Brief summary in key points."
-      });
-      console.log("RESUMEN:", result);
-
-      // Solo aplica si este resultado sigue siendo el más reciente
-      if (myToken === this._summaryToken) {
-        this.view.setSummary?.(result || "No tasks.");
-      }
-    } catch {
-      // Fallback en caso de error de la API
-      const basic = this.buildPlainSummary?.(items) || "";
-      if (myToken === this._summaryToken) {
-        this.view.setSummary?.(basic ? `${basic}\n\n(Basic summary)` : "No tasks.");
-      }
-    }
-  }
-
-  // ====== Summarizer: crear SIN bloquear la UI ======
+  // -------- Summarizer helpers --------
 
   async ensureSummarizerOnGesture() {
     // crea el summarizer únicamente tras un gesto del usuario
     // Evita recrear si ya tenemos uno con 'es'
-    if (this.summarizer) {
+    if (this.summarizer && this.summarizer.outputLanguage === 'es') {
       console.log("Se usará instancia en español existente.")
       return;
     } 
@@ -610,7 +543,6 @@ class ChecklistController {
         try { this.summarizer.destroy?.(); } catch {}
         this.summarizer = null;
       }
-      console.log("Creando instancia de Summarizer...");
       this.summarizer = await Summarizer.create(options); 
       // Bandera de listo (opcional)
       this.summarizerReady = true;
@@ -681,7 +613,7 @@ class ChecklistController {
   }
 
   buildPlainSummary(items) {
-    // Basic summary sin IA (por si la API no existe)
+    // resumen básico sin IA (por si la API no existe)
     if (!items.length) return "";
     const total = items.length;
     const done = items.filter(i => i.completed).length;
