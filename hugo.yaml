@@ -28,7 +28,7 @@ build:
     target: $1
 
 params:
-  description: '"Planea actividades con listas de tareas."'
+  description: 'Universal online planner for organizing, tracking, and automating any project, event, or task with collaborative, hierarchical, and intelligent management tools.'
   footer: '&copy; 2025 All Rights Reserved, Listy App&#8482;'
   dateFormat: 'Jan 2, 2006'
   author: Listy App
