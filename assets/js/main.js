@@ -492,7 +492,6 @@ class ChecklistController {
       return;
     } 
     if (this.summarizerInitError) {
-      console.log("summarizerInitError:", e)
       return;
     }
 
@@ -548,6 +547,7 @@ class ChecklistController {
       this.summarizerReady = true;
     } catch (err) {
       this.summarizerInitError = err;
+      console.log("summarizerInitError:", this.summarizerInitError);
     }
   }
 
