@@ -486,7 +486,15 @@ class ChecklistController {
 
   async ensureSummarizerOnGesture() {
     // crea el summarizer únicamente tras un gesto del usuario
-    if (this.summarizer || this.summarizerInitError) return;
+    // Evita recrear si ya tenemos uno con 'es'
+    if (this.summarizer && this.summarizer.outputLanguage === 'es') {
+      console.log("Se usará instancia en español existente.")
+      return;
+    } 
+    if (this.summarizerInitError) {
+      console.log("summarizerInitError:", e)
+      return;
+    }
 
     try {
       // 1) Detección de soporte
@@ -496,9 +504,30 @@ class ChecklistController {
       }
 
       // 2) Comprobar disponibilidad (puede estar descargable)
-      const availability = await Summarizer.availability();
-      if (availability === "unavailable") {
-        this.summarizerInitError = new Error("Summarizer unavailable");
+
+      // Opciones deseadas con idioma de salida en español
+      const options = {
+        // Cf. https://developer.chrome.com/docs/ai/summarizer-api#api-functions
+        // type: key-points (default), tldr, teaser, and headline
+        // length: short, medium (default), and long
+        // format:  markdown (default) and plain-text
+        type: 'teaser',
+        length: 'short',
+        format: 'plain-text',
+        outputLanguage: 'es',            // ← idioma requerido
+        expectedInputLanguages: ['es'],  // ← opcional, ayuda a la detección
+        sharedContext: 'Resumen emotivo de una lista de tareas.',
+        monitor(m) {
+          m.addEventListener('downloadprogress', (e) => {
+            console.log(`Downloaded ${Math.round(e.loaded * 100)}%`);
+          });
+        }
+      };
+
+      // Comprueba disponibilidad para estas opciones (con idioma)
+      const availability = await Summarizer.availability(options); 
+      if (availability === 'unavailable') {
+        this.summarizerInitError = new Error('Summarizer unavailable for requested language/config.');
         return;
       }
 
@@ -509,26 +538,13 @@ class ChecklistController {
       }
 
       // 4) Crear y almacenar instancia con opciones adecuadas
-      this.summarizer = await Summarizer.create({
-
-        // forzamos idioma de salida a español
-        outputLanguage: 'es',
-
-        // Cf. https://developer.chrome.com/docs/ai/summarizer-api#api-functions
-        type: "teaser",  // key-points (default), tldr, teaser, and headline
-        length: "short",  // short, medium (default), and long
-        format: "plain-text",  // markdown (default) and plain-text
-
-        // monitor opcional para mostrar progreso de descarga del modelo
-        monitor(m) {
-          m.addEventListener("downloadprogress", (e) => {
-            // reflejar progreso en UI si deseas
-            console.log(`Downloaded ${Math.round(e.loaded * 100)}%`);
-          });
-        },
-        // contexto compartido opcional, puede ayudar a la calidad
-        sharedContext: "Summarize a to-do list with completed and pending items."
-      });
+      // Si hay uno previo sin idioma correcto, destrúyelo antes de crear
+      if (this.summarizer && this.summarizer.outputLanguage !== 'es') {
+        try { this.summarizer.destroy?.(); } catch {}
+        this.summarizer = null;
+      }
+      this.summarizer = await Summarizer.create(options); 
+      // Bandera de listo (opcional)
       this.summarizerReady = true;
     } catch (err) {
       this.summarizerInitError = err;
@@ -563,6 +579,7 @@ class ChecklistController {
         return;
       }
 
+      console.log("Elaborando resumen…");
       const result = await this.summarizer.summarize(input, {
         // contexto que ayuda a la intención de salida
         context: "Summarize as concise key points highlighting counts and priorities."
@@ -570,6 +587,7 @@ class ChecklistController {
 
       // result es texto plano (format: 'plain-text'); pintamos seguro
       this.view.setSummary(result || emptyMsg);
+      console.log("…resumen OK.");
     } catch (err) {
       // Fallback si algo falla en runtime
       const summary = this.buildPlainSummary(items);
