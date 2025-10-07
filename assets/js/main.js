@@ -492,6 +492,7 @@ class ChecklistController {
       return;
     } 
     if (this.summarizerInitError) {
+      console.log("summarizerInitError:", this.summarizerInitError);
       return;
     }
 
