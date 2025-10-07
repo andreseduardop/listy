@@ -132,7 +132,7 @@ class ChecklistView {
   // Crea un <li> para una tarea (sin botón mover)
   #renderItem(item, index) {
     const li = document.createElement("li");
-    li.className = "list-group-item p-1 ps-3 d-flex flex-wrap align-items-center";
+    li.className = "list-group-item p-1 ps-2 d-flex flex-wrap align-items-center";
     li.dataset.id = item.id;
     li.draggable = true; // ← habilita arrastrar/soltar
 
