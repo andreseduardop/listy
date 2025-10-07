@@ -132,9 +132,9 @@ class ChecklistView {
   // Crea un <li> para una tarea (sin botón mover)
   #renderItem(item, index) {
     const li = document.createElement("li");
-    li.className = "list-group-item p-1 ps-3 d-flex flex-wrap align-items-center";
+    li.className = "list-group-item p-1 ps-2 d-flex flex-wrap align-items-center";
     li.dataset.id = item.id;
-    li.draggable = true; // ← habilita arrastrar/soltar
+    li.draggable = true; // habilita arrastrar/soltar
 
     const checkId = `check-${index + 1}`;
 
@@ -176,7 +176,7 @@ class ChecklistView {
     const li = document.createElement("li");
     li.className = "list-group-item p-2 d-flex gap-2 align-items-center bg-body-tertiary";
     li.dataset.role = "new-entry";
-    li.draggable = false; // ← entrada no es arrastrable
+    li.draggable = false; // entrada no es arrastrable
 
     const input = document.createElement("input");
     input.type = "text";
@@ -236,7 +236,7 @@ class ChecklistView {
       label.style.display = "none";
       form.appendChild(editor);
       editor.focus();
-      editor.select();
+      // editor.select(); // selecciona el texto de la tarea que se está editando
 
       const commit = () => {
         const next = editor.value.trim();
@@ -402,13 +402,20 @@ class ChecklistController {
     this.model = new ChecklistModel();
     this.view = new ChecklistView(root);
 
+    // bandera para saber si debemos devolver el foco tras el próximo render
+    this.shouldRefocusNewEntry = false; // se activa sólo al crear
+
     // Render inicial
     this.view.render(this.model.getAll());
 
     // Suscripción a cambios del modelo
     this.model.addEventListener("change", () => {
       this.view.render(this.model.getAll());
-      this.view.focusNewEntryInput();
+      // sólo si venimos de 'add' devolvemos el foco
+      if (this.shouldRefocusNewEntry) {
+        this.view.focusNewEntryInput();
+        this.shouldRefocusNewEntry = false; // consumir bandera
+      }
     });
 
     // Conecta eventos de la vista a acciones del modelo
@@ -421,7 +428,12 @@ class ChecklistController {
         this.model.updateText(id, text);
       }
     });
-    this.view.onCreate((text) => this.model.add(text));
+
+    // Al crear una tarea, marcamos que en el próximo render se recupere el foco
+    this.view.onCreate((text) => {
+      this.shouldRefocusNewEntry = true; // señalamos que hay que enfocar
+      this.model.add(text);
+    });
 
     // Reordenamiento por arrastrar y soltar
     this.view.onReorder((draggedId, toIndex) => this.model.moveToIndex(draggedId, toIndex));
