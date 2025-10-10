@@ -1,8 +1,8 @@
 // 1. Include functions first (so you can manipulate colors, SVGs, calc, etc)
 @import "../bootstrap/scss/_functions";
 // Icons
-$bootstrap-icons-font-dir: "../fonts";
-@import "../bootstrap-icons/font/bootstrap-icons";
+// $bootstrap-icons-font-dir: "../fonts";
+@import "./icons";
 
 // Import the Sass files as usual
 // 2. Include an variable overrides here

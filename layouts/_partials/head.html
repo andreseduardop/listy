@@ -34,13 +34,6 @@
 <!-- Canonical URL -->
 <link rel="canonical" href="{{ .Permalink }}">
 
-<!-- Precarga de fuentes -->
-<link rel="preload" href='{{ "fonts/roboto-slab-v36-latin-600.woff2" | absLangURL }}' as="font" type="font/woff2" crossorigin>
-<!-- <link rel="preload" href='{{ "fonts/courier-prime-v11-latin-700.woff2" | absLangURL }}' as="font" type="font/woff2" crossorigin> -->
-<link rel="preload" href='{{ "fonts/open-sans-v44-latin-regular.woff2" | absLangURL }}' as="font" type="font/woff2" crossorigin>
-<!-- Precarga fuentes para íconos -->
-<link rel="preload" href='{{ "fonts/bootstrap-icons.woff2" | absLangURL }}' as="font" type="font/woff2" crossorigin>
-
 <!-- Versiones en cada idioma -->
 {{ range .AllTranslations }}
   <link rel="alternate" hreflang="{{ .Language.Lang }}" href="{{ .Permalink }}" />
