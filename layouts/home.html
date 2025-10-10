@@ -44,26 +44,35 @@
           <div class="navbar">
             <a class="btn d-block d-md-none ps-0" role="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu" aria-controls="sideMenu" aria-label="Side menu button">
               <i class="bi bi-layout-text-sidebar-reverse fs-1"></i>            </a>
-            <h1 class="title text-primary fs-5 my-0 my-lg-1 ms-auto">DYNAMIC PLANNER&thinsp;<span class="blink-text ">_</span></h1>
+            <h1 class="title text-primary fs-5 my-0 my-lg-1 ms-auto">quick smart plan&thinsp;<span class="blink-text">_</span></h1>
           </div>
         </div>
       </header>
       <section class="app-scroll-enable overflow-y-auto p-3 vh-100">
-        <div class="row mb-3">
-          <div class="col-12">
-            <div class="app-card col p-3 h-100">
-              <h2 id="summary" class="">Summary</h2>
-                <div id="summary-container-1"></div>
-              {{/* .Content */}}
+        <div class="row g-4">
+          <div class="col-12 col-lg-6">
+            <div class="row g-4">
+              <div class="col-12">
+                {{ partial "app/summary" . }}
+                {{/* .Content */}}
+              </div>
+              <div class="col-12">
+                {{ partial "app/checklist" . }}
+              </div>
             </div>
           </div>
-        </div>
-        <div class="row row-cols-1 row-cols-lg-2 g-4 mb-5">
-          <div class="col">
-            {{ partial "app/checklist" . }}
-          </div>
-          <div class="col">
-            {{ partial "app/form" . }}
+          <div class="col-12 col-lg-6">
+            <div class="row g-4">
+              <div class="col-12">
+                {{ partial "app/form" . }}
+              </div>
+              <div class="col-12">
+                {{ partial "app/form" . }}
+              </div>
+              <div class="col-12">
+                {{ partial "app/form" . }}
+              </div>
+            </div>
           </div>
         </div>
         <div class="row my-5 py-5"><br>

@@ -11,16 +11,18 @@ $bootstrap-icons-font-dir: "../fonts";
 // $body-color:      #5054ef;
 $font-size-root:    16px;
 $font-size-base:  1rem;
-$h1-font-size:  2rem;
-$h2-font-size:  $font-size-base * 1.5;
-$h3-font-size:  $font-size-base * 1.2;
-$h4-font-size:  $font-size-base * 1.2;
+$h1-font-size:  1.5rem;
+$h2-font-size:  $font-size-base * 1.25;
+$h3-font-size:  $font-size-base * 1.125;
+$h4-font-size:  $font-size-base * 1.125;
 $h5-font-size:  $font-size-base * 1.1;
 $h6-font-size:  $font-size-base;
 $font-family-sans-serif:  "Roboto Slab", Roboto, Helvetica, Arial, sans-serif;
 // $font-family-sans-serif:  "Geist Mono", Roboto, Helvetica, Arial, sans-serif;
 // $font-family-sans-serif:  "Roboto Slab", Roboto, Helvetica, Arial, sans-serif;
-// $headings-font-family:    "Yanone Kaffeesatz",  system-ui, sans-serif;
+// $headings-font-family:    "Geist Mono",  system-ui, sans-serif;
+$headings-font-family:    "Miracode",  system-ui, sans-serif;
+// $headings-font-family:    "Roboto Slab",  system-ui, sans-serif;
 
 // $zindex-dropdown:                   1000;
 // $zindex-sticky:                     1020;
@@ -231,6 +233,14 @@ $theme-colors: map-remove($theme-colors, "info", "warning");
   font-display: swap;
   src: url('../fonts/roboto-slab-v36-latin-500.woff2') format('woff2');
 }
+/* miracod */
+@font-face {
+  font-family: 'Miracode';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/miracode.woff2') format('woff2');
+}
 
 /* Smooth Scrolling */
 html {
@@ -258,10 +268,11 @@ body {
 // Scroll hasta encabezados
 h1, h2, h3, h4, h5, h6 {
   scroll-margin-top: 2.5em;
-  font-weight: 500;
+  font-weight: 600;
+  // letter-spacing: .5px;
 }
 h1.title {
-  letter-spacing: .05rem;
+  // letter-spacing: .05rem;
 }
 // Hipervínculos
 a {
@@ -294,18 +305,26 @@ svg.bi {
   }
 }
 
-// CONTAINER
-.app-container {
-  height: 95vh;
-}
-
 // CARD (start)
 .app-card {
   border: 1px solid $body-color;
+  // border-radius: 4px;
   box-shadow: 4px 4px $body-color-subtle-5;
+  padding: 1rem;
 }
 .app-card, .app-card * {
   background-color: $app-bg-subtle;
+}
+.app-card h2 {
+  // text-transform: uppercase;
+  font-size: 1rem;
+  margin-top: -10px;
+  margin-left: -8px;
+  // border-bottom: 1px dashed $body-color;
+}
+.app-card h2::after {
+  // animation: blink-animation 1.2s infinite; /* Apply the animation */
+  // content: '\2009_';
 }
 // CARD (end)
 
@@ -440,5 +459,5 @@ main img {
 }
 .blink-text {
   // color: $orange;
-  animation: blink-animation 1s infinite; /* Apply the animation */
+  animation: blink-animation 1.2s infinite; /* Apply the animation */
 }
