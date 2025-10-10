@@ -28,7 +28,7 @@
       <script src="{{ .RelPermalink }}"></script>
     {{ else }}
       {{ with . | fingerprint }}
-        <script src="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}" crossorigin="anonymous"></script>
+        <script src="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}" crossorigin="anonymous" defer></script>
       {{ end }}
     {{ end }}
   {{ end }}
