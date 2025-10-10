@@ -349,6 +349,7 @@ body {
   text-rendering: optimizeLegibility;
   width: 100%;
   word-break: normal;
+  overflow-wrap: anywhere;
 }
 // Scroll hasta encabezados
 h1, h2, h3, h4, h5, h6 {
@@ -406,21 +407,25 @@ svg.bi {
 }
 .app-card h2 {
   // text-transform: uppercase;
-  font-size: 1rem;
+  font-size: .933334rem;
+  // font-size: .86667rem;
+  // font-family: 'Courier Prime';
+  // font-weight: 700;
   margin-top: -12px;
   margin-left: -8px;
+  user-select: none;
   // border-bottom: 1px dashed $body-color;
 }
 .app-card h2::after {
-  // animation: blink-animation 1.2s infinite; /* Apply the animation */
-  // content: '\2009_';
+  color: $body-color-subtle-3;
+  // animation: blink-animation 2s infinite; /* Apply the animation */
+  content: '\2006»';
 }
 // CARD (end)
 
 // SIDEBAR (start)
 .offcanvas-start {
   transition: transform 400ms cubic-bezier(0.3, 0.8, 0.3, 1);
-    // transition: transform 400ms cubic-bezier(0.3, 0.75, 0.3, 1);
 }
 .app-sidebar {
   height: 95vh;  
@@ -463,7 +468,7 @@ svg.bi {
   margin-left: -1.6em;
   cursor: pointer;
   border-radius: 50%;
-  bottom: .15em;
+  bottom: .2em;
   height: 1.2em;
   width: 1.2em;
   position: relative;
@@ -480,7 +485,6 @@ svg.bi {
 
 // Label
 .app-checklist input[type="checkbox"] + label {
-  overflow-wrap: break-word;
   cursor: pointer;
   padding-left: 2px;
 }
@@ -547,6 +551,6 @@ main img {
   }
 }
 .blink-text {
-  // color: $orange;
-  animation: blink-animation 1.2s infinite; /* Apply the animation */
+  color: $body-color-subtle-3;
+  animation: blink-animation 1.5s infinite; /* Apply the animation */
 }

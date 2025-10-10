@@ -1,8 +1,3 @@
-<!-- Get Bootstrap JS -->
-{{ $bootstrapJs := resources.Get "bootstrap/dist/js/bootstrap.min.js" | resources.Fingerprint "sha384" }}
-<!-- Load Bootstrap JavaScript  -->
-<script src='{{ $bootstrapJs.RelPermalink }}' integrity='{{ $bootstrapJs.Data.Integrity }}' defer></script>
-
 <!-- Options for build -->
 {{ $buildOptions := (dict 
   "bundle" true
@@ -19,3 +14,22 @@
 {{ end }}
 {{- $script := resources.Get "js/main.js" | js.Build $buildOptions | resources.Fingerprint "sha384" -}}
 <script src='{{ $script.RelPermalink  }}' integrity='{{ $script.Data.Integrity }}' defer></script>
+
+<!-- Get Bootstrap JS -->
+{{ $bootstrapJs := resources.Get "bootstrap/dist/js/bootstrap.min.js" | resources.Fingerprint "sha384" }}
+
+{{ with $bootstrapJs }}
+  {{$opts := dict
+    "minify" (not hugo.IsDevelopment)
+    "targetPath" "js/styles.js"
+  }}
+  {{ with . | js.Build $opts }}
+    {{ if hugo.IsDevelopment }}
+      <script src="{{ .RelPermalink }}"></script>
+    {{ else }}
+      {{ with . | fingerprint }}
+        <script src="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}" crossorigin="anonymous"></script>
+      {{ end }}
+    {{ end }}
+  {{ end }}
+{{ end }}
