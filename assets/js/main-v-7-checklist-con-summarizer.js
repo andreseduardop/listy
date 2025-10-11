@@ -471,6 +471,16 @@ class ChecklistView {
     state.overId = null;
     state.overPos = null;
   }
+
+
+  // actualiza el contenedor del resumen de forma segura
+  setSummary(text) {
+    const box = document.getElementById("summary-container");
+    if (!box) return;
+    // Usamos textContent para evitar inyección de HTML ya que el input de tareas proviene del usuario
+    box.textContent = text || "";
+  }
+
 }
 
 // -------------------------------
@@ -482,14 +492,23 @@ class ChecklistController {
     this.model = new ChecklistModel();
     this.view = new ChecklistView(root);
 
-    // control de creación para evitar duplicados por tecleo repetido
+    // --- SUMMARIZER STATE ---
+    this.summarizer = null;   // instancia reutilizable
+    this.summarizerReady = false;   // bandera de disponibilidad
+    this.summarizerInitError = null;  // guarda error (si ocurre)
+
+    // control de creación y resumen
     this.createInFlight = false;   // evita Enter repetidos (duplicados)
+    this._summaryDebounce = null;  // debounce para no saturar la API
+    this._summaryToken = 0;        // last-write-wins para descartar respuestas viejas
 
     // bandera para saber si debemos devolver el foco tras el próximo render: 
     this.shouldRefocusNewEntry = false; // se activa sólo al crear una nueva tarea
 
     // Render inicial
     this.view.render(this.model.getAll());
+    // Nota: no intentamos resumir aún; esperamos a la primera interacción del usuario
+    this.view.setSummary("Tips: Type tasks and press Enter/OK. Use a gesture (click/Enter) to enable the summary if your browser supports it.");
 
     // Suscripción a cambios del modelo (optimista: NUNCA await aquí)
     this.model.addEventListener("change", () => {
@@ -501,6 +520,9 @@ class ChecklistController {
       }
       // Libera el lock de creación después de renderizar
       this.createInFlight = false;
+
+      // Programa el resumen (no bloquea UI)
+      this.scheduleSummary();
     });
 
 
@@ -514,23 +536,228 @@ class ChecklistController {
       // 1) Mutación optimista (UI responde YA)
       this.shouldRefocusNewEntry = true; // señalamos que se acaba de crear una nueva tarea y, por tanto, hay que enfocar el input para crear otra
       this.model.add(text);
+
+      // 2) Prepara summarizer sin bloquear y agenda resumen
+      this.ensureSummarizerOnGesture().then(() => this.scheduleSummary());
     });
 
     this.view.onToggle((id) => {
       this.model.toggle(id);
+      this.ensureSummarizerOnGesture().then(() => this.scheduleSummary());  // gesto del usuario
     });
 
     this.view.onEdit((id, text) => {
       // Si el texto está vacío, eliminamos la tarea; si no, actualizamos
       if (String(text).trim() === "") this.model.remove(id);
       else this.model.updateText(id, text);
+      this.ensureSummarizerOnGesture().then(() => this.scheduleSummary());    // gesto del usuario
     });
 
     // Reordenamiento por arrastrar y soltar
     this.view.onReorder?.((draggedId, toIndex) => {
       this.model.moveToIndex(draggedId, toIndex);
+      this.ensureSummarizerOnGesture().then(() => this.scheduleSummary());
     });
   }
+
+
+  // ====== Resumen: debounce + last-write-wins ======
+
+  // Programa la ejecución del resumen sin bloquear (debounce ~250ms)
+  scheduleSummary() {
+    clearTimeout(this._summaryDebounce);
+    this._summaryDebounce = setTimeout(() => this._runSummarize(), 250);
+  }
+
+  async _runSummarize() {
+    const items = this.model.getAll();
+
+    // Token para descartar respuestas antiguas (race-safe)
+    const myToken = ++this._summaryToken;
+
+    // Fallback inmediato si no hay soporte o no hay summarizer aún
+    if (this.summarizerInitError || !("Summarizer" in self) || !this.summarizer) {
+      const basic = this.buildPlainSummary?.(items) || "";
+      if (myToken === this._summaryToken) {
+        this.view.setSummary?.(basic || "No tasks.");
+      }
+      return;
+    }
+
+    try {
+      const input = this.buildSummarizableText(items);
+      if (!input.trim()) {
+        if (myToken === this._summaryToken) this.view.setSummary?.("No tasks.");
+        return;
+      }
+
+      console.log("Resumiendo...");
+      const result = await this.summarizer.summarize(input, {
+        context: "Brief summary in key points."
+      });
+      console.log("RESUMEN:", result);
+
+      // Solo aplica si este resultado sigue siendo el más reciente
+      if (myToken === this._summaryToken) {
+        this.view.setSummary?.(result || "No tasks.");
+      }
+    } catch {
+      // Fallback en caso de error de la API
+      const basic = this.buildPlainSummary?.(items) || "";
+      if (myToken === this._summaryToken) {
+        this.view.setSummary?.(basic ? `${basic}\n\n(Basic summary)` : "No tasks.");
+      }
+    }
+  }
+
+  // ====== Summarizer: crear SIN bloquear la UI ======
+
+  async ensureSummarizerOnGesture() {
+    // crea el summarizer únicamente tras un gesto del usuario
+    // Evita recrear si ya tenemos uno con 'es'
+    if (this.summarizer) {
+      console.log("Se usará instancia en español existente.")
+      return;
+    } 
+    if (this.summarizerInitError) {
+      console.log("summarizerInitError:", this.summarizerInitError);
+      return;
+    }
+
+    try {
+      // 1) Detección de soporte
+      if (!("Summarizer" in self)) {
+        this.summarizerInitError = new Error('Prueba "Summarizer" in self. Summarizer API not supported.');
+        return;
+      }
+
+      // 2) Comprobar disponibilidad (puede estar descargable)
+
+      // Opciones deseadas con idioma de salida en español
+      const options = {
+        // Cf. https://developer.chrome.com/docs/ai/summarizer-api#api-functions
+        // type: key-points (default), tldr, teaser, and headline
+        // length: short, medium (default), and long
+        // format:  markdown (default) and plain-text
+        type: 'teaser',
+        length: 'short',
+        format: 'plain-text',
+        outputLanguage: 'es',            // ← idioma requerido
+        expectedInputLanguages: ['es'],  // ← opcional, ayuda a la detección
+        sharedContext: 'Inspiring and motivating style.',
+        monitor(m) {
+          m.addEventListener('downloadprogress', (e) => {
+            console.log(`Downloaded ${Math.round(e.loaded * 100)}%`);
+          });
+        }
+      };
+
+      // Comprueba disponibilidad para estas opciones (con idioma)
+      const availability = await Summarizer.availability(options); 
+      if (availability === 'unavailable') {
+        this.summarizerInitError = new Error('Summarizer unavailable for requested language/config.');
+        return;
+      }
+
+      // 3) Requerir gesto de usuario para crear (API guideline)
+      if (!navigator.userActivation.isActive) {
+        // No crear sin gesto; salimos silenciosamente
+        return;
+      }
+
+      // 4) Crear y almacenar instancia con opciones adecuadas
+      // Si hay uno previo sin idioma correcto, destrúyelo antes de crear
+      if (this.summarizer && this.summarizer.outputLanguage !== 'es') {
+        try { this.summarizer.destroy?.(); } catch {}
+        this.summarizer = null;
+      }
+      console.log("Creando instancia de Summarizer...");
+      this.summarizer = await Summarizer.create(options); 
+      // Bandera de listo (opcional)
+      this.summarizerReady = true;
+    } catch (err) {
+      this.summarizerInitError = err;
+      console.log("summarizerInitError:", this.summarizerInitError);
+    }
+  }
+
+  async updateSummary() {
+    // se llama después de CADA render
+    const items = this.model.getAll();
+    const emptyMsg = "No tasks yet.";
+
+    // 1) Si no hay soporte o error previo, mostramos fallback simple
+    if (this.summarizerInitError || !("Summarizer" in self)) {
+      const summary = this.buildPlainSummary(items);
+      this.view.setSummary(summary || emptyMsg);
+      return;
+    }
+
+    // 2) Si aún no hemos creado summarizer (sin gesto), usa fallback breve
+    if (!this.summarizer) {
+      const hint = "(Click/Enter to enable on-device summary if available.)";
+      const summary = this.buildPlainSummary(items);
+      this.view.setSummary(summary ? `${summary}\n\n${hint}` : `${emptyMsg}\n\n${hint}`);
+      return;
+    }
+
+    // 3) Tenemos summarizer: generamos texto de entrada y resumimos
+    try {
+      const input = this.buildSummarizableText(items); // texto base
+      if (!input.trim()) {
+        this.view.setSummary(emptyMsg);
+        return;
+      }
+
+      console.log("Elaborando resumen…");
+      const result = await this.summarizer.summarize(input, {
+        // contexto que ayuda a la intención de salida
+        context: "Summarize as concise key points highlighting counts and priorities."
+      });
+
+      // result es texto plano (format: 'plain-text'); pintamos seguro
+      this.view.setSummary(result || emptyMsg);
+      console.log("…RESUMEN:", result);
+    } catch (err) {
+      // Fallback si algo falla en runtime
+      const summary = this.buildPlainSummary(items);
+      this.view.setSummary(summary ? `${summary}\n\n(Note: summarizer error)` : emptyMsg);
+    }
+  }
+
+  buildSummarizableText(items) {
+    // construye un bloque de texto con el estado de la lista
+    // Ejemplo:
+    // Todo List (3 items; 1 completed)
+    // - [ ] Buy milk
+    // - [x] Send report
+    // - [ ] Book flights
+    const total = items.length;
+    const done = items.filter(i => i.completed).length;
+    const lines = [
+      `Todo List (${total} items; ${done} completed)`,
+      ...items.map(i => `- [${i.completed ? "x" : " "}] ${i.text}`)
+    ];
+    return lines.join("\n");
+  }
+
+  buildPlainSummary(items) {
+    // Basic summary sin IA (por si la API no existe)
+    if (!items.length) return "";
+    const total = items.length;
+    const done = items.filter(i => i.completed).length;
+    const pending = total - done;
+    const top3 = items
+      .filter(i => !i.completed)
+      .slice(0, 3)
+      .map(i => `• ${i.text}`)
+      .join("\n");
+    const parts = [
+      `Tasks: ${total}  |  Done: ${done}  |  Pending: ${pending}`,
+      top3 ? `Next up:\n${top3}` : ""
+    ].filter(Boolean);
+    return parts.join("\n");
+  }  
 }
 
 
