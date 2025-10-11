@@ -419,6 +419,12 @@ svg.bi {
   }
 }
 
+// HEADER
+.app-title {
+  padding: 0px;
+  margin: 0px;
+}
+
 // CARD (start)
 .app-card {
   border: 1px solid $body-color;
@@ -520,6 +526,11 @@ svg.bi {
 .app-checklist input[type="checkbox"]:checked+label {
   color: $body-color-subtle-3;
 }
+// Input textg
+.app-checklist textarea, 
+.app-checklist input[type="text"] {
+  padding: 0px;
+}
 
 // Buttons
 // Edit 
@@ -590,7 +601,7 @@ main img {
     opacity: 1; /* Fully visible again at the end */
   }
 }
-.blink-text {
+.blink-title {
   color: $body-color-subtle-3;
   animation: blink-animation 1.5s infinite; /* Apply the animation */
 }
