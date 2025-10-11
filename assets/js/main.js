@@ -1,4 +1,4 @@
-// Simple MVC checklist with drag & drop reordering (no move button)
+// checklist component with drag & drop reordering
 // NOTE: Code in English, comentarios en español.
 
 // -------------------------------
@@ -167,7 +167,7 @@ class ChecklistView {
     // Crea el <li> de la tarea
     // (ajusta clases y habilita arrastre en todo el <li>)
     const li = document.createElement("li");
-    li.className = "list-group-item p-2 d-flex align-items-center";
+    li.className = "list-group-item p-2 d-flex align-items-start";
     li.setAttribute("draggable", "true"); // ← permite arrastrar el item completo
     li.dataset.id = item.id;
 
@@ -175,7 +175,7 @@ class ChecklistView {
     // (avisa al usuario que el item es arrastrable)
     const btnMove = document.createElement("button");
     btnMove.type = "button";
-    btnMove.className = "btn app-btn-move fs-4";
+    btnMove.className = "btn app-btn-move";
     btnMove.setAttribute("aria-label", "Move");
     btnMove.title = "Move";
     btnMove.innerHTML = `<i class="bi bi-arrow-down-up"></i>`;
@@ -183,7 +183,7 @@ class ChecklistView {
 
     // --- Bloque form-check con checkbox + label ---
     const form = document.createElement("div");
-    form.className = "form-check position-relative d-flex align-items-center flex-grow-1";
+    form.className = "form-check position-relative d-flex align-items-top flex-grow-1";
 
     const input = document.createElement("input");
     input.className = "form-check-input";
@@ -221,7 +221,7 @@ class ChecklistView {
   // Crea el <li> de entrada para nuevas tareas (al final)
   #renderNewItemEntry() {
     const li = document.createElement("li");
-    li.className = "list-group-item p-2 d-flex gap-2 align-items-center bg-body-tertiary";
+    li.className = "list-group-item p-2 d-flex gap-2 align-items-start";
     li.dataset.role = "new-entry";
     li.draggable = false; // entrada no es arrastrable
 

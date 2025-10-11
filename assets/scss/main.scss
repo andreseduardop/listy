@@ -8,7 +8,7 @@
 
 
 // $body-color:      #5054ef;
-$font-size-root:    15px;
+$font-size-root:    14px;
 $font-size-base:  1rem;
 $h1-font-size:  1.5rem;
 $h2-font-size:  $font-size-base * 1.4;
@@ -16,8 +16,8 @@ $h3-font-size:  $font-size-base * 1.3;
 $h4-font-size:  $font-size-base * 1.2;
 $h5-font-size:  $font-size-base * 1.1;
 $h6-font-size:  $font-size-base;
-$headings-font-family:    "Roboto Slab",  system-ui, sans-serif;
-$font-family-sans-serif:  "Open Sans", Roboto, Helvetica, Arial, sans-serif;
+$headings-font-family:    "Space Mono",  system-ui, sans-serif;
+$font-family-sans-serif:  "Geist Mono", Roboto, Helvetica, Arial, sans-serif;
 // Fuentes disponibles: 
 // Miracode
 // Courier Prime
@@ -25,6 +25,7 @@ $font-family-sans-serif:  "Open Sans", Roboto, Helvetica, Arial, sans-serif;
 // Geist Mono
 // Open Sans
 // Inter
+
 $font-weight-lighter:         lighter;
 $font-weight-light:           300;
 $font-weight-normal:          400;
@@ -332,6 +333,22 @@ $theme-colors: map-remove($theme-colors, "info", "warning");
   font-display: swap;
   src: url('../fonts/open-sans-v44-latin-600.woff2') format('woff2');
 }
+/* space-mono-regular - latin */
+@font-face {
+  font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+  font-family: 'Space Mono';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../fonts/space-mono-v17-latin-regular.woff2') format('woff2'); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+}
+/* space-mono-700 - latin */
+@font-face {
+  font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+  font-family: 'Space Mono';
+  font-style: normal;
+  font-weight: 700;
+  src: url('../fonts/space-mono-v17-latin-700.woff2') format('woff2'); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+}
 
 /* Smooth Scrolling */
 html {
@@ -351,7 +368,7 @@ body {
   font-weight: 400;
   height: 100%;
   margin: 0;
-  line-height: 1.25;
+  line-height: 1.3;
   overflow-wrap: anywhere;
   text-rendering: optimizeLegibility;
   width: 100%;
@@ -361,7 +378,7 @@ body {
 // Scroll hasta encabezados
 h1, h2, h3, h4, h5, h6 {
   scroll-margin-top: 2.5em;
-  font-weight: 600;
+  font-weight: 700;
   // letter-spacing: .25px;
 }
 // Hipervínculos
@@ -414,7 +431,7 @@ svg.bi {
 }
 .app-card h2 {
   // text-transform: uppercase;
-  font-size: .933334rem;
+  font-size: 1.1rem;
   // font-size: .86667rem;
   // font-family: 'Courier Prime';
   // font-weight: 700;
@@ -427,6 +444,7 @@ svg.bi {
   color: $body-color-subtle-3;
   // animation: blink-animation 2s infinite; /* Apply the animation */
   content: '\2006»';
+  font-family: 'Geist Mono' !important;
 }
 // CARD (end)
 
@@ -479,7 +497,7 @@ svg.bi {
   margin-left: -1.6em;
   cursor: pointer;
   border-radius: 50%;
-  bottom: .25em;
+  bottom: .15em;
   height: 1.2em;
   width: 1.2em;
   position: relative;
@@ -496,7 +514,8 @@ svg.bi {
 // Label
 .app-checklist input[type="checkbox"] + label {
   cursor: default;
-  padding-left: 2px;
+  padding-left: 6px;
+  padding-top: 1.5px;
 }
 .app-checklist input[type="checkbox"]:checked+label {
   color: $body-color-subtle-3;

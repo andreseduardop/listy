@@ -9,7 +9,7 @@
           </a>
         </div>
         <div class="offcanvas-body p-1">
-          <menu class="list-group list-group-flush fw-bold col-12 mt-0">
+          <menu id="app-root" class="list-group list-group-flush fw-bold col-12 mt-0">
             <li class="list-group-item list-group-item-action border border-0">
               <a href="/#lista-1" class="text-decoration-none text-body">
                 <i class="bi bi-check-circle fs-4"></i>
@@ -38,13 +38,13 @@
         </div>
       </div>
     </nav>
-    <main class="col col-sm-11 col-md-7 col-lg-8 col-xxl-7 mb-3 p-0">
+    <main id="app-main" class="col col-sm-11 col-md-7 col-lg-8 col-xxl-7 mb-3 p-0">
       <header class="user-select-none sticky-top p-3 pe-lg-0">
         <div class="app-card col p-3 py-1">
           <div class="navbar">
             <a class="btn d-block d-md-none ps-0" role="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu" aria-controls="sideMenu" aria-label="Side menu button">
               <i class="bi bi-layout-text-sidebar-reverse fs-1"></i>            </a>
-            <h1 class="title text-primary fs-1 my-0 my-lg-1 ms-auto">quick &thinsp;smart &thinsp;plan&thinsp;<span class="blink-text">»</span></h1>
+            <h1 id="app-title" class="">qsp&thinsp;<span class="fw-normal fs-3">&thinsp;-fiesta de cumpleaños</span></h1><span class="blink-text d-inline fs-1 fw-normal me-auto pb-1">&thinsp;»</span>
           </div>
         </div>
       </header>
@@ -64,6 +64,7 @@
           <div id="app-container-2" class="col-12 col-lg-6">
             <div class="row g-4">
               <div class="col-12">
+                {{ partial "app/summary" . }}
               </div>
               <div class="col-12">
               </div>
