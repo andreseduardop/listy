@@ -133,11 +133,15 @@
       "vh-100"
     ],
     "ids": [
+      "app-container",
+      "app-container-1",
+      "app-container-2",
       "check-1",
+      "dashboard-container",
       "error-message-1",
-      "list-container-1",
+      "list-container",
       "sideMenu",
-      "summary-container-1"
+      "summary-container"
     ]
   }
 }

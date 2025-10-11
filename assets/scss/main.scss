@@ -335,7 +335,7 @@ html {
 }
 // Color del texto seleccioando
 ::selection {
-  background-color: tint-color($primary, 70%); /* Color de fondo */
+  background-color: tint-color($body-color, 70%); /* Color de fondo */
   color: $body-color; /* Color del texto */
 }
 body {

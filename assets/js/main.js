@@ -112,7 +112,7 @@ class ChecklistModel extends EventTarget {
 // -------------------------------
 class ChecklistView {
   constructor(root) {
-    // root: contenedor principal (ej. #list-container-1)
+    // root: contenedor principal (ej. #list-container)
     this.root = root;
     this.list = root.querySelector(".app-checklist");
     if (!this.list) throw new Error("Missing .app-checklist inside provided root.");  // valida existencia
@@ -424,7 +424,7 @@ class ChecklistView {
 
   // actualiza el contenedor del resumen de forma segura
   setSummary(text) {
-    const box = document.getElementById("summary-container-1");
+    const box = document.getElementById("summary-container");
     if (!box) return;
     // Usamos textContent para evitar inyección de HTML ya que el input de tareas proviene del usuario
     box.textContent = text || "";
@@ -437,7 +437,7 @@ class ChecklistView {
 // -------------------------------
 class ChecklistController {
   constructor({ root }) {
-    // root: elemento contenedor (e.g., document.getElementById('list-container-1'))
+    // root: elemento contenedor (e.g., document.getElementById('list-container'))
     this.model = new ChecklistModel();
     this.view = new ChecklistView(root);
 
@@ -715,7 +715,7 @@ class ChecklistController {
 // Inicializa el controlador usando el contenedor dado por el HTML de la consigna.
 // Asegúrate de ejecutar esto después de que el DOM esté listo.
 document.addEventListener("DOMContentLoaded", () => {
-  const container = document.getElementById("list-container-1");
+  const container = document.getElementById("list-container");
   if (!container) return;
   new ChecklistController({ root: container });
 });

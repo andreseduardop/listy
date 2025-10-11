@@ -50,10 +50,10 @@
       </header>
       <section class="app-scroll-enable overflow-y-auto p-3 vh-100">
         <div class="row g-4">
-          <div class="col-12 col-lg-6">
+          <div id="app-container-1" class="col-12 col-lg-6">
             <div class="row g-4">
               <div class="col-12">
-                {{ partial "app/summary" . }}
+                {{ partial "app/dashboard" . }}
                 {{/* .Content */}}
               </div>
               <div class="col-12">
@@ -61,10 +61,10 @@
               </div>
             </div>
           </div>
-          <div class="col-12 col-lg-6">
+          <div id="app-container-2" class="col-12 col-lg-6">
             <div class="row g-4">
               <div class="col-12">
-                {{ partial "app/form" . }}
+                {{ partial "app/summary" . }}
               </div>
               <div class="col-12">
                 {{ partial "app/form" . }}
