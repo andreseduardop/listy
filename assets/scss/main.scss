@@ -424,6 +424,13 @@ svg.bi {
   padding: 0px;
   margin: 0px;
 }
+.app-title::after {
+  color: $body-color-subtle-3;
+  animation: blink-animation 1.5s infinite;
+  font-family: 'Geist Mono' !important;
+  content: '\2006»';
+  font-weight: 400;
+}
 
 // CARD (start)
 .app-card {
@@ -448,7 +455,6 @@ svg.bi {
 }
 .app-card h2::after {
   color: $body-color-subtle-3;
-  // animation: blink-animation 2s infinite; /* Apply the animation */
   content: '\2006»';
   font-family: 'Geist Mono' !important;
 }
@@ -600,8 +606,4 @@ main img {
   100% {
     opacity: 1; /* Fully visible again at the end */
   }
-}
-.blink-title {
-  color: $body-color-subtle-3;
-  animation: blink-animation 1.5s infinite; /* Apply the animation */
 }
