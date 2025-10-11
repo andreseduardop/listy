@@ -178,6 +178,8 @@ class ChecklistView {
   }
 
   // Crea <li> según layout actualizado (sin atributo 'for' en label)
+  // Replace the whole #renderItem with this version
+  // Crea <li> según layout actualizado (btn a la derecha del form-check)
   #renderItem(item) {
     const li = el("li", {
       className: "list-group-item p-2 d-flex align-items-start",
@@ -185,14 +187,7 @@ class ChecklistView {
     });
     li.dataset.id = item.id;
 
-    // Botón de mover (conserva el layout)
-    const btnMove = el("button", {
-      className: "btn app-btn-move",
-      attrs: { type: "button", "aria-label": "Move", title: "Move" },
-      html: `<i class="bi bi-arrow-down-up"></i>`,
-    });
-
-    // Bloque form-check
+    // Bloque form-check (izquierda)
     const form = el("div", { className: "form-check position-relative d-flex align-items-top flex-grow-1" });
 
     // Input checkbox (toggle solo al hacer clic en el input)
@@ -211,10 +206,28 @@ class ChecklistView {
     form.appendChild(input);
     form.appendChild(label);
 
-    // Orden final: [btnMove] [form-check]
-    li.append(btnMove, form);
+    // Botón decorativo de mover (derecha del form-check)
+    // - No tiene acciones; solo comunica que el li es arrastrable
+    // - Se marca como no-focusable para accesibilidad (tabindex -1) y aria-hidden
+    // - Se fuerza draggable="false" en el botón para evitar comportamientos erráticos
+    const btnMove = el("button", {
+      className: "btn app-btn-move",
+      attrs: {
+        type: "button",
+        "aria-label": "Move",
+        title: "Move",
+        "aria-hidden": "true",
+        tabindex: "-1",
+        draggable: "false"
+      },
+      html: `<i class="bi bi-arrow-down-up" aria-hidden="true"></i>`,
+    });
+
+    // Orden final: [form-check] [btnMove]  ← coincide con checklist.html
+    li.append(form, btnMove);
     return li;
   }
+
 
   // <li> de nueva entrada
   #renderNewItemEntry() {

@@ -526,7 +526,7 @@ svg.bi {
 // Label
 .app-checklist input[type="checkbox"] + label {
   cursor: default;
-  padding-left: 6px;
+  padding-left: 8px;
   padding-top: 1.5px;
 }
 .app-checklist input[type="checkbox"]:checked+label {
@@ -535,7 +535,8 @@ svg.bi {
 // Input textg
 .app-checklist textarea, 
 .app-checklist input[type="text"] {
-  padding: 0px;
+  // padding: 0px 6px;
+  align-content: center;
 }
 
 // Buttons
@@ -553,9 +554,7 @@ button.app-btn-move {
   border: 0px;
   color: $body-color-subtle-5;
   cursor: grab !important;
-  margin: 0px 8px 0px 0px;
-  padding: 0px;
-  // font-size-adjust: .6;
+  padding: 0px 0px 0px 16px;
 }
 button.app-btn-move:active { cursor: grabbing !important; }
 // Add new task
