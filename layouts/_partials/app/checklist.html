@@ -3,21 +3,26 @@
   <div id="checklist-container">
     <ul class="nav nav-tabs nav-fill" id="checklist-tabs" role="tablist">
       <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="pendig-tab" data-bs-toggle="tab" data-bs-target="#pendig-tab-pane" type="button" role="tab" aria-controls="pendig-tab-pane" aria-selected="true">Pending</button>
+        <button class="nav-link active" id="checklist-pending-tab" data-bs-toggle="tab" data-bs-target="#checklist-pending-tab-pane" type="button" role="tab" aria-controls="checklist-pending-tab-pane" aria-selected="true">Pending</button>
       </li>
       <li class="nav-item" role="presentation">
-        <button class="nav-link" id="completed-tab" data-bs-toggle="tab" data-bs-target="#completed-tab-pane" type="button" role="tab" aria-controls="completed-tab-pane" aria-selected="false">Completed</button>
+        <button class="nav-link" id="checklist-completed-tab" data-bs-toggle="tab" data-bs-target="#checklist-completed-tab-pane" type="button" role="tab" aria-controls="checklist-completed-tab-pane" aria-selected="false">Completed</button>
       </li>
 
       </li>
     </ul>
     <div class="tab-content" id="checklist-tabs-content">
-      <div class="tab-pane fade show active" id="pendig-tab-pane" role="tabpanel" aria-labelledby="pendig-tab" tabindex="0">
+      <div class="tab-pane fade show active" id="checklist-pending-tab-pane" role="tabpanel" aria-labelledby="checklist-pending-tab" tabindex="0">
         <ul class="app-checklist list-group">
           <li class="list-group-item p-1 ps-2 d-flex align-items-center" draggable="true">
+            <!-- Este botón es decorativo para notificar al usuario -->
+            <!-- de la posibilidad de arrastrar y soltar -->
+            <button type="button" class="btn app-btn-move" aria-label="Move" title="Move">
+              <i class="bi bi-arrows-move"></i>
+            </button>
             <div class="form-check position-relative flex-grow-1">
-              <input class="form-check-input" type="checkbox" value="" id="checklist-check-1">
-              <label class="form-check-label stretched-link" for="checklist-check-1">Pending task example
+              <input class="form-check-input" type="checkbox" value="" id="check-1">
+              <label class="form-check-label stretched-link" for="check-1">Pending 
               </label>
             </div>
             <button type="button" class="btn app-btn-edit" aria-label="Edit" title="Edit">
@@ -25,23 +30,29 @@
             </button>
           </li>
           <li class="list-group-item p-2 d-flex gap-2 align-items-center bg-body-tertiary" data-role="new-entry" draggable="false">
-            <input type="text" class="form-control" name="New task entry" placeholder="Add new task and press Enter" aria-label="Add new task">
+            <input type="text" class="form-control" placeholder="Add new task and press Enter" aria-label="Add new task">
             <button type="button" class="btn app-btn-add" title="Add new task" aria-label="Add new task">
               <i class="bi bi-plus-square-fill fs-3" aria-hidden="true"></i>
             </button>
           </li>
         </ul>
       </div>
-      <div class="tab-pane fade" id="completed-tab-pane" role="tabpanel" aria-labelledby="completed-tab" tabindex="0">
+      <div class="tab-pane fade" id="checklist-completed-tab-pane" role="tabpanel" aria-labelledby="checklist-completed-tab" tabindex="0">
         <ul class="app-checklist list-group">
           <li class="list-group-item p-1 ps-2 d-flex align-items-center" draggable="true">
             <div class="form-check position-relative flex-grow-1">
-              <input class="form-check-input" type="checkbox" value="" id="checklist-checked-1" checked>
-              <label class="form-check-label stretched-link" for="checklist-checked-1">Completed task example
+              <input class="form-check-input" type="checkbox" value="" id="check-10" checked>
+              <label class="form-check-label stretched-link" for="check-1">Completed task example
               </label>
             </div>
             <button type="button" class="btn app-btn-edit" aria-label="Edit" title="Edit">
               <i class="bi bi-pencil-fill"></i>
+            </button>
+          </li>
+          <li class="list-group-item p-2 d-flex gap-2 align-items-center bg-body-tertiary" data-role="new-entry" draggable="false">
+            <input type="text" class="form-control" placeholder="Add new task and press Enter" aria-label="Add new task">
+            <button type="button" class="btn app-btn-add" title="Add new task" aria-label="Add new task">
+              <i class="bi bi-plus-square-fill fs-3" aria-hidden="true"></i>
             </button>
           </li>
         </ul>

@@ -81,7 +81,7 @@ $app-gray-200:      #edf3fc;  // Lavender
 $app-gray-300:      #dce7f9;  // Lavender 
 $highlight:         #f4ebdd;  // Marfil
 // $highlight-subtle:  #fcfbf7;  // Marfil
-$highlight-subtle:  #FAF7EB;  // Marfil
+$highlight-subtle:  #FAF7EB;  // Marfil claro
 
 // Theme colors:
 $primary:       $app-blue;
@@ -468,7 +468,11 @@ svg.bi {
     background-color: $app-bg;
   }
 }
-
+// Form check (checkbox + label)
+// Se debe hacer ajuste para centrar verticalmente (¬_¬)
+.app-checklist .form-check {
+  margin-bottom: -.4rem;
+}
 // Checkbox
 .app-checklist input[type="checkbox"] {
   background-color: transparent;
@@ -489,10 +493,9 @@ svg.bi {
   color: $app-bg-subtle;
   background-color: $body-color;
 }
-
 // Label
 .app-checklist input[type="checkbox"] + label {
-  cursor: pointer;
+  cursor: default;
   padding-left: 2px;
 }
 .app-checklist input[type="checkbox"]:checked+label {
@@ -508,6 +511,17 @@ svg.bi {
   margin: 2px 0px 2px 12px;
   padding: 4px;
 }
+// Move task
+button.app-btn-move {
+  border-color: transparent;
+  border: 0px;
+  color: $body-color-subtle-5;
+  cursor: grab !important;
+  margin: 4px 6px 0px 0px;
+  padding: 0px 4px 0px 0px;
+  font-size-adjust: .6;
+}
+button.app-btn-move:active { cursor: grabbing !important; }
 // Add new task
 .app-btn-add {
   background-color: $app-bg-subtle;

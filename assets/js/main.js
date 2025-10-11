@@ -114,73 +114,109 @@ class ChecklistView {
   constructor(root) {
     // root: contenedor principal (ej. #checklist-container)
     this.root = root;
-    this.list = root.querySelector(".app-checklist");
-    if (!this.list) throw new Error("Missing .app-checklist inside provided root.");  // valida existencia
+
+    // Selecciona listas por tab (pendientes / completadas)
+    // (carga los elementos específicos para cada tab)
+    this.pendingList = root.querySelector("#checklist-pending-tab-pane .app-checklist"); // valida existencia
+    this.completedList = root.querySelector("#checklist-completed-tab-pane .app-checklist"); // valida existencia
+    if (!this.pendingList || !this.completedList) {
+      throw new Error("Missing .app-checklist in one or both tab panes.");
+    }
+
+    // Estado DnD por lista
+    // (se separa el estado para no mezclar arrastres entre tabs)
+    // draggingId: null,   // id del <li> que se arrastra
+    // overId: null,       // id del <li> objetivo actual
+    // overPos: null       // "before" | "after" | "after-end"
     this.dnd = {
-      draggingId: null,   // id del <li> que se arrastra
-      overId: null,       // id del <li> objetivo actual
-      overPos: null       // "before" | "after" | "after-end"
+      pending: { draggingId: null, overId: null, overPos: null },
+      completed: { draggingId: null, overId: null, overPos: null },
     };
   }
 
-  // Render principal: reemplaza el contenido de la lista
+  // Render principal: reemplaza el contenido de ambas listas
   render(items) {
-    // Limpia la UL
-    this.list.innerHTML = "";
+    // Separa por estado
+    // (filtra los arreglos para cada tab)
+    const pending = items.filter(i => !i.completed);
+    const completed = items.filter(i => i.completed);
 
-    // Render de cada tarea existente
-    const frag = document.createDocumentFragment();
-    items.forEach((item, index) => {
-      frag.appendChild(this.#renderItem(item, index));
-    });
+    // Limpia ambas UL
+    this.pendingList.innerHTML = "";
+    this.completedList.innerHTML = "";
 
-    // Render de la fila para añadir nueva tarea
-    frag.appendChild(this.#renderNewItemEntry());
+    // Render pendientes + entrada de nueva tarea al final
+    {
+      const frag = document.createDocumentFragment();
+      pending.forEach((item, index) => frag.appendChild(this.#renderItem(item, index)));
+      frag.appendChild(this.#renderNewItemEntry()); // ← solo en pendientes
+      this.pendingList.appendChild(frag);
+    }
 
-    this.list.appendChild(frag);
+    // Render completadas (sin entrada de nueva tarea)
+    {
+      const frag = document.createDocumentFragment();
+      completed.forEach((item, index) => frag.appendChild(this.#renderItem(item, index)));
+      this.completedList.appendChild(frag);
+    }
   }
+
 
   // Crea un <li> para una tarea
   #renderItem(item, index) {
+    // Crea el <li> de la tarea
+    // (ajusta clases y habilita arrastre en todo el <li>)
     const li = document.createElement("li");
     li.className = "list-group-item p-1 ps-2 d-flex align-items-center";
+    li.setAttribute("draggable", "true"); // ← permite arrastrar el item completo
     li.dataset.id = item.id;
-    li.draggable = true; // habilita arrastrar/soltar
-    // usar id estable del modelo
-    const checkId = `check-${item.id}`;
 
-    // Form-check (checkbox + label)
+    // --- Botón decorativo de mover ---
+    // (avisa al usuario que el item es arrastrable)
+    const btnMove = document.createElement("button");
+    btnMove.type = "button";
+    btnMove.className = "btn app-btn-move";
+    btnMove.setAttribute("aria-label", "Move");
+    btnMove.title = "Move";
+    btnMove.innerHTML = `<i class="bi bi-arrow-down-up"></i>`;
+    // (no se registran listeners; es decorativo)
+
+    // --- Bloque form-check con checkbox + label ---
     const form = document.createElement("div");
     form.className = "form-check position-relative flex-grow-1";
 
     const input = document.createElement("input");
     input.className = "form-check-input";
     input.type = "checkbox";
-    input.id = checkId;
-    input.checked = !!item.completed;
+    input.id = `check-${item.id}`;
+    input.checked = !!item.completed; // ← refleja estado
 
     const label = document.createElement("label");
     label.className = "form-check-label stretched-link";
-    label.htmlFor = checkId;
+    label.setAttribute("for", input.id);
     label.textContent = item.text;
 
+    // Inserta input y label dentro del form-check
     form.appendChild(input);
     form.appendChild(label);
 
-    // Botón editar
+    // --- Botón Editar ---
     const btnEdit = document.createElement("button");
     btnEdit.type = "button";
-    btnEdit.className = "btn app-btn-edit";
-    btnEdit.innerHTML = `<i class="bi bi-pencil-fill" aria-hidden="true"></i>`;
+    // eleva para evitar overlays (si aplica)
+    btnEdit.className = "btn app-btn-edit position-relative z-3 pe-auto";
+    btnEdit.setAttribute("aria-label", "Edit");
     btnEdit.title = "Edit";
-    btnEdit.setAttribute("aria-label", "Edit")
+    btnEdit.innerHTML = `<i class="bi bi-pencil-fill" aria-hidden="true"></i>`;
 
-    // Orden final: [form-check | btn-edit]
+    // Orden final: [btnMove] [form-check] [btnEdit]
+    li.appendChild(btnMove);
     li.appendChild(form);
     li.appendChild(btnEdit);
 
     return li;
   }
+
 
   // Crea el <li> de entrada para nuevas tareas (al final)
   #renderNewItemEntry() {
@@ -189,13 +225,14 @@ class ChecklistView {
     li.dataset.role = "new-entry";
     li.draggable = false; // entrada no es arrastrable
 
+    // Entrada de texto para nueva tarea
     const input = document.createElement("input");
     input.type = "text";
     input.className = "form-control";
     input.placeholder = "Add new task and press Enter";
     input.setAttribute("aria-label", "Add new task");
 
-    // Botón "Ok" (definición del usuario)
+    // Botón [+] para agregar tarea
     const btnAdd = document.createElement("button");
     btnAdd.type = "button";
     btnAdd.className = "btn app-btn-add";
@@ -211,89 +248,117 @@ class ChecklistView {
 
   // -------- Delegación de eventos de la vista --------
 
-  // Maneja el cambio de checkbox (toggle completed)
+  // Maneja el cambio de checkbox (toggle completed) en ambas listas
   onToggle(handler) {
-    // handler(id)
-    this.list.addEventListener("change", (e) => {
-      const input = e.target.closest(".form-check-input");
-      if (!input) return;
-      const li = input.closest("li.list-group-item");
-      if (!li || !li.dataset.id) return;
-      handler(li.dataset.id);
-    });
+    // adjunta listener a una UL concreta
+    const listen = (ul) => {
+      ul.addEventListener("change", (e) => {
+        const input = e.target.closest(".form-check-input");
+        if (!input) return;
+
+        const li = input.closest("li.list-group-item");
+        if (!li || !li.dataset.id) return;
+
+        // determina el destino según el nuevo estado del checkbox
+        // (si queda checked → va a Completed; si queda unchecked → va a Pending)
+        const goingCompleted = input.checked === true;
+
+        // ejecuta acción de dominio (el Controller moverá el item y re-renderizará)
+        handler(li.dataset.id);
+
+        // resalta la Tab de destino (IDs específicos del checklist)
+        // (usa IDs sin colisionar con otros componentes en la página)
+        const targetTabId = goingCompleted
+          ? "checklist-completed-tab"
+          : "checklist-pending-tab";
+
+        const targetEl = document.getElementById(targetTabId);
+        // dispara el flash si el elemento existe
+        if (targetEl) flashCompletedTab(targetEl);
+      });
+    };
+
+    // registra para ambas listas
+    listen(this.pendingList);
+    listen(this.completedList);
   }
 
-  // Maneja la edición del texto (click en botón editar → inline editor)
+
+  // Maneja la edición del texto en ambas listas
+  // (click en botón editar → inline editor)
   onEdit(handler) {
-    // handler(id, nextText)
-    this.list.addEventListener("click", (e) => {
-      const btn = e.target.closest(".app-btn-edit");
-      if (!btn) return;
-      const li = btn.closest("li.list-group-item");
-      if (!li || !li.dataset.id) return;
+    const listen = (ul) => {
+      ul.addEventListener("click", (e) => {
+        const btn = e.target.closest(".app-btn-edit");
+        if (!btn) return;
+        const li = btn.closest("li.list-group-item");
+        if (!li || !li.dataset.id) return;
 
-      const form = li.querySelector(".form-check");
-      const label = form.querySelector("label");
-      const currentText = label.textContent.trim();
+        const form = li.querySelector(".form-check");
+        const label = form.querySelector("label");
+        const currentText = label.textContent.trim();
 
-      // Avoid multiple editors in the same item
-      if (form.querySelector("input[type='text']")) return;
+        // Avoid multiple editors in the same item
+        if (form.querySelector("input[type='text']")) return;
 
-      const editor = document.createElement("input");
-      editor.type = "text";
-      editor.className = "form-control";
-      editor.value = currentText;
-      editor.setAttribute("aria-label", "Edit task text");
+        const editor = document.createElement("input");
+        editor.type = "text";
+        editor.className = "form-control";
+        editor.value = currentText;
+        editor.setAttribute("aria-label", "Edit task text");
 
-      label.style.display = "none";
-      form.appendChild(editor);
-      editor.focus();
-      // editor.select(); // selecciona el texto de la tarea que se está editando
+        label.style.display = "none";
+        form.appendChild(editor);
+        editor.focus();
+        // editor.select(); // selecciona el texto de la tarea que se está editando
 
-      // --- Make commit/cancel idempotent ---
-      let finished = false; // evita doble ejecución (Enter + blur)
+        // --- Make commit/cancel idempotent ---
+        let finished = false; // evita doble ejecución (Enter + blur)
 
-      const finalize = (mode /* 'commit' | 'cancel' */) => {
-        // si ya se ejecutó, salir
-        if (finished) return;
-        finished = true;
+        const finalize = (mode /* 'commit' | 'cancel' */) => {
+          // si ya se ejecutó, salir
+          if (finished) return;
+          finished = true;
 
-        // limpia listeners para evitar fugas
-        editor.removeEventListener("keydown", onKeyDown);
-        editor.removeEventListener("blur", onBlur);
+          // limpia listeners para evitar fugas
+          editor.removeEventListener("keydown", onKeyDown);
+          editor.removeEventListener("blur", onBlur);
 
-        // restaura la UI de forma segura
-        if (editor.parentNode === form) {
-          editor.remove(); // más seguro que removeChild; no lanza si ya no es hijo
-        }
-        label.style.display = "";
-
-        // sólo notificar cambios si es commit
-        if (mode === "commit") {
-          const next = editor.value.trim();
-          if (next !== currentText) {
-            // next puede ser "" → el controller decidirá eliminar
-            handler(li.dataset.id, next);
+          // restaura la UI de forma segura
+          if (editor.parentNode === form) {
+            editor.remove(); // más seguro que removeChild; no lanza si ya no es hijo
           }
-        }
-      };
+          label.style.display = "";
 
-      const onKeyDown = (ke) => {
-        if (ke.key === "Enter") finalize("commit");
-        else if (ke.key === "Escape") finalize("cancel");
-      };
+          // sólo notificar cambios si es commit
+          if (mode === "commit") {
+            const next = editor.value.trim();
+            if (next !== currentText) {
+              // next puede ser "" → el controller decidirá eliminar
+              handler(li.dataset.id, next);
+            }
+          }
+        };
 
-      const onBlur = () => finalize("commit");
+        const onKeyDown = (ke) => {
+          if (ke.key === "Enter") finalize("commit");
+          else if (ke.key === "Escape") finalize("cancel");
+        };
 
-      editor.addEventListener("keydown", onKeyDown, { once: false });
-      editor.addEventListener("blur", onBlur, { once: true }); // blur sólo una vez
-    });
+        const onBlur = () => finalize("commit");
+
+        editor.addEventListener("keydown", onKeyDown, { once: false });
+        editor.addEventListener("blur", onBlur, { once: true }); // blur sólo una vez
+      });
+    }
+    listen(this.pendingList);
+    listen(this.completedList);
   }
 
-  // Maneja la creación de nuevas tareas (Enter o botón Ok)
+  // Maneja creación de nuevas tareas SOLO en pendientes
   onCreate(handler) {
-    // Enter en el input
-    this.list.addEventListener("keydown", (e) => {
+    // Enter en el input (solo en la fila de nueva entrada de pendientes)
+    this.pendingList.addEventListener("keydown", (e) => {
       const entry = e.target.closest("li[data-role='new-entry']");
       if (!entry || e.key !== "Enter") return;
       const input = entry.querySelector("input[type='text']");
@@ -303,7 +368,8 @@ class ChecklistView {
       // No enfocamos aquí; el controller lo hará tras el render
     });
 
-    this.list.addEventListener("click", (e) => {
+    // Click en el botón (solo en pendientes)
+    this.pendingList.addEventListener("click", (e) => {
       const entry = e.target.closest("li[data-role='new-entry']");
       if (!entry) return;
       const btn = e.target.closest("button.app-btn-add");
@@ -312,115 +378,100 @@ class ChecklistView {
       const text = input.value.trim();
       if (!text) return;
       handler(text);
+      // No enfocamos aquí; el controller lo hará tras el render
     });
   }
 
-  // Enfoca el input para nueva tarea
+  // Enfoca el input de nueva tarea SOLO en el tab de pendientes
   focusNewEntryInput() {
     // Busca el input de la fila "nueva tarea" tras el render y aplica foco
-    const entry = this.list.querySelector("li[data-role='new-entry'] input[type='text']");
-    if (entry) {
-      entry.focus({ preventScroll: true }); // evita saltos de scroll
+    // (trabaja dentro de la lista de pendientes)
+    const entry = this.pendingList.querySelector("li[data-role='new-entry'] input[type='text']");
+    if (entry) entry.focus({ preventScroll: true });
       // entry.select(); // opcional: selecciona el texto si lo hubiera
-    }
   }
 
 
   // -------------------------------
-  // Drag & Drop (arrastrar y soltar) — reordenar sin botón mover
+  // Drag & Drop (arrastrar y soltar) 
   // -------------------------------
+  // Drag & Drop per-list (no cross-tab)
   onReorder(handler) {
-    // handler(draggedId, toIndex)
+    const attachDnD = (ul, key /* 'pending' | 'completed' */) => {
+      const state = this.dnd[key];
 
-    // dragstart: inicia arrastre
-    this.list.addEventListener("dragstart", (e) => {
-      const li = e.target.closest("li.list-group-item");
-      if (!li || !li.dataset.id || li.dataset.role === "new-entry") return;
-      this.dnd.draggingId = li.dataset.id;
-      li.classList.add("opacity-50"); // feedback visual ligero
-      e.dataTransfer.effectAllowed = "move";
-      e.dataTransfer.setData("text/plain", this.dnd.draggingId);
-    });
+      ul.addEventListener("dragstart", (e) => {
+        const li = e.target.closest("li.list-group-item");
+        if (!li || !li.dataset.id || li.dataset.role === "new-entry") return;
+        state.draggingId = li.dataset.id;
+        li.classList.add("opacity-50");
+        e.dataTransfer.effectAllowed = "move";
+        e.dataTransfer.setData("text/plain", state.draggingId);
+      });
 
-    // dragover: permite soltar y decide si antes o después
-    this.list.addEventListener("dragover", (e) => {
-      if (!this.dnd.draggingId) return;
-      const li = e.target.closest("li.list-group-item");
-      if (!li || !li.dataset.id || li.dataset.role === "new-entry") {
-        // Permitir soltar al final (sobre la UL o entrada nueva)
+      ul.addEventListener("dragover", (e) => {
+        if (!state.draggingId) return;
+        const li = e.target.closest("li.list-group-item");
+        if (!li || !li.dataset.id || li.dataset.role === "new-entry") {
+          e.preventDefault();
+          this.#clearDndMarkers(ul);
+          state.overId = null;
+          state.overPos = "after-end";
+          return;
+        }
         e.preventDefault();
-        this.#clearDndMarkers();
-        this.dnd.overId = null;
-        this.dnd.overPos = "after-end"; // bandera especial para insertar al final
-        return;
-      }
+        const rect = li.getBoundingClientRect();
+        const before = (e.clientY - rect.top) < (rect.height / 2);
+        this.#clearDndMarkers(ul);
+        state.overId = li.dataset.id;
+        state.overPos = before ? "before" : "after";
+        li.classList.add(before ? ("border-top") : ("border-bottom"));
+      });
 
-      e.preventDefault(); // necesario para permitir drop
-      const rect = li.getBoundingClientRect();
-      const offsetY = e.clientY - rect.top;
-      const before = offsetY < rect.height / 2;
+      ul.addEventListener("dragleave", (e) => {
+        const li = e.target.closest("li.list-group-item");
+        if (!li) return;
+        li.classList.remove("border-top", "border-bottom", "border-primary");
+      });
 
-      this.#clearDndMarkers();
-      this.dnd.overId = li.dataset.id;
-      this.dnd.overPos = before ? "before" : "after";
+      ul.addEventListener("drop", (e) => {
+        if (!state.draggingId) return;
+        e.preventDefault();
+        const itemsDom = [...ul.querySelectorAll("li.list-group-item[data-id]")];
+        let toIndex;
+        if (state.overPos === "after-end" || state.overId === null) {
+          toIndex = itemsDom.length; // insertar al final
+        } else {
+          const targetLi = itemsDom.find(li => li.dataset.id === state.overId);
+          const targetIndex = itemsDom.indexOf(targetLi);
+          toIndex = state.overPos === "before" ? targetIndex : targetIndex + 1;
+        }
+        handler(state.draggingId, toIndex);
+        this.#clearDndStateFor(ul, state);
+      });
 
-      // Añade marcas simples (requiere estilos si quieres verlas)
-      li.classList.add(before ? "border-top" : "border-bottom");
-      li.classList.add("border-primary");
-    });
+      ul.addEventListener("dragend", () => this.#clearDndStateFor(ul, state));
+    };
 
-    // dragleave: limpia marcas al salir del elemento
-    this.list.addEventListener("dragleave", (e) => {
-      const li = e.target.closest("li.list-group-item");
-      if (!li) return;
-      li.classList.remove("border-top", "border-bottom", "border-primary");
-    });
+    attachDnD(this.pendingList, "pending");
+    attachDnD(this.completedList, "completed");
+  }
 
-    // drop: calcula índice destino y notifica
-    this.list.addEventListener("drop", (e) => {
-      if (!this.dnd.draggingId) return;
-      e.preventDefault();
-
-      const itemsDom = [...this.list.querySelectorAll("li.list-group-item[data-id]")];
-
-      let toIndex;
-      if (this.dnd.overPos === "after-end" || this.dnd.overId === null) {
-        // Insertar al final
-        toIndex = itemsDom.length; // insertar al final (índice len)
-      } else {
-        const targetLi = itemsDom.find(li => li.dataset.id === this.dnd.overId);
-        const targetIndex = itemsDom.indexOf(targetLi);
-        toIndex = this.dnd.overPos === "before" ? targetIndex : targetIndex + 1;
-      }
-
-      // Llama al handler con el id arrastrado y el índice destino
-      handler(this.dnd.draggingId, toIndex);
-
-      this.#clearDndState();
-    });
-
-    // dragend: limpieza visual y estado
-    this.list.addEventListener("dragend", () => {
-      this.#clearDndState();
+  // Limpia marcas visuales de DnD en una UL concreta
+  #clearDndMarkers(ul) {
+    ul.querySelectorAll("li.list-group-item").forEach(li => {
+      li.classList.remove("border-top", "border-bottom", "border-primary", "opacity-50");
     });
   }
 
-  // Limpia marcas visuales de DnD
-  #clearDndMarkers() {
-    this.list.querySelectorAll("li.list-group-item").forEach(li => {
-      li.classList.remove("border-top", "border-bottom", "border-primary");
-    });
+  // Limpia estado DnD para una UL concreta
+  #clearDndStateFor(ul, state) {
+    this.#clearDndMarkers(ul);
+    state.draggingId = null;
+    state.overId = null;
+    state.overPos = null;
   }
 
-  // Limpia estado completo de DnD
-  #clearDndState() {
-    this.#clearDndMarkers();
-    const draggingEl = this.list.querySelector(`li.list-group-item.opacity-50`);
-    if (draggingEl) draggingEl.classList.remove("opacity-50");
-    this.dnd.draggingId = null;
-    this.dnd.overId = null;
-    this.dnd.overPos = null;
-  }
 
   // actualiza el contenedor del resumen de forma segura
   setSummary(text) {
@@ -708,6 +759,60 @@ class ChecklistController {
     return parts.join("\n");
   }  
 }
+
+
+// -------------------------------
+// Helpers
+// -------------------------------
+
+// Resalta brevemente un elemento usando las transiciones existentes (Bootstrap)
+// - Cancela un flash anterior si aún estaba activo (evita quedarse resaltado)
+// - No toca las transiciones CSS; solo cambia backgroundColor inline
+// el: HTMLElement → elemento a resaltar
+// color: string → color del flash (por defecto #f5d9ab)
+// holdMs: number → tiempo "en color" antes de iniciar la vuelta (por defecto 250ms)
+// backMs: number → tiempo hasta limpiar el inline, permitiendo que la transición haga su trabajo (por defecto 250ms)
+function flashCompletedTab(el, color = "#f5d9ab", holdMs = 800, backMs = 250) {
+  // valida elemento
+  if (!el || !(el instanceof HTMLElement)) return;
+
+  // si había un flash previo, cancelarlo y restaurar estado anterior
+  // (evita solapamientos que dejan el botón pegado en estado resaltado)
+  if (el.__flashTimerHold) clearTimeout(el.__flashTimerHold);
+  if (el.__flashTimerBack) clearTimeout(el.__flashTimerBack);
+  if (el.__flashPrevBg !== undefined) {
+    // restaura el inline previo del flash anterior
+    el.style.backgroundColor = el.__flashPrevBg || "";
+  }
+
+  // guarda el valor inline previo para restaurarlo al final
+  el.__flashPrevBg = el.style.backgroundColor || "";
+
+  // fuerza un reflow para que una nueva asignación dispare transición consistentemente
+  void el.offsetWidth; // ← fuerza reflow
+
+  // aplica color del flash (Bootstrap manejará la transición si existe)
+  el.style.backgroundColor = color;
+
+  // tras un pequeño "hold", iniciar la vuelta al color previo
+  el.__flashTimerHold = setTimeout(() => {
+    // fuerza reflow antes de volver para asegurar la transición de salida
+    void el.offsetWidth; // ← fuerza reflow
+
+    // asigna el color previo ("" si no había inline), dejando que CSS haga el fade
+    el.style.backgroundColor = el.__flashPrevBg || "";
+
+    // limpieza final: eliminar marcas internas tras un margen
+    el.__flashTimerBack = setTimeout(() => {
+      // borra referencias internas
+      delete el.__flashTimerHold;
+      delete el.__flashTimerBack;
+      delete el.__flashPrevBg;
+    }, backMs);
+  }, holdMs);
+}
+
+
 
 // -------------------------------
 // Boot
