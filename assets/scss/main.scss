@@ -471,7 +471,7 @@ svg.bi {
 // Form check (checkbox + label)
 // Se debe hacer ajuste para centrar verticalmente (¬_¬)
 .app-checklist .form-check {
-  margin-bottom: -.4rem;
+  margin-bottom: 0rem;
 }
 // Checkbox
 .app-checklist input[type="checkbox"] {
@@ -508,8 +508,8 @@ svg.bi {
   border-color: transparent;
   border: 0px;
   color: $body-color-subtle-5;
-  margin: 2px 0px 2px 12px;
-  padding: 4px;
+  margin: 0px 0px 0px 12px;
+  padding: 0px;
 }
 // Move task
 button.app-btn-move {
@@ -517,8 +517,8 @@ button.app-btn-move {
   border: 0px;
   color: $body-color-subtle-5;
   cursor: grab !important;
-  margin: 4px 6px 0px 0px;
-  padding: 0px 4px 0px 0px;
+  margin: 0px 8px 0px 0px;
+  padding: 0px;
   font-size-adjust: .6;
 }
 button.app-btn-move:active { cursor: grabbing !important; }

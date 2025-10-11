@@ -204,7 +204,7 @@ class ChecklistView {
     const btnEdit = document.createElement("button");
     btnEdit.type = "button";
     // eleva para evitar overlays (si aplica)
-    btnEdit.className = "btn app-btn-edit position-relative z-3 pe-auto";
+    btnEdit.className = "btn app-btn-edit position-relative";
     btnEdit.setAttribute("aria-label", "Edit");
     btnEdit.title = "Edit";
     btnEdit.innerHTML = `<i class="bi bi-pencil-fill" aria-hidden="true"></i>`;

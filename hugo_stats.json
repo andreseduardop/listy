@@ -124,6 +124,7 @@
       "p-1",
       "p-2",
       "p-3",
+      "pe-auto",
       "pe-lg-0",
       "position-relative",
       "ps-0",
@@ -145,13 +146,17 @@
       "text-primary",
       "title",
       "user-select-none",
-      "vh-100"
+      "vh-100",
+      "z-3"
     ],
     "ids": [
       "app-container-1",
       "app-container-2",
       "check-1",
       "check-10",
+      "check-5e75c21634b7",
+      "check-ed367b5b8588",
+      "checked-1",
       "checklist-check-1",
       "checklist-checked-1",
       "checklist-completed-tab",
