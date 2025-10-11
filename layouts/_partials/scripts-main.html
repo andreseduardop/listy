@@ -13,7 +13,7 @@
     "sourceMap" "inline") }}
 {{ end }}
 {{- $script := resources.Get "js/main.js" | js.Build $buildOptions | resources.Fingerprint "sha384" -}}
-<!-- <script src='{{ $script.RelPermalink  }}' integrity='{{ $script.Data.Integrity }}' defer></script> -->
+<script src='{{ $script.RelPermalink  }}' integrity='{{ $script.Data.Integrity }}' defer></script>
 
 <!-- Get Bootstrap JS -->
 {{ $bootstrapJs := resources.Get "bootstrap/dist/js/bootstrap.min.js" | resources.Fingerprint "sha384" }}
