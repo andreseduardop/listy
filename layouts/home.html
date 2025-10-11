@@ -1,7 +1,7 @@
 {{ define "main" }}
 <div class="container p-0">
   <div class="row g-0 overflow-y-hidden mx-0 vh-100">
-    <nav class="offcanvas-md offcanvas-start col-5 col-lg-4 col-xxl-3 m-0 h-100" data-bs-scroll="true" data-bs-backdrop="true" tabindex="-1" id="sideMenu" aria-label="Side Menu">
+    <nav class="offcanvas-md offcanvas-start col-5 col-lg-4 col-xl-3 m-0 h-100" data-bs-scroll="true" data-bs-backdrop="true" tabindex="-1" id="sideMenu" aria-label="Side Menu">
       <div class="app-sidebar app-scroll-enable app-card m-3">
         <div class="offcanvas-header p-1">
           <a class="btn d-block ms-auto px-0" role="button" data-bs-dismiss="offcanvas" data-bs-target="#sideMenu" aria-label="Close">
@@ -38,7 +38,7 @@
         </div>
       </div>
     </nav>
-    <main class="col mb-3 p-0">
+    <main class="col col-sm-11 col-md-7 col-lg-8 col-xxl-7 mb-3 p-0">
       <header class="user-select-none sticky-top p-3 pe-lg-0">
         <div class="app-card col p-3 py-1">
           <div class="navbar">
@@ -67,10 +67,8 @@
                 {{ partial "app/summary" . }}
               </div>
               <div class="col-12">
-                {{ partial "app/form" . }}
               </div>
               <div class="col-12">
-                {{ partial "app/form" . }}
               </div>
             </div>
           </div>

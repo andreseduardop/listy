@@ -1,7 +1,6 @@
 // 1. Include functions first (so you can manipulate colors, SVGs, calc, etc)
 @import "../bootstrap/scss/_functions";
 // Icons
-// $bootstrap-icons-font-dir: "../fonts";
 @import "./icons";
 
 // Import the Sass files as usual
@@ -26,6 +25,13 @@ $font-family-sans-serif:  "Open Sans", Roboto, Helvetica, Arial, sans-serif;
 // Geist Mono
 // Open Sans
 // Inter
+$font-weight-lighter:         lighter;
+$font-weight-light:           300;
+$font-weight-normal:          400;
+$font-weight-medium:          500;
+$font-weight-semibold:        600;
+$font-weight-bold:            600;
+$font-weight-bolder:          600;
 
 
 // $zindex-dropdown:                   1000;
@@ -115,6 +121,7 @@ $border-color:                      $body-color !default;
 // Tabs (color of navigation links in menus)
 $nav-link-color:                    $body-color;
 $nav-link-hover-color:              $body-color;
+$nav-tabs-link-active-color:        $body-color;
 
 // Nav buttons (pills)
 $nav-pills-link-active-bg:          $gray-600;
@@ -309,14 +316,6 @@ $theme-colors: map-remove($theme-colors, "info", "warning");
   font-display: swap;
   src: url('../fonts/open-sans-v44-latin-regular.woff2') format('woff2');
 }
-/* open-sans-600 - latin */
-@font-face {
-  font-family: 'Open Sans';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url('../fonts/open-sans-v44-latin-600.woff2') format('woff2');
-}
 /* open-sans-700 - latin */
 @font-face {
   font-family: 'Open Sans';
@@ -324,6 +323,14 @@ $theme-colors: map-remove($theme-colors, "info", "warning");
   font-weight: 700;
   font-display: swap;
   src: url('../fonts/open-sans-v44-latin-700.woff2') format('woff2');
+}
+/* open-sans-600 - latin */
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../fonts/open-sans-v44-latin-600.woff2') format('woff2');
 }
 
 /* Smooth Scrolling */
@@ -468,7 +475,7 @@ svg.bi {
   margin-left: -1.6em;
   cursor: pointer;
   border-radius: 50%;
-  bottom: .2em;
+  bottom: .25em;
   height: 1.2em;
   width: 1.2em;
   position: relative;

@@ -112,7 +112,7 @@ class ChecklistModel extends EventTarget {
 // -------------------------------
 class ChecklistView {
   constructor(root) {
-    // root: contenedor principal (ej. #list-container)
+    // root: contenedor principal (ej. #checklist-container)
     this.root = root;
     this.list = root.querySelector(".app-checklist");
     if (!this.list) throw new Error("Missing .app-checklist inside provided root.");  // valida existencia
@@ -437,7 +437,7 @@ class ChecklistView {
 // -------------------------------
 class ChecklistController {
   constructor({ root }) {
-    // root: elemento contenedor (e.g., document.getElementById('list-container'))
+    // root: elemento contenedor (e.g., document.getElementById('checklist-container'))
     this.model = new ChecklistModel();
     this.view = new ChecklistView(root);
 
@@ -715,7 +715,7 @@ class ChecklistController {
 // Inicializa el controlador usando el contenedor dado por el HTML de la consigna.
 // Asegúrate de ejecutar esto después de que el DOM esté listo.
 document.addEventListener("DOMContentLoaded", () => {
-  const container = document.getElementById("list-container");
+  const container = document.getElementById("checklist-container");
   if (!container) return;
   new ChecklistController({ root: container });
 });
