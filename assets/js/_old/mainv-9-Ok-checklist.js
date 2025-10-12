@@ -425,167 +425,73 @@ onEdit(handler) {
   }
 
   /* ================================
-   * Drag & Drop (per list) + drop fuera del UL (arriba → 0, abajo → final)
+   * Drag & Drop (per list)
    * ================================ */
   onReorder(handler) {
-    // --- Helpers internos -----------------------------------------------
-
-    // Devuelve todos los <li> "reales" (excluye plantillas/new-entry)
-    const getRealItems = (ul) => {
-      // Obtiene los hijos que representan ítems de datos
-      return Array.from(ul.querySelectorAll("li.list-group-item[data-id]"))
-        .filter(li => li.dataset.role !== "new-entry");
-    };
-
-    // Calcula el índice de inserción basándose en la coordenada Y del puntero.
-    // Retorna un número entre 0..n (n = append al final).
-    const indexFromPointerY = (ul, clientY) => {
-      // Lee ítems actuales del UL (DOM vivo)
-      const items = getRealItems(ul);
-      // Recorre y decide “antes de la mitad” → corta en ese índice
-      for (let i = 0; i < items.length; i++) {
-        const rect = items[i].getBoundingClientRect();
-        const midY = rect.top + rect.height / 2;
-        // Si el puntero está por encima de la mitad del item i, inserta antes de i
-        if (clientY < midY) return i;
-      }
-      // Si no cae antes de nadie, va al final
-      return items.length;
-    };
-
-    // Limpia marcas visuales de guía DnD en un UL
-    const clearMarkers = (ul) => {
-      // Elimina clases usadas como guías de inserción
-      ul.querySelectorAll(".border-top, .border-bottom, .border-primary, .opacity-50")
-        .forEach(el => el.classList.remove("border-top", "border-bottom", "border-primary", "opacity-50"));
-    };
-
-    // Limpia todo el estado DnD de una lista
-    const clearStateFor = (ul, state) => {
-      // Restablece marcas y variables
-      clearMarkers(ul);
-      state.draggingId = null;
-      state.lastOverLi = null;
-    };
-
-    // Pinta una guía en función de la posición del puntero sobre un LI
-    const paintGuide = (li, clientY) => {
-      // Dibuja una línea arriba/abajo según mitad del <li>
-      const rect = li.getBoundingClientRect();
-      const before = (clientY - rect.top) < (rect.height / 2);
-      li.classList.add(before ? "border-top" : "border-bottom");
-    };
-
-    // --- Wiring por lista ------------------------------------------------
     const attachDnD = (ul, key /* 'pending' | 'completed' */) => {
       const state = this.dnd[key];
 
       ul.addEventListener("dragstart", (e) => {
-        // Detecta el <li> arrastrado y marca estado
         const li = e.target.closest(ChecklistView.SEL.item);
-        if (!li?.dataset?.id || li.dataset.role === "new-entry") return;
+        if (!li?.dataset.id || li.dataset.role === "new-entry") return;
         state.draggingId = li.dataset.id;
-        li.classList.add("opacity-50"); // ← marca visual del elemento arrastrado
+        li.classList.add("opacity-50");
         e.dataTransfer.effectAllowed = "move";
-        // Guarda el id en DataTransfer (útil si se arrastra entre listas)
         e.dataTransfer.setData("text/plain", state.draggingId);
       });
 
       ul.addEventListener("dragover", (e) => {
-        // Permite el drop mientras haya un ítem en arrastre
         if (!state.draggingId) return;
-        e.preventDefault();
-
-        // Limpia marcas previas y pinta guía en el LI actual (si lo hay)
-        clearMarkers(ul);
 
         const li = e.target.closest(ChecklistView.SEL.item);
-        if (li && li.dataset.id && li.dataset.role !== "new-entry") {
-          // Pinta guía superior/inferior en el LI bajo el puntero
-          paintGuide(li, e.clientY);
-          state.lastOverLi = li;
-        } else {
-          // Si no está sobre un LI, no pinta marcas (pero igual se podrá insertar)
-          state.lastOverLi = null;
+        if (!li || !li.dataset.id || li.dataset.role === "new-entry") {
+          e.preventDefault();
+          this.#clearDndMarkers(ul);
+          state.overId = null;
+          state.overPos = "after-end";
+          return;
         }
+
+        e.preventDefault();
+        const rect = li.getBoundingClientRect();
+        const before = (e.clientY - rect.top) < (rect.height / 2);
+        this.#clearDndMarkers(ul);
+        state.overId = li.dataset.id;
+        state.overPos = before ? "before" : "after";
+        li.classList.add(before ? "border-top" : "border-bottom");
       });
 
-      ul.addEventListener("dragleave", () => {
-        // Borra guías cuando el puntero sale del UL/LI
-        clearMarkers(ul);
-        state.lastOverLi = null;
+      ul.addEventListener("dragleave", (e) => {
+        const li = e.target.closest(ChecklistView.SEL.item);
+        if (!li) return;
+        li.classList.remove("border-top", "border-bottom", "border-primary");
       });
 
       ul.addEventListener("drop", (e) => {
-        // Procesa drop DENTRO de este UL
         if (!state.draggingId) return;
         e.preventDefault();
 
-        const items = getRealItems(ul);
+        const itemsDom = qsa(ul, "li.list-group-item[data-id]");
+        let toIndex;
 
-        // Índice de origen dentro de este UL (si es -1, proviene de otra lista)
-        const fromIndex = items.findIndex(el => el.dataset.id === state.draggingId);
+        if (state.overPos === "after-end" || state.overId === null) {
+          toIndex = itemsDom.length; // insertar al final
+        } else {
+          const targetLi = itemsDom.find(node => node.dataset.id === state.overId);
+          const targetIndex = itemsDom.indexOf(targetLi);
+          toIndex = state.overPos === "before" ? targetIndex : targetIndex + 1;
+        }
 
-        // Índice destino calculado por la coordenada Y del puntero
-        let toIndex = indexFromPointerY(ul, e.clientY);
-
-        // Dispara actualización de modelo
         handler(state.draggingId, toIndex);
-
-        // Limpia estado y marcas
-        clearStateFor(ul, state);
+        this.#clearDndStateFor(ul, state);
       });
 
-      ul.addEventListener("dragend", () => clearStateFor(ul, state));
+      ul.addEventListener("dragend", () => this.#clearDndStateFor(ul, state));
     };
 
-    // Conecta las dos listas (Pending / Completed)
     attachDnD(this.pendingList, "pending");
     attachDnD(this.completedList, "completed");
-
-    // --- Drop global: fuera del UL (arriba → 0, abajo → final) -----------
-    const handleDocumentDrop = (e) => {
-      // Busca cuál lista está en arrastre
-      const pairs = [
-        { ul: this.pendingList,   state: this.dnd.pending   },
-        { ul: this.completedList, state: this.dnd.completed },
-      ];
-
-      for (const { ul, state } of pairs) {
-        if (!state.draggingId) continue;
-
-        const rect = ul.getBoundingClientRect();
-
-        // Suelta por ENCIMA del UL → índice 0
-        if (e.clientY < rect.top) {
-          e.preventDefault();
-          clearMarkers(ul);
-          handler(state.draggingId, 0);
-          clearStateFor(ul, state);
-          break;
-        }
-
-        // Suelta por DEBAJO del UL → índice final
-        if (e.clientY > rect.bottom) {
-          e.preventDefault();
-          const n = getRealItems(ul).length; // ← longitud actual de la lista
-          clearMarkers(ul);
-          handler(state.draggingId, n);
-          clearStateFor(ul, state);
-          break;
-        }
-      }
-    };
-
-    // Registra listeners globales una única vez
-    if (!this._docDropBound) {
-      this._docDropBound = true;
-      // Permite que el navegador emita 'drop' fuera de zonas droppable
-      document.addEventListener("dragover", (e) => e.preventDefault()); // ← asegura evento drop global
-      document.addEventListener("drop", handleDocumentDrop);
-    }
   }
-
 
   // Limpia marcas visuales de DnD
   #clearDndMarkers(ul) {
