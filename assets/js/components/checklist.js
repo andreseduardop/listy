@@ -74,13 +74,8 @@ import { Model } from "../core/model.js";
 class View {
   // selectores reutilizables
   static SEL = {
-<<<<<<< HEAD
     pendingPane: "#checklist-pending-tab-pane .app-checklist .type-checkbox",
     completedPane: "#checklist-completed-tab-pane .app-checklist .type-checkbox",
-=======
-    pendingPane: "#checklist-pending-tab-pane .app-checklist",
-    completedPane: "#checklist-completed-tab-pane .app-checklist",
->>>>>>> parent of 5e98f75 (resourceslist component)
     item: "li.list-group-item",
     newEntry: "li[data-role='new-entry']",
     newEntryInput: "li[data-role='new-entry'] input[type='text']",
@@ -158,11 +153,7 @@ class View {
         tabindex: "0",
       },
     });
-<<<<<<< HEAD
     const ulPend = el("ul", { className: "app-checklist type-checkbox list-group" });
-=======
-    const ulPend = el("ul", { className: "app-checklist list-group" });
->>>>>>> parent of 5e98f75 (resourceslist component)
     panePend.append(ulPend);
 
     const paneComp = el("div", {
@@ -174,11 +165,7 @@ class View {
         tabindex: "0",
       },
     });
-<<<<<<< HEAD
     const ulComp = el("ul", { className: "app-checklist type-checkbox list-group" });
-=======
-    const ulComp = el("ul", { className: "app-checklist list-group" });
->>>>>>> parent of 5e98f75 (resourceslist component)
     paneComp.append(ulComp);
 
     tabContent.append(panePend, paneComp);
@@ -290,19 +277,28 @@ class View {
 
     const actions = el("div", { className: "d-flex flex-column mt-2 small" });
     const actionDefs = [
+      // [key, text, hint, icono (opcional, default false)]
       ["save", "Save", "[Enter]"],
       ["discard", "Discard", "[Esc]"],
       ["delete", "Delete", "[Shift+Del]"],
-      ["ai-spelling", "Fix spelling »", "[Shift+F8]"],
-      ["ai-improve", "Improve writing »", "[Shift+F9]"],
-      ["ai-breakdown", "Break down task »", "[Shift+F10]"],
+      ["ai-spelling", "Fix spelling", "[Shift+F8]", true],
+      ["ai-improve", "Improve writing", "[Shift+F9]", true],
+      ["ai-breakdown", "Break down task", "[Shift+F10]", true],
     ];
-    actionDefs.forEach(([key, text, hint]) => {
+
+    actionDefs.forEach(([key, text, hint, icono = false]) => {
+      // Clase base para el elemento <a> (ancla).
+      const anchorClassName = "text-decoration-none fw-bold mb-2 d-flex justify-content-between";
+      
+      // Clase condicional para el primer <span>. Si 'icono' es true, se establece 'app-icono'.
+      const spanClassName = icono ? "app-icono" : "";
       actions.append(
         el("a", {
-          className: "text-decoration-none fw-bold mb-2 d-flex justify-content-between",
+          // La clase del <a> se mantiene constante.
+          className: anchorClassName,
           attrs: { href: "#", "data-action": key },
-          html: `<span>${text}</span><span class="text-muted">${hint}</span>`,
+          // El contenido HTML ahora inyecta la clase condicional en el primer <span>
+          html: `<span class="${spanClassName}">${text}</span><span class="text-muted">${hint}</span>`,
         })
       );
     });
@@ -455,7 +451,7 @@ class View {
   // crea fila de nueva entrada
   #renderNewItemEntry() {
     const li = el("li", {
-      className: "list-group-item p-2 d-flex gap-2 align-items-start",
+      className: "list-group-item p-2 d-flex align-items-start",
     });
     li.dataset.role = "new-entry";
     li.draggable = false;

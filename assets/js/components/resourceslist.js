@@ -289,7 +289,7 @@ class View {
     ];
 
     actionDefs.forEach(([key, text, hint, icono = false]) => {
-      // Clase base para el elemento <a> (ancla). No lleva la clase 'app-icono'.
+      // Clase base para el elemento <a> (ancla).
       const anchorClassName = "text-decoration-none fw-bold mb-2 d-flex justify-content-between";
       
       // Clase condicional para el primer <span>. Si 'icono' es true, se establece 'app-icono'.
@@ -453,7 +453,7 @@ class View {
   // crea fila de nueva entrada
   #renderNewItemEntry() {
     const li = el("li", {
-      className: "list-group-item p-2 d-flex gap-2 align-items-start",
+      className: "list-group-item p-2 d-flex align-items-start",
     });
     li.dataset.role = "new-entry";
     li.draggable = false;

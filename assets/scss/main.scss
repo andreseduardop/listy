@@ -368,11 +368,7 @@ svg.bi {
 
 // APP CHECKLIST (start)
 // Checklists
-<<<<<<< HEAD
 .type-checkbox {
-=======
-.app-checklist {
->>>>>>> parent of 5e98f75 (resourceslist component)
   background-color: transparent;
   border-radius: 0px;
   transition-duration: .8s;
@@ -380,11 +376,7 @@ svg.bi {
 
 // List item
 /* Resaltado cuando el mouse pase por encima */
-<<<<<<< HEAD
 .type-checkbox li:has(input[type="checkbox"]):hover {
-=======
-.app-checklist li:has(input[type="checkbox"]):hover {
->>>>>>> parent of 5e98f75 (resourceslist component)
   background-color: $highlight-subtle;
   & div,
   & button,
@@ -396,11 +388,7 @@ svg.bi {
   }
 }
 // Resaltado cuando checked
-<<<<<<< HEAD
 .type-checkbox li:has(input[type="checkbox"]:checked) {
-=======
-.app-checklist li:has(input[type="checkbox"]:checked) {
->>>>>>> parent of 5e98f75 (resourceslist component)
   background-color: $app-bg;
   & div,
   & button,
@@ -413,19 +401,11 @@ svg.bi {
 }
 // Form check (checkbox + label)
 // Se debe hacer ajuste para centrar verticalmente (¬_¬)
-<<<<<<< HEAD
 .type-checkbox .form-check {
   margin-bottom: 0rem;
 }
 // Checkbox
 .type-checkbox input[type="checkbox"] {
-=======
-.app-checklist .form-check {
-  margin-bottom: 0rem;
-}
-// Checkbox
-.app-checklist input[type="checkbox"] {
->>>>>>> parent of 5e98f75 (resourceslist component)
   background-color: transparent;
   margin-left: -1.6em;
   cursor: pointer;
@@ -435,61 +415,39 @@ svg.bi {
   width: 1.2em;
   position: relative;
 }
-<<<<<<< HEAD
 .type-checkbox input[type="checkbox"]:focus {
-=======
-.app-checklist input[type="checkbox"]:focus {
->>>>>>> parent of 5e98f75 (resourceslist component)
   border-color: $body-color;
   outline: 0;
   box-shadow: none;  
 }
-<<<<<<< HEAD
 .type-checkbox input[type="checkbox"]:checked {
-=======
-.app-checklist input[type="checkbox"]:checked {
->>>>>>> parent of 5e98f75 (resourceslist component)
   color: $app-bg-subtle;
   background-color: $body-color;
 }
 // Label
-<<<<<<< HEAD
 .type-checkbox input[type="checkbox"] + label {
-=======
-.app-checklist input[type="checkbox"] + label {
->>>>>>> parent of 5e98f75 (resourceslist component)
   cursor: default;
   padding-left: 8px;
   padding-top: 1.5px;
 }
-<<<<<<< HEAD
 .type-checkbox input[type="checkbox"]:checked+label {
   color: $body-color-subtle-3;
 }
-// Input textg
+// Input text
 .type-checkbox textarea {
-=======
-.app-checklist input[type="checkbox"]:checked+label {
-  color: $body-color-subtle-3;
-}
-// Input textg
-.app-checklist textarea {
->>>>>>> parent of 5e98f75 (resourceslist component)
   resize: none;
   overflow: hidden;
   height: auto;
   padding: 0px 4px;
 }
-<<<<<<< HEAD
 .type-checkbox textarea, 
 .type-checkbox input[type="text"] {
-=======
-.app-checklist textarea, 
-.app-checklist input[type="text"] {
->>>>>>> parent of 5e98f75 (resourceslist component)
   align-content: center;
 }
-
+// Stepslist
+.type-stepslist li::before {
+  min-width: 1.5em;
+}
 // Buttons
 // Edit 
 .app-btn-edit {
@@ -507,23 +465,20 @@ button.app-btn-move {
   cursor: grab !important;
   padding: 0px 0px 0px 16px;
 }
-button.app-btn-move:active { cursor: grabbing !important; }
+button.app-btn-move:active {
+  cursor: grabbing !important; 
+}
 // Add new task
 .app-btn-add {
   background-color: $app-bg-subtle;
   border-color: transparent;
   border: 0px;
-  box-shadow: transparent;  
   color: $body-color-subtle-5;
-  margin: 2px 0px 2px 2px;
+  margin: 0px 0px 0px 7px;
   outline: 0;
   padding: 0px;
 }
-<<<<<<< HEAD
 .type-checkbox button.app-btn-add:active {
-=======
-.app-checklist button.app-btn-add:active {
->>>>>>> parent of 5e98f75 (resourceslist component)
   background-color: $app-bg-subtle;
   border-color: transparent;
   border: 0px;

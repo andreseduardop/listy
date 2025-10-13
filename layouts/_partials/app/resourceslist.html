@@ -2,99 +2,110 @@
   <div class="app-card col">
     <h2>resources</h2>
     <div id="resourceslist-container">
-      <ul class="nav nav-tabs nav-fill" id="resourcelist-tabs" role="tablist">
-        <li class="nav-item" role="presentation">
-          <button class="nav-link active" id="resourcelist-pending-tab" data-bs-toggle="tab" data-bs-target="#resourcelist-pending-tab-pane" type="button" role="tab" aria-controls="resourcelist-pending-tab-pane" aria-selected="true">Pending
-          </button>
-        </li>
-        <li class="nav-item" role="presentation">
-          <button class="nav-link" id="resourcelist-ready-tab" data-bs-toggle="tab" data-bs-target="#resourcelist-ready-tab-pane" type="button" role="tab" aria-controls="resourcelist-ready-tab-pane" aria-selected="false" style="" tabindex="-1">Ready
-          </button>
-        </li>
-      </ul>
-      <div class="tab-content" id="resourcelist-tabs-content">
-        <div class="tab-pane fade active show" id="resourcelist-pending-tab-pane" role="tabpanel" aria-labelledby="resourcelist-pending-tab" tabindex="0">
-          <ul class="app-resourcelist type-checkbox list-group">
-            <li class="list-group-item p-2 d-flex align-items-start" draggable="true" data-id="">
-              <div class="form-check position-relative d-flex align-items-top flex-grow-1">
-                <input class="form-check-input" type="checkbox" id="resourcelist-check-1">
-                <label class="form-check-label flex-grow-1" for="textarea-for-pending-resource-1">Pending resource example</label>
-                <div class="d-flex flex-column ps-1 flex-grow-1 d-none"> 
-                  <textarea class="form-control" data-role="inline-editor" aria-label="Edit resource text" name="inline-editor" rows="1" id="textarea-for-pending-resource-1">Editing (Pending resource example)</textarea>
-                  <div class="d-flex flex-column mt-2 small"> 
-                    <a class="text-decoration-none fw-bold mt-1 mb-2 d-flex justify-content-between" href="#">
-                      <span>Save</span><span class="text-muted">[Enter]</span>
-                    </a>
-                    <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#">
-                      <span>Discard</span><span class="text-muted">[Esc]</span>
-                    </a>
-                    <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#">
-                      <span>Delete</span><span class="text-muted">[Shift+Del]</span>
-                    </a>
-                    <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#">
-                      <span class="app-icono">AI Fix spelling</span><span class="text-muted">[Shift+F8]</span>
-                    </a>
-                    <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#">
-                      <span class="app-icono">AI improve writing</span><span class="text-muted">[Shift+F9]</span>
-                    </a>
-                    <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#">
-                      <span class="app-icono">AI break down resource</span><span class="text-muted">[Shift+F10]</span>
-                    </a>
-                  </div>
+    </div>
+    <ul class="nav nav-tabs nav-fill" id="resourceslist-tabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="resourceslist-pending-tab" data-bs-toggle="tab" data-bs-target="#resourceslist-pending-tab-pane" type="button" role="tab" aria-controls="resourceslist-pending-tab-pane" aria-selected="true">Pending</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="resourceslist-ready-tab" data-bs-toggle="tab" data-bs-target="#resourceslist-ready-tab-pane" type="button" role="tab" aria-controls="resourceslist-ready-tab-pane" aria-selected="false" tabindex="-1" style="">Ready</button>
+      </li>
+    </ul>
+    <div class="tab-content" id="resourceslist-tabs-content">
+      <div class="tab-pane fade active show" id="resourceslist-pending-tab-pane" role="tabpanel" aria-labelledby="resourceslist-pending-tab" tabindex="0">
+        <ul class="app-resourceslist type-checkbox list-group">
+          <li class="list-group-item p-2 d-flex align-items-start" draggable="true" data-id="2ebc70a9c333">
+            <div class="form-check position-relative d-flex align-items-top flex-grow-1">
+              <input class="form-check-input" type="checkbox" id="resourceslist-check-2ebc70a9c333">
+              <label class="form-check-label flex-grow-1" for="textarea-for-2ebc70a9c333">Pending resource example</label>
+              <div class="d-flex flex-column ps-1 flex-grow-1 d-none" data-role="inline-panel">
+                <textarea class="form-control" data-role="inline-editor" aria-label="Edit resource text" name="inline-editor" rows="1" id="textarea-for-2ebc70a9c333">
+                </textarea>
+                <div class="d-flex flex-column mt-2 small">
+                  <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#" data-action="save">
+                    <span class="">Save</span>
+                    <span class="text-muted">[Enter]</span>
+                  </a>
+                  <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#" data-action="discard">
+                    <span class="">Discard</span>
+                    <span class="text-muted">[Esc]</span>
+                  </a>
+                  <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#" data-action="delete">
+                    <span class="">Delete</span>
+                    <span class="text-muted">[Shift+Del]</span>
+                  </a>
+                  <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#" data-action="ai-spelling">
+                    <span class="app-icono">Fix spelling</span>
+                    <span class="text-muted">[Shift+F8]</span>
+                  </a>
+                  <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#" data-action="ai-improve">
+                    <span class="app-icono">Improve writing</span>
+                    <span class="text-muted">[Shift+F9]</span>
+                  </a>
+                  <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#" data-action="ai-breakdown">
+                    <span class="app-icono">Break down task</span>
+                    <span class="text-muted">[Shift+F10]</span>
+                  </a>
                 </div>
               </div>
-              <button class="btn app-btn-move" type="button" aria-label="Move" title="Move" aria-hidden="true" tabindex="-1" draggable="false">
-                  <i class="bi bi-arrow-down-up" aria-hidden="true"></i>
-              </button>
-            </li>
-            <li class="list-group-item p-2 d-flex gap-2 align-items-start" data-role="new-entry" draggable="false">
-              <input type="text" class="form-control" placeholder="Add new resource and press Enter" aria-label="Add new resource" name="Add new resource">
-              <button type="button" class="btn app-btn-add" title="Add new resource" aria-label="Add new resource">
-                <i class="bi bi-plus-square-fill fs-3" aria-hidden="true">
-                </i>
-              </button>
-            </li>
-          </ul>
-        </div>
-        <div class="tab-pane fade" id="resourcelist-ready-tab-pane" role="tabpanel" aria-labelledby="resourcelist-ready-tab" tabindex="0">
-          <ul class="app-resourcelist type-checkbox list-group">
-            <li class="list-group-item p-2 d-flex align-items-start" draggable="true" data-id="">
-              No resources ready.
-            </li>
-            <li class="list-group-item p-2 d-flex align-items-start" draggable="true" data-id="">
-              <div class="form-check position-relative d-flex align-items-top flex-grow-1">
-                <input class="form-check-input" type="checkbox" id="resourcelist-check-checked-1">
-                <label class="form-check-label flex-grow-1 d-none" for="textarea-for-ready-resource-1">Ready resource example</label>
-                <div class="d-flex flex-column ps-1 flex-grow-1"> 
-                  <textarea class="form-control" data-role="inline-editor" aria-label="Edit resource text" name="inline-editor" rows="1" id="textarea-for-ready-resource-1">Editing (Ready resource example)</textarea>
-                  <div class="d-flex flex-column mt-2 small"> 
-                    <a class="text-decoration-none fw-bold mt-1 mb-2 d-flex justify-content-between" href="#">
-                      <span>Save</span><span class="text-muted">[Enter]</span>
-                    </a>
-                    <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#">
-                      <span>Discard</span><span class="text-muted">[Esc]</span>
-                    </a>
-                    <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#">
-                      <span>Delete</span><span class="text-muted">[Shift+Del]</span>
-                    </a>
-                    <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#">
-                      <span class="app-icono">AI Fix spelling</span><span class="text-muted">[Shift+F8]</span>
-                    </a>
-                    <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#">
-                      <span class="app-icono">AI improve writing</span><span class="text-muted">[Shift+F9]</span>
-                    </a>
-                    <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#">
-                      <span class="app-icono">AI break down resource</span><span class="text-muted">[Shift+F10]</span>
-                    </a>
-                  </div>
+            </div>
+            <button class="btn app-btn-move" type="button" aria-label="Move" title="Move" aria-hidden="true" tabindex="-1" draggable="false">
+              <i class="bi bi-arrow-down-up" aria-hidden="true">
+              </i>
+            </button>
+          </li>
+          <li class="list-group-item p-2 d-flex align-items-start" data-role="new-entry" draggable="false">
+            <input class="form-control" type="text" name="new-resource" placeholder="Add new resource and press Enter" aria-label="Add new resource">
+            <button class="btn app-btn-add" type="button" title="Add new resource" aria-label="Add new resource">
+              <i class="bi bi-plus-square-fill fs-3" aria-hidden="true">
+              </i>
+            </button>
+          </li>
+        </ul>
+      </div>
+      <div class="tab-pane fade" id="resourceslist-ready-tab-pane" role="tabpanel" aria-labelledby="resourceslist-ready-tab" tabindex="0">
+        <ul class="app-resourceslist type-checkbox list-group">
+          <li class="list-group-item p-2 d-flex align-items-start" draggable="true" data-id="e0f8aed148f7">
+            <div class="form-check position-relative d-flex align-items-top flex-grow-1">
+              <input class="form-check-input" type="checkbox" id="resourceslist-check-e0f8aed148f7">
+              <label class="form-check-label flex-grow-1" for="textarea-for-e0f8aed148f7">Ready resource example</label>
+              <div class="d-flex flex-column ps-1 flex-grow-1 d-none" data-role="inline-panel">
+                <textarea class="form-control" data-role="inline-editor" aria-label="Edit resource text" name="inline-editor" rows="1" id="textarea-for-e0f8aed148f7">
+                </textarea>
+                <div class="d-flex flex-column mt-2 small">
+                  <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#" data-action="save">
+                    <span class="">Save</span>
+                    <span class="text-muted">[Enter]</span>
+                  </a>
+                  <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#" data-action="discard">
+                    <span class="">Discard</span>
+                    <span class="text-muted">[Esc]</span>
+                  </a>
+                  <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#" data-action="delete">
+                    <span class="">Delete</span>
+                    <span class="text-muted">[Shift+Del]</span>
+                  </a>
+                  <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#" data-action="ai-spelling">
+                    <span class="app-icono">Fix spelling</span>
+                    <span class="text-muted">[Shift+F8]</span>
+                  </a>
+                  <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#" data-action="ai-improve">
+                    <span class="app-icono">Improve writing</span>
+                    <span class="text-muted">[Shift+F9]</span>
+                  </a>
+                  <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#" data-action="ai-breakdown">
+                    <span class="app-icono">Break down task</span>
+                    <span class="text-muted">[Shift+F10]</span>
+                  </a>
                 </div>
               </div>
-              <button class="btn app-btn-move" type="button" aria-label="Move" title="Move" aria-hidden="true" tabindex="-1" draggable="false">
-                <i class="bi bi-arrow-down-up" aria-hidden="true"></i>
-              </button>
-            </li>
-          </ul>
-        </div>
+            </div>
+            <button class="btn app-btn-move" type="button" aria-label="Move" title="Move" aria-hidden="true" tabindex="-1" draggable="false">
+              <i class="bi bi-arrow-down-up" aria-hidden="true">
+              </i>
+            </button>
+          </li>
+        </ul>
       </div>
     </div>
   </div>
