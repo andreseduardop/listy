@@ -368,27 +368,23 @@ svg.bi {
 
 // APP CHECKLIST (start)
 // Checklists
-.component-type-checkbox {
+<<<<<<< HEAD
+.type-checkbox {
+=======
+.app-checklist {
+>>>>>>> parent of 5e98f75 (resourceslist component)
   background-color: transparent;
   border-radius: 0px;
   transition-duration: .8s;
-}
-// simple lists
-.component-type-stepslist {
-  background-color: transparent;
-  border-radius: 0px;
-  transition-duration: .8s;
-}
-.component-type-stepslist li::before {
-  min-width: 1.5em;
-}
-.component-type-list li>div {
-  // margin-left: 1em;
 }
 
 // List item
 /* Resaltado cuando el mouse pase por encima */
-.component-type-checkbox li:has(input[type="checkbox"]):hover {
+<<<<<<< HEAD
+.type-checkbox li:has(input[type="checkbox"]):hover {
+=======
+.app-checklist li:has(input[type="checkbox"]):hover {
+>>>>>>> parent of 5e98f75 (resourceslist component)
   background-color: $highlight-subtle;
   & div,
   & button,
@@ -400,7 +396,11 @@ svg.bi {
   }
 }
 // Resaltado cuando checked
-.component-type-checkbox li:has(input[type="checkbox"]:checked) {
+<<<<<<< HEAD
+.type-checkbox li:has(input[type="checkbox"]:checked) {
+=======
+.app-checklist li:has(input[type="checkbox"]:checked) {
+>>>>>>> parent of 5e98f75 (resourceslist component)
   background-color: $app-bg;
   & div,
   & button,
@@ -413,11 +413,19 @@ svg.bi {
 }
 // Form check (checkbox + label)
 // Se debe hacer ajuste para centrar verticalmente (¬_¬)
-.component-type-checkbox .form-check {
+<<<<<<< HEAD
+.type-checkbox .form-check {
   margin-bottom: 0rem;
 }
 // Checkbox
-.component-type-checkbox input[type="checkbox"] {
+.type-checkbox input[type="checkbox"] {
+=======
+.app-checklist .form-check {
+  margin-bottom: 0rem;
+}
+// Checkbox
+.app-checklist input[type="checkbox"] {
+>>>>>>> parent of 5e98f75 (resourceslist component)
   background-color: transparent;
   margin-left: -1.6em;
   cursor: pointer;
@@ -427,33 +435,58 @@ svg.bi {
   width: 1.2em;
   position: relative;
 }
-.component-type-checkbox input[type="checkbox"]:focus {
+<<<<<<< HEAD
+.type-checkbox input[type="checkbox"]:focus {
+=======
+.app-checklist input[type="checkbox"]:focus {
+>>>>>>> parent of 5e98f75 (resourceslist component)
   border-color: $body-color;
   outline: 0;
   box-shadow: none;  
 }
-.component-type-checkbox input[type="checkbox"]:checked {
+<<<<<<< HEAD
+.type-checkbox input[type="checkbox"]:checked {
+=======
+.app-checklist input[type="checkbox"]:checked {
+>>>>>>> parent of 5e98f75 (resourceslist component)
   color: $app-bg-subtle;
   background-color: $body-color;
 }
 // Label
-.component-type-checkbox input[type="checkbox"] + label {
+<<<<<<< HEAD
+.type-checkbox input[type="checkbox"] + label {
+=======
+.app-checklist input[type="checkbox"] + label {
+>>>>>>> parent of 5e98f75 (resourceslist component)
   cursor: default;
   padding-left: 8px;
   padding-top: 1.5px;
 }
-.component-type-checkbox input[type="checkbox"]:checked+label {
+<<<<<<< HEAD
+.type-checkbox input[type="checkbox"]:checked+label {
   color: $body-color-subtle-3;
 }
 // Input textg
-.component-type-checkbox textarea {
+.type-checkbox textarea {
+=======
+.app-checklist input[type="checkbox"]:checked+label {
+  color: $body-color-subtle-3;
+}
+// Input textg
+.app-checklist textarea {
+>>>>>>> parent of 5e98f75 (resourceslist component)
   resize: none;
   overflow: hidden;
   height: auto;
   padding: 0px 4px;
 }
-.component-type-checkbox textarea, 
-.component-type-checkbox input[type="text"] {
+<<<<<<< HEAD
+.type-checkbox textarea, 
+.type-checkbox input[type="text"] {
+=======
+.app-checklist textarea, 
+.app-checklist input[type="text"] {
+>>>>>>> parent of 5e98f75 (resourceslist component)
   align-content: center;
 }
 
@@ -484,9 +517,13 @@ button.app-btn-move:active { cursor: grabbing !important; }
   color: $body-color-subtle-5;
   margin: 2px 0px 2px 2px;
   outline: 0;
-  padding: 0px 0px 0px 6px;
+  padding: 0px;
 }
-.component-type-checkbox button.app-btn-add:active {
+<<<<<<< HEAD
+.type-checkbox button.app-btn-add:active {
+=======
+.app-checklist button.app-btn-add:active {
+>>>>>>> parent of 5e98f75 (resourceslist component)
   background-color: $app-bg-subtle;
   border-color: transparent;
   border: 0px;

@@ -76,8 +76,8 @@ import { Model } from "../core/model.js";
 class View {
   // selectores reutilizables
   static SEL = {
-    pendingPane: "#resourceslist-pending-tab-pane .app-resourceslist .component-type-checkbox",
-    readyPane: "#resourceslist-ready-tab-pane .app-resourceslist .component-type-checkbox",
+    pendingPane: "#resourceslist-pending-tab-pane .app-resourceslist .type-checkbox",
+    readyPane: "#resourceslist-ready-tab-pane .app-resourceslist .type-checkbox",
     item: "li.list-group-item",
     newEntry: "li[data-role='new-entry']",
     newEntryInput: "li[data-role='new-entry'] input[type='text']",
@@ -155,7 +155,7 @@ class View {
         tabindex: "0",
       },
     });
-    const ulPend = el("ul", { className: "app-resourceslist component-type-checkbox list-group" });
+    const ulPend = el("ul", { className: "app-resourceslist type-checkbox list-group" });
     panePend.append(ulPend);
 
     const paneReady = el("div", {
@@ -167,7 +167,7 @@ class View {
         tabindex: "0",
       },
     });
-    const ulReady = el("ul", { className: "app-resourceslist component-type-checkbox list-group" });
+    const ulReady = el("ul", { className: "app-resourceslist type-checkbox list-group" });
     paneReady.append(ulReady);
 
     tabContent.append(panePend, paneReady);
