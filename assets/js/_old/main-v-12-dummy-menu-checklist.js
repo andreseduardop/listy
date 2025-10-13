@@ -117,7 +117,7 @@ const qsa = (root, sel) => Array.from(root.querySelectorAll(sel));
  * ================================ */
 class ChecklistModel extends EventTarget {
   // Clave de almacenamiento
-  static STORAGE_KEY = "checklist";
+  static STORAGE_KEY = "checklist-mvc";
 
   constructor() {
     super();
@@ -504,11 +504,10 @@ class ChecklistView {
         const finalize = (mode /* 'commit' | 'cancel' */) => {
           if (finalize._done) return; finalize._done = true;
 
-          panel.removeEventListener("pointerdown", onActionPointerDown);
-          panel.removeEventListener("click", onActionClick);
           editor.removeEventListener("keydown", onKeyDown);
           editor.removeEventListener("input", onInput);
           editor.removeEventListener("blur", onBlur);
+          panel.removeEventListener("click", onActionClick);
 
           if (mode === "commit") {
             const next = editor.value.trim();
@@ -520,7 +519,7 @@ class ChecklistView {
           visibility.hide(panel);
           visibility.show(label);
         };
-        // Funciones del menú
+
         const onKeyDown = (ke) => {
           if (ke.key === "Enter") {
             ke.preventDefault();
@@ -548,34 +547,10 @@ class ChecklistView {
         const onBlur  = () => finalize("commit");
 
         // Maneja clics en las acciones del menú (Save/Discard/Delete/AI…)
-        const onActionPointerDown = (pe) => {
-          const a = pe.target.closest("a[data-action]");
-          if (!a) return;
-
-          pe.preventDefault(); // bloquea el cambio de foco que causaría blur del textarea
-          const act = a.dataset.action;
-
-          if (act === "save") {
-            finalize("commit"); // ← guarda
-          } else if (act === "discard") {
-            finalize("cancel"); // ← descarta cambios
-          } else if (act === "delete") {
-            editor.value = "";  // ← vacía
-            finalize("commit"); // ← confirma borrado
-          } else if (act === "ai-spell") {
-            /* TODO */
-          } else if (act === "ai-improve") {
-            /* TODO */
-          } else if (act === "ai-breakdown") {
-            /* TODO */
-          }
-        };
-
         const onActionClick = (ce) => {
-          // conserva soporte teclado/AT (Enter en el link)
           const a = ce.target.closest("a[data-action]");
           if (!a) return;
-          ce.preventDefault(); // ← evita navegación '#'
+          ce.preventDefault();
           const act = a.dataset.action;
           if (act === "save") finalize("commit");
           else if (act === "discard") finalize("cancel");
@@ -585,13 +560,11 @@ class ChecklistView {
           else if (act === "ai-breakdown") { /* TODO */ }
         };
 
-        // Registros
-        // se dispara antes que blur
-        panel.addEventListener("pointerdown", onActionPointerDown); // ← se adelanta al blur
-        panel.addEventListener("click", onActionClick);   // teclado/AT
+        // Inicializa edición
         editor.addEventListener("keydown", onKeyDown);
-        editor.addEventListener("blur", onBlur, { once: true });
         editor.addEventListener("input", onInput);
+        editor.addEventListener("blur", onBlur, { once: true });
+        panel.addEventListener("click", onActionClick);
 
         // Foco y tamaño inicial
         editor.focus();

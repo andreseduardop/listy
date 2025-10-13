@@ -1,0 +1,84 @@
+{
+  "id": "string",
+  "date": "date",
+  "title": "title",
+  "state": "active",
+  "description": "Event description",
+  "components": [
+    {
+      "name": "ia-generator",
+      "title": "IA Generator",
+      "content": {}
+    },
+    {
+      "name": "summary",
+      "title": "Summary",
+      "content": {}
+    },
+    {
+      "name": "dashboard",
+      "title": "Dashboard",
+      "content": {}
+    },
+    {
+      "name": "customdescription",
+      "title": "Custom Description",
+      "content": {}
+    },
+    {
+      "name": "notes",
+      "title": "Notes",
+      "content": {}
+    },
+    {
+      "name": "countdown",
+      "title": "Countdown",
+      "content": {}
+    },
+    {
+      "name": "schedule",
+      "title": "Schedule",
+      "content": {}
+    },
+    {
+      "name": "dayagenda",
+      "title": "Day Agenda",
+      "content": {}
+    },
+    {
+      "name": "checklist",
+      "title": "Checklist",
+      "content": {}
+    },
+    {
+      "name": "stepslist",
+      "title": "Steps List",
+      "content": {}
+    },
+    {
+      "name": "teamlist",
+      "title": "Team List",
+      "content": {}
+    },
+    {
+      "name": "expenses",
+      "title": "Expenses",
+      "content": {}
+    },
+    {
+      "name": "resourceslist",
+      "title": "Resources List",
+      "content": {}
+    },
+    {
+      "name": "guestslist",
+      "title": "Guests List",
+      "content": {}
+    },
+    {
+      "name": "suggestedsearches",
+      "title": "Suggested Searches",
+      "content": {}
+    }
+  ]
+}
