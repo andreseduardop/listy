@@ -1,14 +1,16 @@
 /**
- * @fileoverview Checklist UI module.
- * @module components/checklist
+ * @fileoverview Resourceslist UI module.
+ * @module components/resourceslist
  *
  * @description
- * Construye e inicializa una checklist completa **dentro del contenedor recibido**.
- * Crea el layout (tabs + listas), renderiza items desde `localStorage` y conecta
- * edición inline, creación, marcado de completado y reordenamiento por drag & drop.
- * Persistencia: guarda los items en `localStorage` como parte de un **modelo raíz**
- * con el esquema importado desde `../core/json/model.json`, dentro de
- * `components.<COMPONENT_NAME>.content`.
+ * Builds and initializes a resourceslist inside the received container.
+ * Creates the layout (tabs + lists), renders items from `localStorage`, and wires
+ * inline editing, creation, toggle ready state, and drag & drop reordering.
+ * Persistence: stores items in `localStorage` as part of a root model under
+ * `components.<COMPONENT_NAME>.content`, using the schema imported from `../core/json/model.json`.
+ *
+ * Code in English; comentarios en español usando tercera persona singular (carga, lee, escribe, borra).
+ * Seguir la guía: https://google.github.io/styleguide/jsguide.html
  *
  * @requires ../utils/helpers.js
  *   - `el(tag, opts)`        // Crea nodos HTML
@@ -20,36 +22,36 @@
  * @requires ../utils/drag-and-drop.js
  *   - `attachListReorder(ul, options)` // Habilita reordenamiento con DnD
  *
- * @version 1.3.0
+ * @version 1.4.0
  *
- * @exports renderChecklist
- * Expone la función pública para inicializar el módulo.
+ * @exports renderResourceslist
+ * Exposes the public function to initialize the module.
  *
- * @typedef {Object} ChecklistItem
- * @property {string} id        - Identificador único (genera id corto).
- * @property {string} text      - Texto visible de la tarea.
- * @property {boolean} completed - Indica si la tarea está completada.
+ * @typedef {Object} ResourceslistItem
+ * @property {string} id        - Unique identifier.
+ * @property {string} text      - Visible text of the resource.
+ * @property {boolean} completed - Marks if the resource is ready (true) or pending (false).
  *
  * @callback ReorderHandler
- * @param {string} draggedId - Id del item arrastrado.
- * @param {number} toIndex   - Índice destino donde se inserta.
+ * @param {string} draggedId - Id of the dragged item.
+ * @param {number} toIndex   - Destination index where the item is inserted.
  *
  * @constant
  * @default
  * @name STORAGE_KEY
  * @type {string}
  * @description
- * Usa la clave `"app.model"` en `localStorage` para persistir el **modelo raíz**.
+ * Uses the key `"app.model"` in `localStorage` to persist the root model.
  *
- * @function renderChecklist
- * @param {HTMLElement} containerEl - Contenedor **dentro del cual** se construye todo el UI.
+ * @function renderResourceslist
+ * @param {HTMLElement} containerEl - Container where the UI is built.
  * @returns {void}
  *
- * @example <caption>Uso típico desde main.js</caption>
+ * @example <caption>Typical usage from main.js</caption>
  * // Code in English; comentarios en español
- * import { renderChecklist } from "./components/checklist.js";
+ * import { renderResourceslist } from "./components/resourceslist.js";
  * const container = document.getElementById("app-container-1"); // Obtiene contenedor
- * renderChecklist(container); // Crea el layout y arranca la checklist dentro del contenedor
+ * renderResourceslist(container); // Crea el layout y arranca la resourceslist dentro del contenedor
  *
  * @remarks
  * - Accesibilidad: asigna atributos ARIA a tabs y controles; evita saltos de línea en edición inline.
@@ -58,9 +60,9 @@
  * - Esquema: los items se escriben en `components.<COMPONENT_NAME>.content` del modelo raíz.
  *
  * @since 1.0.0
- * @updated 1.2.0 - El Controller almacena y pasa COMPONENT_NAME; el Model no asume valor por defecto.
+ * @updated 1.4.0 - Renombra checklist → resourceslist, task → resource; Completed → Ready; container id y selectores.
  *
- * @browser Compatibilidad moderna (ES2020+). Requiere soporte de `class`, `modules` y `localStorage`.
+ * @browser Modern compatibility (ES2020+). Requires `class`, `modules`, and `localStorage` support.
  */
 
 import { el, qs, qsa, visibility, flashBackground } from "../utils/helpers.js";
@@ -74,8 +76,8 @@ import { Model } from "../core/model.js";
 class View {
   // selectores reutilizables
   static SEL = {
-    pendingPane: "#checklist-pending-tab-pane .app-checklist .component-type-checkbox",
-    completedPane: "#checklist-completed-tab-pane .app-checklist .component-type-checkbox",
+    pendingPane: "#resourceslist-pending-tab-pane .app-resourceslist .component-type-checkbox",
+    readyPane: "#resourceslist-ready-tab-pane .app-resourceslist .component-type-checkbox",
     item: "li.list-group-item",
     newEntry: "li[data-role='new-entry']",
     newEntryInput: "li[data-role='new-entry'] input[type='text']",
@@ -86,104 +88,104 @@ class View {
 
   // crea todo el layout y devuelve referencias clave
   static buildLayout(containerEl) {
-    // limpia contenedor destino
+    // limpia contenedor destino (borra contenido previo)
     containerEl.innerHTML = "";
 
     // crea columna y tarjeta
     const col = el("div", { className: "col-12" });
     const card = el("div", { className: "app-card col" });
-    const h2 = el("h2", { html: "tasks" });
+    const h2 = el("h2", { html: "resources" });
 
-    // raíz lógica del checklist
-    const checklistRoot = el("div", { attrs: { id: "checklist-container" } });
+    // raíz lógica
+    const root = el("div", { attrs: { id: "resourceslist-container" } });
 
     // tabs
     const tabs = el("ul", {
       className: "nav nav-tabs nav-fill",
-      attrs: { id: "checklist-tabs", role: "tablist" },
+      attrs: { id: "resourceslist-tabs", role: "tablist" },
     });
 
     const liPend = el("li", { className: "nav-item", attrs: { role: "presentation" } });
     const btnPend = el("button", {
       className: "nav-link active",
       attrs: {
-        id: "checklist-pending-tab",
+        id: "resourceslist-pending-tab",
         "data-bs-toggle": "tab",
-        "data-bs-target": "#checklist-pending-tab-pane",
+        "data-bs-target": "#resourceslist-pending-tab-pane",
         type: "button",
         role: "tab",
-        "aria-controls": "checklist-pending-tab-pane",
+        "aria-controls": "resourceslist-pending-tab-pane",
         "aria-selected": "true",
       },
       html: "Pending",
     });
     liPend.append(btnPend);
 
-    const liComp = el("li", { className: "nav-item", attrs: { role: "presentation" } });
-    const btnComp = el("button", {
+    const liReady = el("li", { className: "nav-item", attrs: { role: "presentation" } });
+    const btnReady = el("button", {
       className: "nav-link",
       attrs: {
-        id: "checklist-completed-tab",
+        id: "resourceslist-ready-tab",
         "data-bs-toggle": "tab",
-        "data-bs-target": "#checklist-completed-tab-pane",
+        "data-bs-target": "#resourceslist-ready-tab-pane",
         type: "button",
         role: "tab",
-        "aria-controls": "checklist-completed-tab-pane",
+        "aria-controls": "resourceslist-ready-tab-pane",
         "aria-selected": "false",
         tabindex: "-1",
       },
-      html: "Completed",
+      html: "Ready",
     });
-    liComp.append(btnComp);
+    liReady.append(btnReady);
 
-    tabs.append(liPend, liComp);
+    tabs.append(liPend, liReady);
 
     // contenido de pestañas
     const tabContent = el("div", {
       className: "tab-content",
-      attrs: { id: "checklist-tabs-content" },
+      attrs: { id: "resourceslist-tabs-content" },
     });
 
     const panePend = el("div", {
       className: "tab-pane fade show active",
       attrs: {
-        id: "checklist-pending-tab-pane",
+        id: "resourceslist-pending-tab-pane",
         role: "tabpanel",
-        "aria-labelledby": "checklist-pending-tab",
+        "aria-labelledby": "resourceslist-pending-tab",
         tabindex: "0",
       },
     });
-    const ulPend = el("ul", { className: "app-checklist component-type-checkbox list-group" });
+    const ulPend = el("ul", { className: "app-resourceslist component-type-checkbox list-group" });
     panePend.append(ulPend);
 
-    const paneComp = el("div", {
+    const paneReady = el("div", {
       className: "tab-pane fade",
       attrs: {
-        id: "checklist-completed-tab-pane",
+        id: "resourceslist-ready-tab-pane",
         role: "tabpanel",
-        "aria-labelledby": "checklist-completed-tab",
+        "aria-labelledby": "resourceslist-ready-tab",
         tabindex: "0",
       },
     });
-    const ulComp = el("ul", { className: "app-checklist component-type-checkbox list-group" });
-    paneComp.append(ulComp);
+    const ulReady = el("ul", { className: "app-resourceslist component-type-checkbox list-group" });
+    paneReady.append(ulReady);
 
-    tabContent.append(panePend, paneComp);
+    tabContent.append(panePend, paneReady);
 
     // ensambla tarjeta
-    card.append(h2, checklistRoot, tabs, tabContent);
+    card.append(h2, root, tabs, tabContent);
     col.append(card);
     containerEl.append(col);
 
-    return { root: checklistRoot, ulPending: ulPend, ulCompleted: ulComp };
+    return { root, ulPending: ulPend, ulReady };
   }
 
   constructor(containerEl) {
     // construye layout y guarda refs de listas
-    const { root, ulPending, ulCompleted } = View.buildLayout(containerEl);
+    const { root, ulPending, ulReady } = View.buildLayout(containerEl);
     this.root = root;
     this.pendingList = ulPending;
-    this.completedList = ulCompleted;
+    this.readyList = ulReady;
 
     // pool de manejadores DnD para limpieza
     this._dndHandles = [];
@@ -192,15 +194,15 @@ class View {
   // renderiza ambas listas
   render(items) {
     const pending = items.filter((i) => !i.completed);
-    const completed = items.filter((i) => i.completed);
+    const ready = items.filter((i) => i.completed);
 
     this.pendingList.innerHTML = "";
-    this.completedList.innerHTML = "";
+    this.readyList.innerHTML = "";
 
     this.#renderList(this.pendingList, pending, { withNewEntry: true });
-    this.#renderList(this.completedList, completed, { withNewEntry: false });
+    this.#renderList(this.readyList, ready, { withNewEntry: false });
 
-    this.#ensureCompletedEmptyState();
+    this.#ensureReadyEmptyState();
     this.#initDnD(); // Activa DnD tras render
   }
 
@@ -223,7 +225,7 @@ class View {
 
     this._dndHandles.push(
       attachListReorder(this.pendingList, common),
-      attachListReorder(this.completedList, common)
+      attachListReorder(this.readyList, common)
     );
   }
 
@@ -249,7 +251,7 @@ class View {
 
     const input = el("input", {
       className: "form-check-input",
-      attrs: { type: "checkbox", id: `checklist-check-${item.id}` },
+      attrs: { type: "checkbox", id: `resourceslist-check-${item.id}` },
     });
     input.checked = !!item.completed;
 
@@ -268,7 +270,7 @@ class View {
       className: "form-control",
       attrs: {
         "data-role": "inline-editor",
-        "aria-label": "Edit task text",
+        "aria-label": "Edit resource text",
         name: "inline-editor",
         rows: "1",
         id: `textarea-for-${item.id}`,
@@ -325,8 +327,8 @@ class View {
     input.addEventListener("change", () => {
       this.onToggle?.(item.id);
       const targetTabId = input.checked
-        ? "checklist-completed-tab"
-        : "checklist-pending-tab";
+        ? "resourceslist-ready-tab"
+        : "resourceslist-pending-tab";
       const targetEl = document.getElementById(targetTabId);
       if (targetEl) flashBackground(targetEl);
     });
@@ -427,9 +429,9 @@ class View {
     return li;
   }
 
-  // asegura placeholder cuando no hay completadas
-  #ensureCompletedEmptyState() {
-    const ul = this.completedList;
+  // asegura placeholder cuando no hay 'ready'
+  #ensureReadyEmptyState() {
+    const ul = this.readyList;
     if (!ul) return;
     const hasReal = [...ul.querySelectorAll("li.list-group-item[data-id]")].some(
       (li) => (li.dataset.id ?? "") !== ""
@@ -441,7 +443,7 @@ class View {
       const li = el("li", {
         className: "list-group-item p-2 d-flex align-items-start",
         attrs: { draggable: "false" },
-        html: "No tasks completed.",
+        html: "No resources ready.",
       });
       li.dataset.id = "";
       ul.appendChild(li);
@@ -460,15 +462,15 @@ class View {
       className: "form-control",
       attrs: {
         type: "text",
-        name: "new-task",
-        placeholder: "Add new task and press Enter",
-        "aria-label": "Add new task",
+        name: "new-resource",
+        placeholder: "Add new resource and press Enter",
+        "aria-label": "Add new resource",
       },
     });
 
     const btnAdd = el("button", {
       className: "btn app-btn-add",
-      attrs: { type: "button", title: "Add new task", "aria-label": "Add new task" },
+      attrs: { type: "button", title: "Add new resource", "aria-label": "Add new resource" },
       html: `<i class="bi bi-plus-square-fill fs-3" aria-hidden="true"></i>`,
     });
 
@@ -500,7 +502,7 @@ class View {
 class Controller {
   constructor(containerEl) {
     // define y almacena el nombre del componente que controla
-    this.COMPONENT_NAME = "checklist";
+    this.COMPONENT_NAME = "resourceslist";
 
     // instancia modelo y vista
     this.model = new Model();
@@ -549,13 +551,13 @@ class Controller {
  * ================================ */
 
 /**
- * renderChecklist(containerEl: HTMLElement)
+ * renderResourceslist(containerEl: HTMLElement)
  * - Called by main.js passing the container where everything must be created.
  */
-export function renderChecklist(containerEl) {
+export function renderResourceslist(containerEl) {
   // valida el contenedor recibido
   if (!containerEl || !(containerEl instanceof HTMLElement)) {
-    console.error("[checklist] invalid container element");
+    console.error("[resourceslist] invalid container element");
     return;
   }
   // crea layout y monta controlador sobre el contenedor

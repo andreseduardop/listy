@@ -1,26 +1,26 @@
 <div class="col-12">
   <div class="app-card col">
-    <h2>tasks</h2>
-    <div id="checklist-container">
-      <ul class="nav nav-tabs nav-fill" id="checklist-tabs" role="tablist">
+    <h2>resources</h2>
+    <div id="resourceslist-container">
+      <ul class="nav nav-tabs nav-fill" id="resourcelist-tabs" role="tablist">
         <li class="nav-item" role="presentation">
-          <button class="nav-link active" id="checklist-pending-tab" data-bs-toggle="tab" data-bs-target="#checklist-pending-tab-pane" type="button" role="tab" aria-controls="checklist-pending-tab-pane" aria-selected="true">Pending
+          <button class="nav-link active" id="resourcelist-pending-tab" data-bs-toggle="tab" data-bs-target="#resourcelist-pending-tab-pane" type="button" role="tab" aria-controls="resourcelist-pending-tab-pane" aria-selected="true">Pending
           </button>
         </li>
         <li class="nav-item" role="presentation">
-          <button class="nav-link" id="checklist-completed-tab" data-bs-toggle="tab" data-bs-target="#checklist-completed-tab-pane" type="button" role="tab" aria-controls="checklist-completed-tab-pane" aria-selected="false" style="" tabindex="-1">Completed
+          <button class="nav-link" id="resourcelist-ready-tab" data-bs-toggle="tab" data-bs-target="#resourcelist-ready-tab-pane" type="button" role="tab" aria-controls="resourcelist-ready-tab-pane" aria-selected="false" style="" tabindex="-1">Ready
           </button>
         </li>
       </ul>
-      <div class="tab-content" id="checklist-tabs-content">
-        <div class="tab-pane fade active show" id="checklist-pending-tab-pane" role="tabpanel" aria-labelledby="checklist-pending-tab" tabindex="0">
-          <ul class="app-checklist component-type-checkbox list-group">
+      <div class="tab-content" id="resourcelist-tabs-content">
+        <div class="tab-pane fade active show" id="resourcelist-pending-tab-pane" role="tabpanel" aria-labelledby="resourcelist-pending-tab" tabindex="0">
+          <ul class="app-resourcelist component-type-checkbox list-group">
             <li class="list-group-item p-2 d-flex align-items-start" draggable="true" data-id="">
               <div class="form-check position-relative d-flex align-items-top flex-grow-1">
-                <input class="form-check-input" type="checkbox" id="checklist-check-1">
-                <label class="form-check-label flex-grow-1" for="textarea-for-pending-task-1">Pending task example</label>
+                <input class="form-check-input" type="checkbox" id="resourcelist-check-1">
+                <label class="form-check-label flex-grow-1" for="textarea-for-pending-resource-1">Pending resource example</label>
                 <div class="d-flex flex-column ps-1 flex-grow-1 d-none"> 
-                  <textarea class="form-control" data-role="inline-editor" aria-label="Edit task text" name="inline-editor" rows="1" id="textarea-for-pending-task-1">Editing (Pending task example)</textarea>
+                  <textarea class="form-control" data-role="inline-editor" aria-label="Edit resource text" name="inline-editor" rows="1" id="textarea-for-pending-resource-1">Editing (Pending resource example)</textarea>
                   <div class="d-flex flex-column mt-2 small"> 
                     <a class="text-decoration-none fw-bold mt-1 mb-2 d-flex justify-content-between" href="#">
                       <span>Save</span><span class="text-muted">[Enter]</span>
@@ -38,7 +38,7 @@
                       <span class="app-icono">AI improve writing</span><span class="text-muted">[Shift+F9]</span>
                     </a>
                     <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#">
-                      <span class="app-icono">AI break down task</span><span class="text-muted">[Shift+F10]</span>
+                      <span class="app-icono">AI break down resource</span><span class="text-muted">[Shift+F10]</span>
                     </a>
                   </div>
                 </div>
@@ -47,26 +47,26 @@
                   <i class="bi bi-arrow-down-up" aria-hidden="true"></i>
               </button>
             </li>
-            <li class="list-group-item p-2 d-flex align-items-start" data-role="new-entry" draggable="false">
-              <input type="text" class="form-control" placeholder="Add new task and press Enter" aria-label="Add new task" name="Add new task">
-              <button type="button" class="btn app-btn-add" title="Add new task" aria-label="Add new task">
+            <li class="list-group-item p-2 d-flex gap-2 align-items-start" data-role="new-entry" draggable="false">
+              <input type="text" class="form-control" placeholder="Add new resource and press Enter" aria-label="Add new resource" name="Add new resource">
+              <button type="button" class="btn app-btn-add" title="Add new resource" aria-label="Add new resource">
                 <i class="bi bi-plus-square-fill fs-3" aria-hidden="true">
                 </i>
               </button>
             </li>
           </ul>
         </div>
-        <div class="tab-pane fade" id="checklist-completed-tab-pane" role="tabpanel" aria-labelledby="checklist-completed-tab" tabindex="0">
-          <ul class="app-checklist component-type-checkbox list-group">
+        <div class="tab-pane fade" id="resourcelist-ready-tab-pane" role="tabpanel" aria-labelledby="resourcelist-ready-tab" tabindex="0">
+          <ul class="app-resourcelist component-type-checkbox list-group">
             <li class="list-group-item p-2 d-flex align-items-start" draggable="true" data-id="">
-              No tasks completed.
+              No resources ready.
             </li>
             <li class="list-group-item p-2 d-flex align-items-start" draggable="true" data-id="">
               <div class="form-check position-relative d-flex align-items-top flex-grow-1">
-                <input class="form-check-input" type="checkbox" id="checklist-check-checked-1">
-                <label class="form-check-label flex-grow-1 d-none" for="textarea-for-completed-task-1">Completed task example</label>
+                <input class="form-check-input" type="checkbox" id="resourcelist-check-checked-1">
+                <label class="form-check-label flex-grow-1 d-none" for="textarea-for-ready-resource-1">Ready resource example</label>
                 <div class="d-flex flex-column ps-1 flex-grow-1"> 
-                  <textarea class="form-control" data-role="inline-editor" aria-label="Edit task text" name="inline-editor" rows="1" id="textarea-for-completed-task-1">Editing (Completed task example)</textarea>
+                  <textarea class="form-control" data-role="inline-editor" aria-label="Edit resource text" name="inline-editor" rows="1" id="textarea-for-ready-resource-1">Editing (Ready resource example)</textarea>
                   <div class="d-flex flex-column mt-2 small"> 
                     <a class="text-decoration-none fw-bold mt-1 mb-2 d-flex justify-content-between" href="#">
                       <span>Save</span><span class="text-muted">[Enter]</span>
@@ -84,7 +84,7 @@
                       <span class="app-icono">AI improve writing</span><span class="text-muted">[Shift+F9]</span>
                     </a>
                     <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#">
-                      <span class="app-icono">AI break down task</span><span class="text-muted">[Shift+F10]</span>
+                      <span class="app-icono">AI break down resource</span><span class="text-muted">[Shift+F10]</span>
                     </a>
                   </div>
                 </div>
