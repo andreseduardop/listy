@@ -4,109 +4,14 @@
 /* ================================
  * Utilities
  * ================================ */
-  // Crea elemento con clases, atributos, estilos y contenido opcional
-  function el(
-    tag,
-    { className = "", attrs = {}, style = {}, html = "" } = {}
-  ) {
-    const node = document.createElement(tag);
-
-    // Asigna clases si procede
-    if (className) node.className = className;
-
-    // Normaliza aplicación de estilos (string u objeto)
-    // - Si viene en attrs.style, lo aplica primero
-    // - El parámetro "style" tiene precedencia sobre attrs.style
-    const applyStyle = (target, st) => {
-      // Ignora estilos vacíos o nulos
-      if (!st) return;
-
-      // Si es string, lo asigna directo al atributo style
-      if (typeof st === "string") {
-        target.setAttribute("style", st);
-        return;
-      }
-
-      // Si es objeto, recorre claves y aplica con setProperty o acceso directo
-      for (const [prop, val] of Object.entries(st)) {
-        if (val == null) continue; // omite nulos/undefined
-        // Si es una custom property o kebab-case, usa setProperty
-        if (prop.startsWith("--") || prop.includes("-")) {
-          target.style.setProperty(prop, String(val));
-        } else {
-          // Usa acceso camelCase (e.g., backgroundColor)
-          target.style[prop] = String(val);
-        }
-      }
-    };
-
-    // Asigna atributos (exceptuando style para aplicarlo de forma controlada)
-    for (const [k, v] of Object.entries(attrs)) {
-      if (k === "style") continue; // se gestiona aparte
-      node.setAttribute(k, v);
-    }
-
-    // Aplica primero estilos presentes en attrs.style
-    applyStyle(node, attrs?.style);
-    // Aplica luego el parámetro style (tiene precedencia)
-    applyStyle(node, style);
-
-    // Inserta HTML si procede
-    if (html) node.innerHTML = html;
-
-    return node;
-  }
-
-// visibility helper — gestiona mostrar/ocultar sin romper clases Bootstrap d-*
-// (Comentarios en español, tercera persona)
-const visibility = (() => {
-  // Asegura conocer la clase de display visible original; si no existe, usa fallback
-  function ensureDisplayClass(el, fallback = "d-block") {
-    // Busca una utilidad Bootstrap d-* conocida presente en el elemento
-    const displayUtil = Array.from(el.classList).find(c =>
-      /^d-(block|inline|inline-block|flex|inline-flex|grid|inline-grid)$/.test(c)
-    );
-    // Guarda la clase de display a restaurar en dataset (se conserva entre llamadas)
-    el.dataset.displayClass = el.dataset.displayClass || displayUtil || fallback;
-    return el.dataset.displayClass;
-  }
-
-  // Oculta el elemento añadiendo d-none y marcando aria-hidden
-  function hide(el) {
-    if (!el) return;                           // valida elemento
-    ensureDisplayClass(el);                    // asegura display original
-    el.classList.add("d-none");                // aplica ocultación
-    // el.setAttribute("aria-hidden", "true");    // refleja estado en accesibilidad
-  }
-
-  // Muestra el elemento quitando d-none y restaurando su display original (o fallback)
-  function show(el, displayFallback = "d-block") {
-    if (!el) return;                           // valida elemento
-    const display = ensureDisplayClass(el, displayFallback);
-    el.classList.remove("d-none");             // retira ocultación
-    if (!el.classList.contains(display)) {     // asegura clase de display visible
-      el.classList.add(display);
-    }
-    el.setAttribute("aria-hidden", "false");   // refleja estado en accesibilidad
-  }
-
-  // Controla visibilidad de forma determinista según booleano
-  function setVisible(el, visible, displayFallback = "d-block") {
-    // Decide acción según parámetro
-    if (visible) show(el, displayFallback);
-    else hide(el);
-  }
-
-  // Alterna visibilidad cuando no se pasa booleano explícito
-  function toggleVisible(el, displayFallback = "d-block") {
-    // Si está oculto → muestra; si está visible → oculta
-    setVisible(el, el.classList.contains("d-none"), displayFallback);
-  }
-
-  // Expone API pública
-  return { hide, show, setVisible, toggleVisible };
-})();
-
+// Crea elemento con clases, atributos y contenido opcional
+function el(tag, { className = "", attrs = {}, html = "" } = {}) {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v);
+  if (html) node.innerHTML = html;
+  return node;
+}
 
 // Atajos de consulta
 const qs  = (root, sel) => root.querySelector(sel);
@@ -272,7 +177,9 @@ class ChecklistView {
     ul.appendChild(frag);
   }
 
-  // Crea <li> según layout 
+  // Crea <li> según layout actualizado (sin atributo 'for' en label)
+  // Replace the whole #renderItem with this version
+  // Crea <li> según layout actualizado (btn a la derecha del form-check)
   #renderItem(item) {
     const li = el("li", {
       className: "list-group-item p-2 d-flex align-items-start",
@@ -290,64 +197,19 @@ class ChecklistView {
     });
     input.checked = !!item.completed;
 
-    // Label (clic → modo edición)
+    // Label sin 'for' y con flex-grow-1 (clic → modo edición)
     const label = el("label", {
       className: "form-check-label flex-grow-1",
     });
     label.textContent = item.text;
 
-    // Panel inline OCCULTO por defecto — coincide con el nuevo layout
-    // (Se muestra al editar; contiene <textarea> y ayudas/atajos)
-    const panel = el("div", {
-      className: "d-flex flex-column ps-1 flex-grow-1 d-none",
-      attrs: { "data-role": "inline-panel" },
-    });
+    form.appendChild(input);
+    form.appendChild(label);
 
-    // Editor inline (sin d-none; lo que se oculta/muestra es el panel)
-    const editor = el("textarea", {
-      className: "form-control",
-      attrs: {
-        "data-role": "inline-editor",
-        "aria-label": "Edit task text",
-        "name": "inline-editor",
-        "rows": "1",
-        "id": `textarea-for-${item.id}`, // id único
-      }
-    });
-
-    // Menú de acciones
-    // TODO: Agregar data-action para poder manejar clics 
-    const actions = el("div", {
-      className: "d-flex flex-column mt-2 small",
-      html: `
-        <a class="text-decoration-none fw-bold mt-1 mb-2 d-flex justify-content-between" href="#" data-action="save">
-          <span>Save</span><span class="text-muted">[Enter]</span>
-        </a>
-        <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#" data-action="discard">
-          <span>Discard</span><span class="text-muted">[Esc]</span>
-        </a>
-        <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#" data-action="delete">
-          <span>Delete</span><span class="text-muted">[Shift+Del]</span>
-        </a>
-        <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#" data-action="ai-spell">
-          <span class="app-icono">AI Fix spelling</span><span class="text-muted">[Shift+F8]</span>
-        </a>
-        <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#" data-action="ai-improve">
-          <span class="app-icono">AI improve writing</span><span class="text-muted">[Shift+F9]</span>
-        </a>
-        <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#" data-action="ai-breakdown">
-          <span class="app-icono">AI break down task</span><span class="text-muted">[Shift+F10]</span>
-        </a>
-      `
-    });
-
-    // Ensambla panel
-    panel.append(editor, actions);
-
-    // Ensambla form (input + label + panel, en ese orden)
-    form.append(input, label, panel);
-
-    // Botón decorativo de mover
+    // Botón decorativo de mover (derecha del form-check)
+    // - No tiene acciones; solo comunica que el li es arrastrable
+    // - Se marca como no-focusable para accesibilidad (tabindex -1) y aria-hidden
+    // - Se fuerza draggable="false" en el botón para evitar comportamientos erráticos
     const btnMove = el("button", {
       className: "btn app-btn-move",
       attrs: {
@@ -361,6 +223,7 @@ class ChecklistView {
       html: `<i class="bi bi-arrow-down-up" aria-hidden="true"></i>`,
     });
 
+    // Orden final: [form-check] [btnMove]  ← coincide con checklist.html
     li.append(form, btnMove);
     return li;
   }
@@ -376,12 +239,7 @@ class ChecklistView {
 
     const input = el("input", {
       className: "form-control",
-      attrs: { 
-        type: "text",
-        name: "new-task",
-        placeholder: "Add new task and press Enter",
-        "aria-label": "Add new task"
-      },
+      attrs: { type: "text", placeholder: "Add new task and press Enter", "aria-label": "Add new task" },
     });
 
     const btnAdd = el("button", {
@@ -422,125 +280,117 @@ class ChecklistView {
     listen(this.completedList);
   }
 
-  // Edición inline: clic en label abre editor (textarea + menú) con auto-resize
-  onEdit(handler) {
-    const listen = (ul) => {
-      ul.addEventListener("click", (e) => {
-        const label = e.target.closest(ChecklistView.SEL.label);
-        if (!label) return;
+// Edición inline: clic en label abre editor con <textarea> auto-resize (sin saltos de línea)
+onEdit(handler) {
+  const listen = (ul) => {
+    ul.addEventListener("click", (e) => {
+      const label = e.target.closest(ChecklistView.SEL.label);
+      if (!label) return;
 
-        const li = label.closest(ChecklistView.SEL.item);
-        if (!li?.dataset.id) return;
+      const li = label.closest(ChecklistView.SEL.item);
+      if (!li?.dataset.id) return;
 
-        const form  = label.closest(".form-check");
-        // Obtiene el panel y el textarea según el nuevo layout
-        const panel  = form.querySelector("div[data-role='inline-panel']");
-        const editor = form.querySelector("textarea[data-role='inline-editor']");
-        if (!panel || !editor) return;
+      const form = label.closest(".form-check");
+      const currentText = label.textContent.trim();
 
-        // Copia el texto actual y prepara visibilidad
-        const currentText = label.textContent.trim();
-        visibility.hide(label);           // ← oculta label
-        visibility.show(panel, "d-flex"); // ← muestra panel (usa d-flex como fallback)
-        editor.value = currentText;       // ← carga valor
+      // Evita múltiples editores en el mismo ítem
+      if (form.querySelector("textarea[data-role='inline-editor']")) return;
 
-        // --- helpers internos ---
+      // Crea textarea editor
+      const editor = document.createElement("textarea");
+      editor.className = "form-control";
+      editor.setAttribute("data-role", "inline-editor");
+      editor.setAttribute("aria-label", "Edit task text");
+      editor.setAttribute("rows", "1"); // inicia con 1 fila
+      editor.style.resize = "none";     // evita manija de redimensionar
+      editor.style.overflow = "hidden"; // oculta scrollbars verticales
+      editor.style.lineHeight = getComputedStyle(label).lineHeight; // alinea con label
 
-        // Autoajusta altura al contenido
-        const autoresize = () => {
-          editor.style.height = "auto";
-          editor.style.height = editor.scrollHeight + "px";
-        };
+      // Copia texto actual (sin saltos de línea)
+      editor.value = currentText;
 
-        // Sanea saltos de línea → espacios (no admite \n)
-        const sanitizeNoNewlines = () => {
-          const sanitized = editor.value.replace(/\r?\n+/g, " ");
-          if (sanitized !== editor.value) {
-            const pos = editor.selectionStart;
-            editor.value = sanitized;
-            editor.selectionStart = editor.selectionEnd = Math.min(pos, editor.value.length);
-          }
-        };
+      // Oculta label y agrega editor
+      label.style.display = "none";
+      form.appendChild(editor);
 
-        // --- listeners del ciclo de edición ---
+      // --- helpers internos ---
 
-        const finalize = (mode /* 'commit' | 'cancel' */) => {
-          if (finalize._done) return; finalize._done = true;
+      // Autoajusta la altura al contenido (scrollHeight)
+      // (ajusta primero a 'auto' para recalcular, luego fija a scrollHeight)
+      const autoresize = () => {
+        editor.style.height = "auto"; 
+        editor.style.height = editor.scrollHeight + "px";
+      };
 
-          editor.removeEventListener("keydown", onKeyDown);
-          editor.removeEventListener("input", onInput);
-          editor.removeEventListener("blur", onBlur);
-          panel.removeEventListener("click", onActionClick);
+      // Sanea saltos de línea → espacios (no admite \n)
+      const sanitizeNoNewlines = () => {
+        const sanitized = editor.value.replace(/\r?\n+/g, " ");
+        if (sanitized !== editor.value) {
+          const pos = editor.selectionStart;
+          editor.value = sanitized;
+          // Restaura lo mejor posible la posición del cursor
+          editor.selectionStart = editor.selectionEnd = Math.min(pos, editor.value.length);
+        }
+      };
 
-          if (mode === "commit") {
-            const next = editor.value.trim();
-            if (next && next !== currentText) handler(li.dataset.id, next);
-            if (!next) handler(li.dataset.id, ""); // vacío → eliminar
-          }
+      // --- listeners del ciclo de edición ---
 
-          // Restaura visibilidad
-          visibility.hide(panel);
-          visibility.show(label);
-        };
+      // Teclas: Enter = commit (sin nueva línea), Esc = cancel
+      const onKeyDown = (ke) => {
+        if (ke.key === "Enter") {
+          ke.preventDefault(); // bloquea salto de línea
+          finalize("commit");
+        } else if (ke.key === "Escape") {
+          ke.preventDefault();
+          finalize("cancel");
+        }
+      };
 
-        const onKeyDown = (ke) => {
-          if (ke.key === "Enter") {
-            ke.preventDefault();
-            finalize("commit");
-          } else if (ke.key === "Escape") {
-            ke.preventDefault();
-            finalize("cancel");
-          } else if (ke.key === "Delete" && ke.shiftKey) {
-            ke.preventDefault();
-            editor.value = "";
-            finalize("commit");
-          } else if (ke.key === "F8" && ke.shiftKey) {
-            ke.preventDefault();
-            // TODO: integrar AI spellcheck
-          } else if (ke.key === "F9" && ke.shiftKey) {
-            ke.preventDefault();
-            // TODO: integrar AI improve
-          } else if (ke.key === "F10" && ke.shiftKey) {
-            ke.preventDefault();
-            // TODO: integrar AI breakdown
-          }
-        };
-
-        const onInput = () => { sanitizeNoNewlines(); autoresize(); };
-        const onBlur  = () => finalize("commit");
-
-        // Maneja clics en las acciones del panel (Save/Discard/Delete/AI…)
-        const onActionClick = (ce) => {
-          const a = ce.target.closest("a[data-action]");
-          if (!a) return;
-          ce.preventDefault();
-          const act = a.dataset.action;
-          if (act === "save") finalize("commit");
-          else if (act === "discard") finalize("cancel");
-          else if (act === "delete") { editor.value = ""; finalize("commit"); }
-          else if (act === "ai-spell") { /* TODO */ }
-          else if (act === "ai-improve") { /* TODO */ }
-          else if (act === "ai-breakdown") { /* TODO */ }
-        };
-
-        // Inicializa edición
-        editor.addEventListener("keydown", onKeyDown);
-        editor.addEventListener("input", onInput);
-        editor.addEventListener("blur", onBlur, { once: true });
-        panel.addEventListener("click", onActionClick);
-
-        // Foco y tamaño inicial
-        editor.focus();
-        const len = editor.value.length;
-        editor.setSelectionRange(len, len);
+      // Entrada: bloquea cualquier \n proveniente de paste/IME, y auto-resize
+      const onInput = () => {
+        sanitizeNoNewlines(); 
         autoresize();
-      });
-    };
+      };
 
-    listen(this.pendingList);
-    listen(this.completedList);
-  }
+      // Blur: commit
+      const onBlur = () => finalize("commit");
 
+      let finished = false;
+      const finalize = (mode /* 'commit' | 'cancel' */) => {
+        if (finished) return;
+        finished = true;
+
+        editor.removeEventListener("keydown", onKeyDown);
+        editor.removeEventListener("input", onInput);
+        editor.removeEventListener("blur", onBlur);
+
+        if (editor.parentNode === form) editor.remove();
+        label.style.display = "";
+
+        if (mode === "commit") {
+          const next = editor.value.trim();
+          if (next && next !== currentText) handler(li.dataset.id, next);
+          if (!next) handler(li.dataset.id, ""); // vacío → eliminar
+        }
+      };
+
+      // Inicializa editor
+      editor.addEventListener("keydown", onKeyDown);
+      editor.addEventListener("input", onInput);
+      editor.addEventListener("blur", onBlur, { once: true });
+
+      // Foco y tamaño inicial
+      editor.focus();
+      // Coloca cursor al final
+      const len = editor.value.length;
+      editor.setSelectionRange(len, len);
+      autoresize();
+    });
+  };
+
+  listen(this.pendingList);
+  listen(this.completedList);
+}
 
 
   // Crear nueva tarea (solo en pendientes)

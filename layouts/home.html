@@ -45,7 +45,7 @@
             <a class="btn d-block d-md-none ps-0" role="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu" aria-controls="sideMenu" aria-label="Side menu button">
               <i class="bi bi-layout-text-sidebar-reverse fs-1"></i>
             </a>
-            <h1 id="app-title" class="app-title fs-3 me-auto">qsp&ensp;<span class="fw-normal fs-4">−fiesta de cumpleaños</span></h1>
+            <h1 id="app-title" class="app-icono fs-3 me-auto">qsp&ensp;<span class="fw-normal fs-4">−fiesta de cumpleaños</span></h1>
           </div>
         </div>
       </header>
@@ -54,18 +54,16 @@
           <div id="app-container-1" class="col-12 col-lg-6">
             <div class="row g-4">
               <div class="col-12">
-                {{ partial "app/dashboard" . }}
-                {{/* .Content */}}
+                {{ partial "app/checklist" . }}
               </div>
               <div class="col-12">
-                {{ partial "app/checklist" . }}
               </div>
             </div>
           </div>
           <div id="app-container-2" class="col-12 col-lg-6">
             <div class="row g-4">
               <div class="col-12">
-                {{ partial "app/summary" . }}
+                <!-- {{ partial "app/checklist" . }} -->
               </div>
               <div class="col-12">
               </div>

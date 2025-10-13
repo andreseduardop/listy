@@ -272,7 +272,9 @@ class ChecklistView {
     ul.appendChild(frag);
   }
 
-  // Crea <li> según layout 
+  // Crea <li> según layout actualizado (sin atributo 'for' en label)
+  // Replace the whole #renderItem with this version
+  // Crea <li> según layout actualizado (btn a la derecha del form-check)
   #renderItem(item) {
     const li = el("li", {
       className: "list-group-item p-2 d-flex align-items-start",
@@ -296,58 +298,24 @@ class ChecklistView {
     });
     label.textContent = item.text;
 
-    // Panel inline OCCULTO por defecto — coincide con el nuevo layout
-    // (Se muestra al editar; contiene <textarea> y ayudas/atajos)
-    const panel = el("div", {
-      className: "d-flex flex-column ps-1 flex-grow-1 d-none",
-      attrs: { "data-role": "inline-panel" },
-    });
-
-    // Editor inline (sin d-none; lo que se oculta/muestra es el panel)
+    // Editor inline preexistente (oculto por defecto)
+    // (Agrega el textarea para los ítems renderizados dinámicamente)
     const editor = el("textarea", {
-      className: "form-control",
+      className: "form-control d-none",
       attrs: {
         "data-role": "inline-editor",
         "aria-label": "Edit task text",
         "name": "inline-editor",
-        "rows": "1",
-        "id": `textarea-for-${item.id}`, // id único
+        "rows": "1"
       }
     });
 
-    // Menú de acciones
-    // TODO: Agregar data-action para poder manejar clics 
-    const actions = el("div", {
-      className: "d-flex flex-column mt-2 small",
-      html: `
-        <a class="text-decoration-none fw-bold mt-1 mb-2 d-flex justify-content-between" href="#" data-action="save">
-          <span>Save</span><span class="text-muted">[Enter]</span>
-        </a>
-        <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#" data-action="discard">
-          <span>Discard</span><span class="text-muted">[Esc]</span>
-        </a>
-        <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#" data-action="delete">
-          <span>Delete</span><span class="text-muted">[Shift+Del]</span>
-        </a>
-        <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#" data-action="ai-spell">
-          <span class="app-icono">AI Fix spelling</span><span class="text-muted">[Shift+F8]</span>
-        </a>
-        <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#" data-action="ai-improve">
-          <span class="app-icono">AI improve writing</span><span class="text-muted">[Shift+F9]</span>
-        </a>
-        <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#" data-action="ai-breakdown">
-          <span class="app-icono">AI break down task</span><span class="text-muted">[Shift+F10]</span>
-        </a>
-      `
-    });
+    form.append(input, label, editor);
 
-    // Ensambla panel
-    panel.append(editor, actions);
-
-    // Ensambla form (input + label + panel, en ese orden)
-    form.append(input, label, panel);
-
-    // Botón decorativo de mover
+    // Botón decorativo de mover (derecha del form-check)
+    // - No tiene acciones; solo comunica que el li es arrastrable
+    // - Se marca como no-focusable para accesibilidad (tabindex -1) y aria-hidden
+    // - Se fuerza draggable="false" en el botón para evitar comportamientos erráticos
     const btnMove = el("button", {
       className: "btn app-btn-move",
       attrs: {
@@ -361,6 +329,7 @@ class ChecklistView {
       html: `<i class="bi bi-arrow-down-up" aria-hidden="true"></i>`,
     });
 
+    // Cada tarea = [form-check] + [btnMove] 
     li.append(form, btnMove);
     return li;
   }
@@ -422,125 +391,136 @@ class ChecklistView {
     listen(this.completedList);
   }
 
-  // Edición inline: clic en label abre editor (textarea + menú) con auto-resize
-  onEdit(handler) {
-    const listen = (ul) => {
-      ul.addEventListener("click", (e) => {
-        const label = e.target.closest(ChecklistView.SEL.label);
-        if (!label) return;
+// Edición inline: clic en label abre editor con <textarea> auto-resize (sin saltos de línea)
+onEdit(handler) {
+  const listen = (ul) => {
+    ul.addEventListener("click", (e) => {
+      const label = e.target.closest(ChecklistView.SEL.label);
+      if (!label) return;
 
-        const li = label.closest(ChecklistView.SEL.item);
-        if (!li?.dataset.id) return;
+      const li = label.closest(ChecklistView.SEL.item);
+      if (!li?.dataset.id) return;
 
-        const form  = label.closest(".form-check");
-        // Obtiene el panel y el textarea según el nuevo layout
-        const panel  = form.querySelector("div[data-role='inline-panel']");
-        const editor = form.querySelector("textarea[data-role='inline-editor']");
-        if (!panel || !editor) return;
+      const form = label.closest(".form-check");
+      // Obtiene el textarea existente del layout
+      const editor = form.querySelector("textarea[data-role='inline-editor']");
+      if (!editor) return; // si por alguna razón no existe, aborta
 
-        // Copia el texto actual y prepara visibilidad
-        const currentText = label.textContent.trim();
-        visibility.hide(label);           // ← oculta label
-        visibility.show(panel, "d-flex"); // ← muestra panel (usa d-flex como fallback)
-        editor.value = currentText;       // ← carga valor
+      // Copia el texto actual (sin saltos) y configura altura
+      const currentText = label.textContent.trim();
+      // Oculta el label y muestra el editor
+      visibility.hide(label);      // ← oculta label
+      visibility.show(editor);     // ← muestra textarea
+      editor.value = currentText;  // ← carga valor
 
-        // --- helpers internos ---
+      // --- helpers internos ---
 
-        // Autoajusta altura al contenido
-        const autoresize = () => {
-          editor.style.height = "auto";
-          editor.style.height = editor.scrollHeight + "px";
-        };
+      // Autoajusta la altura al contenido (scrollHeight)
+      // (ajusta primero a 'auto' para recalcular, luego fija a scrollHeight)
+      const autoresize = () => {
+        editor.style.height = "auto"; 
+        editor.style.height = editor.scrollHeight + "px";
+      };
 
-        // Sanea saltos de línea → espacios (no admite \n)
-        const sanitizeNoNewlines = () => {
-          const sanitized = editor.value.replace(/\r?\n+/g, " ");
-          if (sanitized !== editor.value) {
-            const pos = editor.selectionStart;
-            editor.value = sanitized;
-            editor.selectionStart = editor.selectionEnd = Math.min(pos, editor.value.length);
-          }
-        };
+      // Sanea saltos de línea → espacios (no admite \n)
+      const sanitizeNoNewlines = () => {
+        const sanitized = editor.value.replace(/\r?\n+/g, " ");
+        // Limpia saltos de línea y restaura posición del cursor
+        if (sanitized !== editor.value) {
+          const pos = editor.selectionStart;
+          editor.value = sanitized;
+          // Restaura lo mejor posible la posición del cursor
+          editor.selectionStart = editor.selectionEnd = Math.min(pos, editor.value.length);
+        }
+      };
 
-        // --- listeners del ciclo de edición ---
+      // --- listeners del ciclo de edición ---
 
-        const finalize = (mode /* 'commit' | 'cancel' */) => {
-          if (finalize._done) return; finalize._done = true;
+      // Teclas: Enter = commit (sin nueva línea), Esc = cancel
+      const onKeyDown = (ke) => {
+        if (ke.key === "Enter") {
+          ke.preventDefault(); // bloquea salto de línea
+          finalize("commit");
+        } else if (ke.key === "Escape") {
+          ke.preventDefault(); 
+          finalize("cancel");
+        }
+        // Capturar Shift+Delete
+        else if (ke.key === 'Delete' && event.shiftKey) {
+          ke.preventDefault(); 
+          console.log(ke.key, 'shiftKey+Del');
+          editor.value = "";
+          // TODO: Más adelante se definirá función aquí
+          finalize("commit");
+        }
+        // Capturar Shift+F8
+        else if (ke.key === 'F8' && event.shiftKey) {
+          ke.preventDefault(); 
+          console.log(ke.key, 'Shift+F8');
+          // TODO: Más adelante se definirán llamadas a API
+        }
+        // Capturar Shift+F9
+        else if (ke.key === 'F9' && event.shiftKey) {
+          ke.preventDefault();
+          console.log(ke.key, 'Shift+F9');
+          // TODO: Más adelante se definirán llamadas a API
+        }
+        // Capturar Shift+F10
+        else if (ke.key === 'F10' && event.shiftKey) {
+          ke.preventDefault();
+          console.log(ke.key, 'Shift+F10');
+          // TODO: Más adelante se definirán llamadas a API
+        }
+      };
 
-          editor.removeEventListener("keydown", onKeyDown);
-          editor.removeEventListener("input", onInput);
-          editor.removeEventListener("blur", onBlur);
-          panel.removeEventListener("click", onActionClick);
 
-          if (mode === "commit") {
-            const next = editor.value.trim();
-            if (next && next !== currentText) handler(li.dataset.id, next);
-            if (!next) handler(li.dataset.id, ""); // vacío → eliminar
-          }
-
-          // Restaura visibilidad
-          visibility.hide(panel);
-          visibility.show(label);
-        };
-
-        const onKeyDown = (ke) => {
-          if (ke.key === "Enter") {
-            ke.preventDefault();
-            finalize("commit");
-          } else if (ke.key === "Escape") {
-            ke.preventDefault();
-            finalize("cancel");
-          } else if (ke.key === "Delete" && ke.shiftKey) {
-            ke.preventDefault();
-            editor.value = "";
-            finalize("commit");
-          } else if (ke.key === "F8" && ke.shiftKey) {
-            ke.preventDefault();
-            // TODO: integrar AI spellcheck
-          } else if (ke.key === "F9" && ke.shiftKey) {
-            ke.preventDefault();
-            // TODO: integrar AI improve
-          } else if (ke.key === "F10" && ke.shiftKey) {
-            ke.preventDefault();
-            // TODO: integrar AI breakdown
-          }
-        };
-
-        const onInput = () => { sanitizeNoNewlines(); autoresize(); };
-        const onBlur  = () => finalize("commit");
-
-        // Maneja clics en las acciones del panel (Save/Discard/Delete/AI…)
-        const onActionClick = (ce) => {
-          const a = ce.target.closest("a[data-action]");
-          if (!a) return;
-          ce.preventDefault();
-          const act = a.dataset.action;
-          if (act === "save") finalize("commit");
-          else if (act === "discard") finalize("cancel");
-          else if (act === "delete") { editor.value = ""; finalize("commit"); }
-          else if (act === "ai-spell") { /* TODO */ }
-          else if (act === "ai-improve") { /* TODO */ }
-          else if (act === "ai-breakdown") { /* TODO */ }
-        };
-
-        // Inicializa edición
-        editor.addEventListener("keydown", onKeyDown);
-        editor.addEventListener("input", onInput);
-        editor.addEventListener("blur", onBlur, { once: true });
-        panel.addEventListener("click", onActionClick);
-
-        // Foco y tamaño inicial
-        editor.focus();
-        const len = editor.value.length;
-        editor.setSelectionRange(len, len);
+      const onInput = () => {
+        // Sanea texto y ajusta altura
+        sanitizeNoNewlines();
         autoresize();
-      });
-    };
+      };
 
-    listen(this.pendingList);
-    listen(this.completedList);
-  }
+      // Blur: commit
+      const onBlur = () => finalize("commit");
 
+      let finished = false;
+      const finalize = (mode /* 'commit' | 'cancel' */) => {
+        // Evita doble finalización
+        if (finished) return;
+        finished = true;
+
+        editor.removeEventListener("keydown", onKeyDown);
+        editor.removeEventListener("input", onInput);
+        editor.removeEventListener("blur", onBlur);
+
+        if (mode === "commit") {
+          const next = editor.value.trim();
+          if (next && next !== currentText) handler(li.dataset.id, next);
+          if (!next) handler(li.dataset.id, ""); // vacío → eliminar
+        }
+
+        // Oculta editor y muestra label
+        visibility.hide(editor);
+        visibility.show(label);
+      };
+
+      // Inicializa editor
+      editor.addEventListener("keydown", onKeyDown);
+      editor.addEventListener("input", onInput);
+      editor.addEventListener("blur", onBlur, { once: true });
+
+      // Foco y tamaño inicial
+      editor.focus();
+      // Coloca cursor al final
+      const len = editor.value.length;
+      editor.setSelectionRange(len, len);
+      autoresize();
+    });
+  };
+
+  listen(this.pendingList);
+  listen(this.completedList);
+}
 
 
   // Crear nueva tarea (solo en pendientes)
