@@ -262,6 +262,9 @@ class ChecklistView {
 
     this.#renderList(this.pendingList, pending, { withNewEntry: true });
     this.#renderList(this.completedList, completed, { withNewEntry: false });
+
+    // Asegura colocar un placeholder cuando no hay tareas completadas
+    this.#ensureCompletedEmptyState();
   }
 
   // Renderiza lista
@@ -365,6 +368,39 @@ class ChecklistView {
     return li;
   }
 
+  // Inserta/retira el placeholder "No tasks completed."
+  #ensureCompletedEmptyState() {
+    // Obtiene la UL de completadas
+    const ul = this.completedList;
+    if (!ul) return;
+
+    // Cuenta <li> reales (con data-id no vacío)
+    // — ignora placeholders previos si existieran
+    const realItems = [...ul.querySelectorAll("li.list-group-item")]
+      .filter(li => (li.dataset?.id ?? "") !== "");
+
+    // Si hay elementos → asegúrese de quitar placeholder
+    if (realItems.length > 0) {
+      const ph = ul.querySelector('li.list-group-item[data-id=""]');
+      if (ph) ph.remove(); // ← elimina placeholder existente
+      return;
+    }
+
+    // Si no hay elementos → inserta placeholder 
+    // (Evita duplicados si ya existe)
+    if (!ul.querySelector('li.list-group-item[data-id=""]')) {
+      // Crea el <li> para placeholder
+      const li = el("li", {
+        className: "list-group-item p-2 d-flex align-items-start",
+        attrs: { draggable: "false" },
+        html: "No tasks completed.", // ← inserta el texto exacto
+      });
+      // Asigna data-id vacío (se hace luego porque el() no gestiona dataset)
+      li.dataset.id = "";
+      // Inserta al final
+      ul.appendChild(li);
+    }
+  }
 
   // <li> de nueva entrada
   #renderNewItemEntry() {

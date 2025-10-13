@@ -86,7 +86,7 @@ $highlight-subtle:  #FAF7EB;  // Marfil claro
 
 // Theme colors:
 $primary:       $app-blue;
-$secondary:     $app-pink;
+$secondary:     $orange;
 $tertiary:      $orange;  // Required
 $success:       $green;   // Required
 $info:          $yellow;
@@ -113,7 +113,7 @@ $modal-backdrop-opacity:            .3;
 // Style anchor elements.
 $link-color:                        $primary;
 $link-decoration:                   none;
-$link-hover-color:                  $tertiary;
+$link-hover-color:                  $secondary;
 $link-hover-decoration:             underline;
 
 // Borders
