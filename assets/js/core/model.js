@@ -1,148 +1,220 @@
-// model.js
-// NOTE: Code in English; comments in Spanish (tercera persona).
+/**
+ * @fileoverview Root model for app state persisted in localStorage.
+ * @module core/model
+ *
+ * @description
+ * Encapsula el **modelo raíz** de la aplicación. Lee y escribe en `localStorage`
+ * bajo una única clave, garantiza la existencia del componente solicitado
+ * y emite eventos `change` con `{ name, items }` tras cada mutación.
+ *
+ * Code style: follows the Google JavaScript Style Guide.
+ * https://google.github.io/styleguide/jsguide.html
+ */
 
-import { getItem, setItem } from "../utils/storage.js";
-import { uuidv4 } from "../utils/id.js";
-
-const STORAGE_KEYS = {
-  plansIndex: "app:plans",                 // lista de { id, title, date }
-  activePlanId: "app:activePlanId",        // sessionStorage
-  planById: (id) => `app:plan:${id}`,      // JSON completo del plan
-};
-
-const JSON_TEMPLATE_URL = "/assets/js/core/json/model.json"; // ruta canónica (§13). :contentReference[oaicite:2]{index=2}
+import modelTemplate from "./json/model.json" assert { type: "json" };
 
 /**
- * Busca el índice del componente por su name dentro de plan.components (array del esquema).
- * @param {Object} plan
- * @param {string} name
- * @returns {number} index or -1
+ * Model of the root persisted state (scoped by component name).
+ * @export
  */
-// Comentario: calcula el índice del componente con name == {name}
-function findComponentIndex(plan, name) {
-  if (!plan || !Array.isArray(plan.components)) return -1;
-  return plan.components.findIndex((c) => c.name === name);
-}
-
-/**
- * Crea un plan a partir del template /core/json/model.json y lo marca activo.
- * Asigna uuid a 'id' y 'activo' a 'state' (requisito del usuario).
- */
-// Comentario: crea el primer plan desde la plantilla y lo persiste como activo
-async function createFirstPlanFromTemplate() {
-  const res = await fetch(JSON_TEMPLATE_URL);
-  const template = await res.json(); // esquema base del plan. :contentReference[oaicite:3]{index=3}
-
-  const newPlan = {
-    ...template,
-    id: uuidv4(),                       // asigna uuid requerido
-    state: "activo",                    // marca como plan activo
-    date: new Date().toISOString(),     // fecha de creación
-    title: template.title || "New Plan" // conserva o asigna título
-  };
-
-  // Comentario: persiste el plan y actualiza el índice
-  const plans = getItem(localStorage, STORAGE_KEYS.plansIndex, []);
-  const newIndex = [
-    ...plans,
-    { id: newPlan.id, title: newPlan.title, date: newPlan.date }
-  ];
-  setItem(localStorage, STORAGE_KEYS.plansIndex, newIndex);
-  setItem(localStorage, STORAGE_KEYS.planById(newPlan.id), newPlan);
-
-  // Comentario: almacena el plan activo en sessionStorage
-  sessionStorage.setItem(STORAGE_KEYS.activePlanId, newPlan.id);
-
-  return newPlan;
-}
-
-class Model {
-  // Comentario: implementa patrón Singleton
-  static _instance = null;
-  static get instance() {
-    if (!Model._instance) Model._instance = new Model();
-    return Model._instance;
-  }
+export class Model extends EventTarget {
+  /** @private {string} */
+  static STORAGE_KEY = "app.model";
 
   constructor() {
-    // Comentario: evita construcción múltiple
-    if (Model._instance) return Model._instance;
-    this._plan = null; // plan activo en memoria
+    super();
+    /** @private {!Object} */
+    this._rootModel = this.#readRootModel(); // Comentario: carga el modelo raíz
   }
 
-  /**
-   * Inicializa el modelo. Si no existe plan activo, crea uno desde la plantilla.
-   * Devuelve el plan activo en memoria.
-   */
-  // Comentario: asegura que exista un plan activo según la arquitectura (§6) 
-  async ensureReady() {
-    let activeId = sessionStorage.getItem(STORAGE_KEYS.activePlanId);
+  /** @private */
+  #deepClone(obj) {
+    // Comentario: clona de forma segura objetos JSON
+    return JSON.parse(JSON.stringify(obj));
+  }
 
-    if (!activeId) {
-      this._plan = await createFirstPlanFromTemplate(); // primera llamada crea/almacena JSON
-      return this._plan;
+  /** @private */
+  #readRootModel() {
+    // Comentario: lee desde localStorage o cae a plantilla en caso de error
+    try {
+      const raw = localStorage.getItem(Model.STORAGE_KEY);
+      return raw ? JSON.parse(raw) : this.#deepClone(modelTemplate);
+    } catch {
+      return this.#deepClone(modelTemplate);
     }
-
-    const loaded = getItem(localStorage, STORAGE_KEYS.planById(activeId), null);
-    if (!loaded) {
-      // Comentario: si la referencia existía pero el plan no, crea uno nuevo
-      this._plan = await createFirstPlanFromTemplate();
-      return this._plan;
-    }
-
-    this._plan = loaded;
-    return this._plan;
   }
 
-  /**
-   * Lee el contenido de un componente por su {name}.
-   * Solo devuelve components.{name}.content (nunca todo el JSON).
-   */
-  // Comentario: retorna exclusivamente la sección de datos del componente solicitante
-  readComponent(name) {
-    if (!this._plan) throw new Error("Model not initialized");
-    const idx = findComponentIndex(this._plan, name);
-    if (idx === -1) return undefined;
-    return this._plan.components[idx].content;
+  /** @private */
+  #findComponentIndex(root, name) {
+    // Comentario: obtiene índice del componente por nombre
+    if (!root || !Array.isArray(root.components)) return -1;
+    return root.components.findIndex((c) => c && c.name === name);
   }
 
-  /**
-   * Escribe contenido EXACTAMENTE como lo envía el controlador del componente.
-   * No modifica los datos; solo los guarda en components.{name}.content.
-   * Emites 'model:change' con path 'components.{name}.content'.
-   */
-  // Comentario: guarda sin transformar la información que envía el controlador
-  writeComponent(name, data) {
-    if (!this._plan) throw new Error("Model not initialized");
+  /** @private */
+  #ensureComponent(root, componentName) {
+    // Comentario: garantiza la existencia de `components[]` y del componente
+    if (!componentName) throw new Error("[model] missing componentName");
+    if (!root || typeof root !== "object") root = {};
+    if (!Array.isArray(root.components)) root.components = [];
 
-    const idx = findComponentIndex(this._plan, name);
+    let idx = this.#findComponentIndex(root, componentName);
     if (idx === -1) {
-      // Comentario: si no existe el componente en el esquema, no lo crea
-      throw new Error(`Component '${name}' not found in model schema`);
+      root.components.push({
+        name: componentName,
+        title:
+          componentName.charAt(0).toUpperCase() + componentName.slice(1),
+        content: [],
+      });
+      idx = root.components.length - 1;
     }
 
-    // Comentario: asigna content directamente, sin mutaciones adicionales
-    this._plan.components[idx].content = data;
+    const comp = root.components[idx];
+    if (!comp || typeof comp !== "object") {
+      root.components[idx] = {
+        name: componentName,
+        title: componentName,
+        content: [],
+      };
+    } else if (!Array.isArray(comp.content)) {
+      comp.content = [];
+    }
 
-    // Comentario: persiste el plan completo bajo la clave app:plan:{id}
-    setItem(localStorage, STORAGE_KEYS.planById(this._plan.id), this._plan);
+    return root;
+  }
 
-    // Comentario: emite evento de cambio acotado al namespace del componente
-    const detail = {
-      path: `components.${name}.content`,
-      changes: data,
-      planId: this._plan.id
-    };
-    window.dispatchEvent(new CustomEvent("model:change", { detail }));
+  /** @private */
+  #writeModel(componentName, nextItems) {
+    // Comentario: actualiza el modelo en memoria, persiste y emite evento
+    try {
+      this._rootModel = this.#ensureComponent(this._rootModel, componentName);
+      const idx = this.#findComponentIndex(this._rootModel, componentName);
+      this._rootModel.components[idx].content = nextItems.map((i) => ({ ...i }));
+
+      localStorage.setItem(
+        Model.STORAGE_KEY,
+        JSON.stringify(this._rootModel),
+      );
+
+      this.dispatchEvent(
+        new CustomEvent("change", {
+          detail: { name: componentName, items: this.getAll(componentName) },
+        }),
+      );
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error("[model] persist error", e); // Comentario: registra error de persistencia
+    }
   }
 
   /**
-   * Devuelve el id del plan activo.
+   * Returns a defensive copy of all items for the requested component.
+   * @param {string} componentName
+   * @return {!Array<{id:string,text:string,completed:boolean}>}
    */
-  // Comentario: expone el id del plan activo para diagnósticos y uso de UI
-  getActivePlanId() {
-    return this._plan?.id || null;
+  getAll(componentName) {
+    // Comentario: normaliza el modelo y devuelve copia de los items
+    if (!componentName) throw new Error("[model] missing componentName");
+    const normalized = this.#ensureComponent(this._rootModel, componentName);
+    const idx = this.#findComponentIndex(normalized, componentName);
+    const items = Array.isArray(normalized.components[idx].content)
+      ? normalized.components[idx].content
+      : [];
+    return items.map((i) => ({ ...i }));
+  }
+
+  /**
+   * Appends a new task with generated id.
+   * @param {string} componentName
+   * @param {string} text
+   * @return {void}
+   */
+  add(componentName, text) {
+    // Comentario: agrega item si el texto no está vacío
+    const t = String(text || "").trim();
+    if (!t) return;
+    const items = this.getAll(componentName);
+    items.push({ id: this.#uid(), text: t, completed: false });
+    this.#writeModel(componentName, items);
+  }
+
+  /**
+   * Toggles completion state by id.
+   * @param {string} componentName
+   * @param {string} id
+   * @return {void}
+   */
+  toggle(componentName, id) {
+    // Comentario: invierte el estado de completado del item
+    const items = this.getAll(componentName).map((i) =>
+      i.id === id ? { ...i, completed: !i.completed } : i,
+    );
+    this.#writeModel(componentName, items);
+  }
+
+  /**
+   * Updates task text; removes the item if next text is empty.
+   * @param {string} componentName
+   * @param {string} id
+   * @param {string} text
+   * @return {void}
+   */
+  updateText(componentName, id, text) {
+    // Comentario: actualiza texto o elimina si queda vacío
+    const t = String(text || "").trim();
+    if (!t) return this.remove(componentName, id);
+    const items = this.getAll(componentName).map((i) =>
+      i.id === id ? { ...i, text: t } : i,
+    );
+    this.#writeModel(componentName, items);
+  }
+
+  /**
+   * Removes an item by id.
+   * @param {string} componentName
+   * @param {string} id
+   * @return {void}
+   */
+  remove(componentName, id) {
+    // Comentario: elimina el item filtrándolo por id
+    const items = this.getAll(componentName).filter((i) => i.id !== id);
+    this.#writeModel(componentName, items);
+  }
+
+  /**
+   * Moves an item to the given target index (same list).
+   * @param {string} componentName
+   * @param {string} id
+   * @param {number} toIndex
+   * @return {void}
+   */
+  moveToIndex(componentName, id, toIndex) {
+    // Comentario: reubica el item dentro del arreglo en el índice destino
+    const items = this.getAll(componentName);
+    const len = items.length;
+    if (len <= 1) return;
+
+    const from = items.findIndex((i) => i.id === id);
+    if (from === -1) return;
+
+    let dest = Math.max(0, Math.min(len, Number(toIndex)));
+    if (dest === from || dest === from + 1) return;
+
+    const arr = [...items];
+    const [moved] = arr.splice(from, 1);
+    if (dest > from) dest -= 1;
+    arr.splice(dest, 0, moved);
+
+    this.#writeModel(componentName, arr);
+  }
+
+  /** @private */
+  #uid() {
+    // Comentario: genera id corto estable usando UUID si está disponible
+    const s =
+      typeof crypto?.randomUUID === "function"
+        ? crypto.randomUUID().replace(/-/g, "")
+        : Date.now().toString(36) + Math.random().toString(36).slice(2);
+    return s.slice(0, 12);
   }
 }
-
-export const AppModel = Model.instance;

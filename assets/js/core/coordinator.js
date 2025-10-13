@@ -1,59 +1,37 @@
-// coordinator.js
-// Comentario: coordina el ciclo de vida de los componentes (mount/unmount) y asegura el modelo.
+/**
+ * @fileoverview App-level coordinator that selects and initializes UI components.
+ * @module core/coordinator
+ *
+ * @description
+ * Centraliza la selección de componentes y su inicialización en la interfaz.
+ * Por ahora, sólo inicializa la checklist en el contenedor "#app-container-1".
+ *
+ * Code style: follows the Google JavaScript Style Guide.
+ * https://google.github.io/styleguide/jsguide.html
+ */
 
-import { AppModel } from "./model.js";
-import { ComponentsRegistry } from "./components-registry.js";
+import { renderChecklist } from "../components/checklist.js"; // Comentario: importa el inicializador de checklist
 
-export class AppCoordinator {
-  // Comentario: guarda referencia al contenedor raíz y al componente activo
-  constructor({ rootSelector = "#app" } = {}) {
-    this.root = document.querySelector(rootSelector);
-    if (!this.root) throw new Error(`Root container not found: ${rootSelector}`);
-    this._active = null; // { name, api, element }
+/** @const {string} */
+const CHECKLIST_CONTAINER_ID = "app-container-1";
+
+/**
+ * Starts all configured UI components.
+ * @return {void}
+ */
+export function startApp() {
+  // Comentario: obtiene el contenedor de checklist
+  const container1 = document.getElementById(CHECKLIST_CONTAINER_ID);
+
+  // Comentario: valida existencia del contenedor
+  if (!container1) {
+    // eslint-disable-next-line no-console
+    console.error(
+      `[coordinator] container #${CHECKLIST_CONTAINER_ID} not found`,
+    );
+    return;
   }
 
-  // Comentario: inicializa el modelo y monta el componente por defecto
-  async init({ defaultComponent }) {
-    await AppModel.ensureReady();
-    const initial = defaultComponent || Object.keys(ComponentsRegistry)[0];
-    await this.mount(initial);
-  }
-
-  // Comentario: desmonta el componente activo si existe
-  async unmountActive() {
-    if (!this._active) return;
-    try {
-      this._active.api.unmount?.(this._active.element);
-    } finally {
-      this.root.innerHTML = "";
-      this._active = null;
-    }
-  }
-
-  // Comentario: monta un componente por su name usando el registro
-  async mount(name) {
-    const api = ComponentsRegistry[name];
-    if (!api) throw new Error(`Component '${name}' not found in registry`);
-    await this.unmountActive();
-
-    const section = document.createElement("div");
-    section.setAttribute("data-component", name);
-    this.root.appendChild(section);
-
-    await AppModel.ensureReady();
-    await api.mount(section);
-
-    this._active = { name, api, element: section };
-  }
-
-  // Comentario: navegación entre componentes
-  async navigateTo(name) {
-    if (this._active?.name === name) return;
-    await this.mount(name);
-  }
-
-  // Comentario: devuelve el nombre del componente activo
-  get activeComponentName() {
-    return this._active?.name || null;
-  }
+  // Comentario: inicializa la checklist dentro del contenedor
+  renderChecklist(container1);
 }
