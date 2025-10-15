@@ -376,7 +376,8 @@ svg.bi {
 
 // List item
 /* Resaltado cuando el mouse pase por encima */
-.type-checkbox li:has(input[type="checkbox"]):hover {
+.app-checklist li:hover, 
+.app-stepslist li:hover  {
   background-color: $highlight-subtle;
   & div,
   & button,
@@ -532,4 +533,14 @@ main img {
   animation: blink-animation 1.5s infinite;
   content: '\2006»';
   font-family: 'Geist Mono' !important;
+}
+// helpers
+/* Guías de reorden (evita conflictos con .list-group-item de Bootstrap) */
+.app-guide-top { 
+  box-shadow: inset 0 3px 0 $body-color-subtle-5; 
+  // border-top-color: $body-color-subtle-5;
+}
+.app-guide-bottom {
+  box-shadow: inset 0 -3px 0 $body-color-subtle-5;
+  // border-bottom-color: $body-color-subtle-5;
 }

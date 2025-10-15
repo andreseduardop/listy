@@ -348,7 +348,7 @@ class View {
       className: "form-control",
       attrs: {
         "data-role": "inline-editor",
-        "aria-label": "Edit resource text",
+        "aria-label": "Edit supply text",
         name: "inline-editor",
         rows: "1",
         id: `textarea-for-${item.id}`,
@@ -511,7 +511,7 @@ class View {
       const li = el("li", {
         className: "list-group-item p-2 d-flex align-items-start",
         attrs: { draggable: "false" },
-        html: "No resources ready.",
+        html: "No supplies ready.",
       });
       li.dataset.id = "";
       ul.appendChild(li);
@@ -530,15 +530,15 @@ class View {
       className: "form-control",
       attrs: {
         type: "text",
-        name: "new-resource",
-        placeholder: "Add new resource and press Enter",
-        "aria-label": "Add new resource",
+        name: "new-supply",
+        placeholder: "Add new supply and press Enter",
+        "aria-label": "Add new supply",
       },
     });
 
     const btnAdd = el("button", {
       className: "btn app-btn-add",
-      attrs: { type: "button", title: "Add new resource", "aria-label": "Add new resource" },
+      attrs: { type: "button", title: "Add new supply", "aria-label": "Add new supply" },
       html: `<i class="bi bi-plus-square-fill fs-3" aria-hidden="true"></i>`,
     });
 
