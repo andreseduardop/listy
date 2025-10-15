@@ -439,6 +439,7 @@ class View {
         name: "Add new step",
         placeholder: "Add new step and press Enter",
         "aria-label": "Add new step",
+        enterkeyhint:"enter",
       },
     });
 

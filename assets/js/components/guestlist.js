@@ -535,6 +535,7 @@ class View {
         name: "new-guest",
         placeholder: "Add guest and press Enter",
         "aria-label": "Add guest",
+        enterkeyhint:"enter",
       },
     });
 

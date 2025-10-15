@@ -533,6 +533,7 @@ class View {
         name: "new-supply",
         placeholder: "Add new supply and press Enter",
         "aria-label": "Add new supply",
+        enterkeyhint:"enter",
       },
     });
 
