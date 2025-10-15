@@ -552,7 +552,10 @@ class View {
     };
 
     input.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") create();
+      if (e.key === "Enter") {
+        e.preventDefault();
+        create();
+      }
     });
     btnAdd.addEventListener("click", create);
 
