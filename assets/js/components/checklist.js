@@ -536,6 +536,7 @@ class View {
         name: "new-task",
         placeholder: "Add new task and press Enter",
         "aria-label": "Add new task",
+        enterkeyhint:"enter",
       },
     });
 
@@ -553,7 +554,6 @@ class View {
 
     input.addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
-        e.preventDefault();
         create();
       }
     });
