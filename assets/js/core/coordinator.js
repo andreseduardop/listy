@@ -101,7 +101,6 @@ export function startApp() {
 
     try {
       RENDERERS[name].render(host); // invoca el render del componente
-      console.log('Rendering', name);
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error(`[coordinator] failed to render "${name}" in #${host.id}:`, err);
