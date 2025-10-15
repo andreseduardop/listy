@@ -538,6 +538,7 @@ main img {
 /* Guías de reorden (evita conflictos con .list-group-item de Bootstrap) */
 /*! purgecss start ignore */
 .app-guide-top { 
+  /* purgecss ignore current */
   box-shadow: inset 0 3px 0 $body-color-subtle-5; 
   // border-top-color: $body-color-subtle-5;
 }
