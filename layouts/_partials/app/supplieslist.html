@@ -1,25 +1,25 @@
 <div class="col-12">
   <div class="app-card col">
-    <h2>resources</h2>
-    <div id="resourceslist-container">
+    <h2>supplies</h2>
+    <div id="supplieslist-container">
     </div>
-    <ul class="nav nav-tabs nav-fill" id="resourceslist-tabs" role="tablist">
+    <ul class="nav nav-tabs nav-fill" id="supplieslist-tabs" role="tablist">
       <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="resourceslist-pending-tab" data-bs-toggle="tab" data-bs-target="#resourceslist-pending-tab-pane" type="button" role="tab" aria-controls="resourceslist-pending-tab-pane" aria-selected="true">Pending</button>
+        <button class="nav-link active" id="supplieslist-pending-tab" data-bs-toggle="tab" data-bs-target="#supplieslist-pending-tab-pane" type="button" role="tab" aria-controls="supplieslist-pending-tab-pane" aria-selected="true">Pending</button>
       </li>
       <li class="nav-item" role="presentation">
-        <button class="nav-link" id="resourceslist-ready-tab" data-bs-toggle="tab" data-bs-target="#resourceslist-ready-tab-pane" type="button" role="tab" aria-controls="resourceslist-ready-tab-pane" aria-selected="false" tabindex="-1" style="">Ready</button>
+        <button class="nav-link" id="supplieslist-ready-tab" data-bs-toggle="tab" data-bs-target="#supplieslist-ready-tab-pane" type="button" role="tab" aria-controls="supplieslist-ready-tab-pane" aria-selected="false" tabindex="-1" style="">Ready</button>
       </li>
     </ul>
-    <div class="tab-content" id="resourceslist-tabs-content">
-      <div class="tab-pane fade active show" id="resourceslist-pending-tab-pane" role="tabpanel" aria-labelledby="resourceslist-pending-tab" tabindex="0">
-        <ul class="app-resourceslist type-checkbox list-group">
-          <li class="list-group-item p-2 d-flex align-items-start" draggable="true" data-id="2ebc70a9c333">
+    <div class="tab-content" id="supplieslist-tabs-content">
+      <div class="tab-pane fade active show" id="supplieslist-pending-tab-pane" role="tabpanel" aria-labelledby="supplieslist-pending-tab" tabindex="0">
+        <ul class="app-supplieslist type-checkbox list-group">
+          <li class="list-group-item p-2 d-flex align-items-start" draggable="true" data-id="1">
             <div class="form-check position-relative d-flex align-items-top flex-grow-1">
-              <input class="form-check-input" type="checkbox" id="resourceslist-check-2ebc70a9c333">
-              <label class="form-check-label flex-grow-1" for="textarea-for-2ebc70a9c333">Pending resource example</label>
+              <input class="form-check-input squarebox" type="checkbox" id="supplieslist-check-1">
+              <label class="form-check-label flex-grow-1" for="textarea-for-1">Pending resource example</label>
               <div class="d-flex flex-column ps-1 flex-grow-1 d-none" data-role="inline-panel">
-                <textarea class="form-control" data-role="inline-editor" aria-label="Edit resource text" name="inline-editor" rows="1" id="textarea-for-2ebc70a9c333">
+                <textarea class="form-control" data-role="inline-editor" aria-label="Edit resource text" name="inline-editor" rows="1" id="textarea-for-1">
                 </textarea>
                 <div class="d-flex flex-column mt-2 small">
                   <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#" data-action="save">
@@ -42,10 +42,6 @@
                     <span class="app-icono">Improve writing</span>
                     <span class="text-muted">[Shift+F9]</span>
                   </a>
-                  <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#" data-action="ai-breakdown">
-                    <span class="app-icono">Break down task</span>
-                    <span class="text-muted">[Shift+F10]</span>
-                  </a>
                 </div>
               </div>
             </div>
@@ -63,14 +59,14 @@
           </li>
         </ul>
       </div>
-      <div class="tab-pane fade" id="resourceslist-ready-tab-pane" role="tabpanel" aria-labelledby="resourceslist-ready-tab" tabindex="0">
-        <ul class="app-resourceslist type-checkbox list-group">
-          <li class="list-group-item p-2 d-flex align-items-start" draggable="true" data-id="e0f8aed148f7">
+      <div class="tab-pane fade" id="supplieslist-ready-tab-pane" role="tabpanel" aria-labelledby="supplieslist-ready-tab" tabindex="0">
+        <ul class="app-supplieslist type-checkbox list-group">
+          <li class="list-group-item p-2 d-flex align-items-start" draggable="true" data-id="2">
             <div class="form-check position-relative d-flex align-items-top flex-grow-1">
-              <input class="form-check-input" type="checkbox" id="resourceslist-check-e0f8aed148f7">
-              <label class="form-check-label flex-grow-1" for="textarea-for-e0f8aed148f7">Ready resource example</label>
+              <input class="form-check-input squarebox" type="checkbox" id="supplieslist-check-2">
+              <label class="form-check-label flex-grow-1" for="textarea-for-2">Ready resource example</label>
               <div class="d-flex flex-column ps-1 flex-grow-1 d-none" data-role="inline-panel">
-                <textarea class="form-control" data-role="inline-editor" aria-label="Edit resource text" name="inline-editor" rows="1" id="textarea-for-e0f8aed148f7">
+                <textarea class="form-control" data-role="inline-editor" aria-label="Edit resource text" name="inline-editor" rows="1" id="textarea-for-2">
                 </textarea>
                 <div class="d-flex flex-column mt-2 small">
                   <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#" data-action="save">

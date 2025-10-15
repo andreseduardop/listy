@@ -1,74 +1,149 @@
 /**
- * @fileoverview Resourceslist UI module.
- * @module components/resourceslist
+ * @fileoverview Guest list UI module.
+ * @module components/guestlist
  *
  * @description
- * Builds and initializes a resourceslist inside the received container.
- * Creates the layout (tabs + lists), renders items from `localStorage`, and wires
- * inline editing, creation, toggle ready state, and drag & drop reordering.
- * Persistence: stores items in `localStorage` as part of a root model under
- * `components.<COMPONENT_NAME>.content`, using the schema imported from `../core/json/model.json`.
+ * Builds and initializes a guest list inside the given container. It renders items,
+ * wires inline editing, creation, confirmation toggling, and drag & drop reordering.
+ * Persistence is handled by an internal `Model` class that delegates reads/writes
+ * to `core/storage.js`, storing items under `components.<COMPONENT_NAME>.content`.
  *
- * Code in English; comentarios en español usando tercera persona singular (carga, lee, escribe, borra).
- * Seguir la guía: https://google.github.io/styleguide/jsguide.html
+ * @version 1.6.0
  *
- * @requires ../utils/helpers.js
- *   - `el(tag, opts)`        // Crea nodos HTML
- *   - `qs(root, sel)`        // Busca un único elemento
- *   - `qsa(root, sel)`       // Busca múltiples elementos
- *   - `visibility.{show,hide}` // Cambia visibilidad con clases
- *   - `flashBackground(el)`  // Destaca visualmente un elemento
+ * Code style: follows the Google JavaScript Style Guide.
+ * https://google.github.io/styleguide/jsguide.html
  *
- * @requires ../utils/drag-and-drop.js
- *   - `attachListReorder(ul, options)` // Habilita reordenamiento con DnD
- *
- * @version 1.4.0
- *
- * @exports renderResourceslist
- * Exposes the public function to initialize the module.
- *
- * @typedef {Object} ResourceslistItem
- * @property {string} id        - Unique identifier.
- * @property {string} text      - Visible text of the resource.
- * @property {boolean} completed - Marks if the resource is ready (true) or pending (false).
- *
- * @callback ReorderHandler
- * @param {string} draggedId - Id of the dragged item.
- * @param {number} toIndex   - Destination index where the item is inserted.
- *
- * @constant
- * @default
- * @name STORAGE_KEY
- * @type {string}
- * @description
- * Uses the key `"app.model"` in `localStorage` to persist the root model.
- *
- * @function renderResourceslist
- * @param {HTMLElement} containerEl - Container where the UI is built.
- * @returns {void}
- *
- * @example <caption>Typical usage from main.js</caption>
- * // Code in English; comentarios en español
- * import { renderResourceslist } from "./components/resourceslist.js";
- * const container = document.getElementById("app-container-1"); // Obtiene contenedor
- * renderResourceslist(container); // Crea el layout y arranca la resourceslist dentro del contenedor
- *
- * @remarks
- * - Accesibilidad: asigna atributos ARIA a tabs y controles; evita saltos de línea en edición inline.
- * - DnD: `attachListReorder` ignora la fila de “nueva entrada” y reenvía cambios al modelo.
- * - Persistencia: guarda automáticamente tras crear/editar/toggle/reordenar/eliminar.
- * - Esquema: los items se escriben en `components.<COMPONENT_NAME>.content` del modelo raíz.
- *
- * @since 1.0.0
- * @updated 1.4.0 - Renombra checklist → resourceslist, task → resource; Completed → Ready; container id y selectores.
- *
- * @browser Modern compatibility (ES2020+). Requires `class`, `modules`, and `localStorage` support.
+ * @exports renderGuestlist
  */
 
 import { el, qs, qsa, visibility, flashBackground } from "../utils/helpers.js";
 import { attachListReorder } from "../utils/drag-and-drop.js";
-// importa modelo:
-import { Model } from "../core/model.js";
+import * as storage from "../core/storage.js";
+import { uid } from "../utils/uid.js";
+
+/* ================================
+ * Model (component-scoped; delegates to storage.js)
+ * ================================ */
+/**
+ * @typedef {Object} GuestItem
+ * @property {string} id
+ * @property {string} text
+ * @property {boolean} checked
+ */
+class Model extends EventTarget {
+  /**
+   * @param {string} componentName
+   */
+  constructor(componentName) {
+    super();
+    /** @private {string} */
+    this._name = componentName; // Comentario: guarda el nombre del componente
+  }
+
+  /** @private */
+  _deepClone(obj) {
+    // Comentario: clona objetos JSON de forma defensiva
+    return JSON.parse(JSON.stringify(obj));
+  }
+
+  /**
+   * Returns all items for this component.
+   * @return {!Array<GuestItem>}
+   */
+  getAll() {
+    // Comentario: lee desde storage y normaliza a arreglo de items
+    const content = storage.getComponentContent(this._name);
+    const arr = Array.isArray(content) ? content : [];
+    return arr.map((i) => ({ ...i }));
+  }
+
+  /** @private */
+  _write(nextItems) {
+    // Comentario: escribe items en storage y emite evento de cambio
+    storage.setComponentContent(this._name, nextItems.map((i) => ({ ...i })));
+    this.dispatchEvent(
+      new CustomEvent("change", {
+        detail: { name: this._name, items: this.getAll() },
+      }),
+    );
+  }
+
+  /**
+   * Adds a new item.
+   * @param {string} text
+   * @return {void}
+   */
+  add(text) {
+    // Comentario: agrega item si el texto no está vacío
+    const t = String(text || "").trim();
+    if (!t) return;
+    const items = this.getAll();
+    items.push({ id: uid(), text: t, checked: false });
+    this._write(items);
+  }
+
+  /**
+   * Toggles the `checked` state of an item by id.
+   * @param {string} id
+   * @return {void}
+   */
+  toggle(id) {
+    // Comentario: invierte el estado `checked`
+    const items = this.getAll().map((i) => (i.id === id ? { ...i, checked: !i.checked } : i));
+    this._write(items);
+  }
+
+  /**
+   * Updates the text of an item; removes it if the text becomes empty.
+   * @param {string} id
+   * @param {string} text
+   * @return {void}
+   */
+  updateText(id, text) {
+    // Comentario: actualiza el texto o elimina si queda vacío
+    const t = String(text || "").trim();
+    if (!t) return this.remove(id);
+    const items = this.getAll().map((i) => (i.id === id ? { ...i, text: t } : i));
+    this._write(items);
+  }
+
+  /**
+   * Removes an item by id.
+   * @param {string} id
+   * @return {void}
+   */
+  remove(id) {
+    // Comentario: elimina el item según id
+    const items = this.getAll().filter((i) => i.id !== id);
+    this._write(items);
+  }
+
+  /**
+   * Moves an item to a target index in the same list.
+   * @param {string} id
+   * @param {number} toIndex
+   * @return {void}
+   */
+  moveToIndex(id, toIndex) {
+    // Comentario: reubica el item al índice destino
+    const items = this.getAll();
+    const len = items.length;
+    if (len <= 1) return;
+
+    const from = items.findIndex((i) => i.id === id);
+    if (from === -1) return;
+
+    let dest = Math.max(0, Math.min(len, Number(toIndex)));
+    if (dest === from || dest === from + 1) return;
+
+    const arr = [...items];
+    const [moved] = arr.splice(from, 1);
+    if (dest > from) dest -= 1;
+    arr.splice(dest, 0, moved);
+
+    this._write(arr);
+  }
+}
 
 /* ================================
  * View (builds full layout inside container)
@@ -76,160 +151,165 @@ import { Model } from "../core/model.js";
 class View {
   // selectores reutilizables
   static SEL = {
-    pendingPane: "#resourceslist-pending-tab-pane .app-resourceslist .type-checkbox",
-    readyPane: "#resourceslist-ready-tab-pane .app-resourceslist .type-checkbox",
+    pendingPane: "#guestlist-pending-tab-pane .app-guestlist .type-checkbox",
+    completedPane: "#guestlist-completed-tab-pane .app-guestlist .type-checkbox",
     item: "li.list-group-item",
     newEntry: "li[data-role='new-entry']",
     newEntryInput: "li[data-role='new-entry'] input[type='text']",
-    checkbox: "input.form-check-input",
+    checkbox: "input.form-check-input.squircle",
     label: "label.form-check-label",
     btnAdd: "button.app-btn-add",
   };
 
   // crea todo el layout y devuelve referencias clave
   static buildLayout(containerEl) {
-    // limpia contenedor destino (borra contenido previo)
+    // Comentario: limpia contenedor destino
     containerEl.innerHTML = "";
 
-    // crea columna y tarjeta
+    // Comentario: crea columna y tarjeta
     const col = el("div", { className: "col-12" });
     const card = el("div", { className: "app-card col" });
-    const h2 = el("h2", { html: "resources" });
+    const h2 = el("h2", { html: "guests" });
 
-    // raíz lógica
-    const root = el("div", { attrs: { id: "resourceslist-container" } });
+    // Comentario: raíz lógica del guestlist
+    const guestlistRoot = el("div", { attrs: { id: "guestlist-container" } });
 
-    // tabs
+    // Comentario: tabs (ids y atributos actualizados)
     const tabs = el("ul", {
       className: "nav nav-tabs nav-fill",
-      attrs: { id: "resourceslist-tabs", role: "tablist" },
+      attrs: { id: "guestlist-tabs", role: "tablist" },
     });
 
     const liPend = el("li", { className: "nav-item", attrs: { role: "presentation" } });
     const btnPend = el("button", {
       className: "nav-link active",
       attrs: {
-        id: "resourceslist-pending-tab",
+        id: "guestlist-pending-tab",
         "data-bs-toggle": "tab",
-        "data-bs-target": "#resourceslist-pending-tab-pane",
+        "data-bs-target": "#guestlist-pending-tab-pane",
         type: "button",
         role: "tab",
-        "aria-controls": "resourceslist-pending-tab-pane",
+        "aria-controls": "guestlist-pending-tab-pane",
         "aria-selected": "true",
       },
       html: "Pending",
     });
     liPend.append(btnPend);
 
-    const liReady = el("li", { className: "nav-item", attrs: { role: "presentation" } });
-    const btnReady = el("button", {
+    const liConf = el("li", { className: "nav-item", attrs: { role: "presentation" } });
+    const btnConf = el("button", {
       className: "nav-link",
       attrs: {
-        id: "resourceslist-ready-tab",
+        id: "guestlist-completed-tab",
         "data-bs-toggle": "tab",
-        "data-bs-target": "#resourceslist-ready-tab-pane",
+        "data-bs-target": "#guestlist-completed-tab-pane",
         type: "button",
         role: "tab",
-        "aria-controls": "resourceslist-ready-tab-pane",
+        "aria-controls": "guestlist-completed-tab-pane",
         "aria-selected": "false",
         tabindex: "-1",
       },
-      html: "Ready",
+      html: "Confirmed",
     });
-    liReady.append(btnReady);
+    liConf.append(btnConf);
 
-    tabs.append(liPend, liReady);
+    tabs.append(liPend, liConf);
 
-    // contenido de pestañas
+    // Comentario: contenido de pestañas
     const tabContent = el("div", {
       className: "tab-content",
-      attrs: { id: "resourceslist-tabs-content" },
+      attrs: { id: "guestlist-tabs-content" },
     });
 
     const panePend = el("div", {
-      className: "tab-pane fade show active",
+      className: "tab-pane fade active show",
       attrs: {
-        id: "resourceslist-pending-tab-pane",
+        id: "guestlist-pending-tab-pane",
         role: "tabpanel",
-        "aria-labelledby": "resourceslist-pending-tab",
+        "aria-labelledby": "guestlist-pending-tab",
         tabindex: "0",
       },
     });
-    const ulPend = el("ul", { className: "app-resourceslist type-checkbox list-group" });
+    const ulPend = el("ul", { className: "app-guestlist type-checkbox list-group" });
     panePend.append(ulPend);
 
-    const paneReady = el("div", {
+    const paneConf = el("div", {
       className: "tab-pane fade",
       attrs: {
-        id: "resourceslist-ready-tab-pane",
+        id: "guestlist-completed-tab-pane",
         role: "tabpanel",
-        "aria-labelledby": "resourceslist-ready-tab",
+        "aria-labelledby": "guestlist-completed-tab",
         tabindex: "0",
       },
     });
-    const ulReady = el("ul", { className: "app-resourceslist type-checkbox list-group" });
-    paneReady.append(ulReady);
+    const ulConf = el("ul", { className: "app-guestlist type-checkbox list-group" });
+    paneConf.append(ulConf);
 
-    tabContent.append(panePend, paneReady);
+    tabContent.append(panePend, paneConf);
 
-    // ensambla tarjeta
-    card.append(h2, root, tabs, tabContent);
+    // Comentario: ensambla tarjeta
+    const cardHeader = el("div", { className: "d-flex align-items-center justify-content-between mb-2" });
+    cardHeader.append(h2);
+    const headerWrap = el("div", { className: "d-flex flex-column w-100" });
+    headerWrap.append(cardHeader, tabs, tabContent);
+
+    card.append(guestlistRoot, headerWrap);
     col.append(card);
     containerEl.append(col);
 
-    return { root, ulPending: ulPend, ulReady };
+    return { root: guestlistRoot, ulPending: ulPend, ulCompleted: ulConf };
   }
 
   constructor(containerEl) {
-    // construye layout y guarda refs de listas
-    const { root, ulPending, ulReady } = View.buildLayout(containerEl);
+    // Comentario: construye layout y guarda refs de listas
+    const { root, ulPending, ulCompleted } = View.buildLayout(containerEl);
     this.root = root;
     this.pendingList = ulPending;
-    this.readyList = ulReady;
+    this.completedList = ulCompleted;
 
-    // pool de manejadores DnD para limpieza
+    // Comentario: pool de manejadores DnD para limpieza
     this._dndHandles = [];
   }
 
-  // renderiza ambas listas
+  // Comentario: renderiza ambas listas
   render(items) {
-    const pending = items.filter((i) => !i.completed);
-    const ready = items.filter((i) => i.completed);
+    const pending = items.filter((i) => !i.checked);
+    const completed = items.filter((i) => i.checked);
 
     this.pendingList.innerHTML = "";
-    this.readyList.innerHTML = "";
+    this.completedList.innerHTML = "";
 
     this.#renderList(this.pendingList, pending, { withNewEntry: true });
-    this.#renderList(this.readyList, ready, { withNewEntry: false });
+    this.#renderList(this.completedList, completed, { withNewEntry: false });
 
-    this.#ensureReadyEmptyState();
-    this.#initDnD(); // Activa DnD tras render
+    this.#ensureCompletedEmptyState();
+    this.#initDnD(); // Comentario: activa DnD tras render
   }
 
-  // inicializa drag & drop en ambas listas
+  // Comentario: inicializa drag & drop en ambas listas
   #initDnD() {
-    // destruye instancias previas
+    // Comentario: destruye instancias previas
     this._dndHandles.forEach((h) => {
       try { h.destroy?.(); } catch {}
     });
     this._dndHandles = [];
 
     const common = {
-      // ignora fila de nueva entrada
+      // Comentario: ignora fila de nueva entrada
       ignoreSelector: "[data-role='new-entry']",
-      // habilita drops en bordes globales
+      // Comentario: habilita drops en bordes globales
       allowGlobalEdges: true,
-      // reenvía orden al controlador
+      // Comentario: reenvía orden al controlador
       onReorder: (draggedId, toIndex) => this.onReorder?.(draggedId, toIndex),
     };
 
     this._dndHandles.push(
       attachListReorder(this.pendingList, common),
-      attachListReorder(this.readyList, common)
+      attachListReorder(this.completedList, common),
     );
   }
 
-  // renderiza una UL completa
+  // Comentario: renderiza una UL completa
   #renderList(ul, data, { withNewEntry }) {
     const frag = document.createDocumentFragment();
     data.forEach((item) => frag.appendChild(this.#renderItem(item)));
@@ -237,7 +317,7 @@ class View {
     ul.appendChild(frag);
   }
 
-  // crea <li> por item
+  // Comentario: crea <li> por item
   #renderItem(item) {
     const li = el("li", {
       className: "list-group-item p-2 d-flex align-items-start",
@@ -250,10 +330,10 @@ class View {
     });
 
     const input = el("input", {
-      className: "form-check-input",
-      attrs: { type: "checkbox", id: `resourceslist-check-${item.id}` },
+      className: "form-check-input squircle",
+      attrs: { type: "checkbox", id: `guestlist-check-${item.id}` },
     });
-    input.checked = !!item.completed;
+    input.checked = !!item.checked;
 
     const label = el("label", {
       className: "form-check-label flex-grow-1",
@@ -270,7 +350,7 @@ class View {
       className: "form-control",
       attrs: {
         "data-role": "inline-editor",
-        "aria-label": "Edit resource text",
+        "aria-label": "Edit guest name",
         name: "inline-editor",
         rows: "1",
         id: `textarea-for-${item.id}`,
@@ -279,29 +359,22 @@ class View {
 
     const actions = el("div", { className: "d-flex flex-column mt-2 small" });
     const actionDefs = [
-      // [key, text, hint, icono (opcional, default false)]
       ["save", "Save", "[Enter]"],
       ["discard", "Discard", "[Esc]"],
       ["delete", "Delete", "[Shift+Del]"],
       ["ai-spelling", "Fix spelling", "[Shift+F8]", true],
       ["ai-improve", "Improve writing", "[Shift+F9]", true],
-      ["ai-breakdown", "Break down task", "[Shift+F10]", true],
     ];
 
     actionDefs.forEach(([key, text, hint, icono = false]) => {
-      // Clase base para el elemento <a> (ancla).
       const anchorClassName = "text-decoration-none fw-bold mb-2 d-flex justify-content-between";
-      
-      // Clase condicional para el primer <span>. Si 'icono' es true, se establece 'app-icono'.
       const spanClassName = icono ? "app-icono" : "";
       actions.append(
         el("a", {
-          // La clase del <a> se mantiene constante.
           className: anchorClassName,
           attrs: { href: "#", "data-action": key },
-          // El contenido HTML ahora inyecta la clase condicional en el primer <span>
           html: `<span class="${spanClassName}">${text}</span><span class="text-muted">${hint}</span>`,
-        })
+        }),
       );
     });
 
@@ -323,43 +396,40 @@ class View {
 
     li.append(form, btnMove);
 
-    // listeners del item
+    // Comentario: listeners del item
     input.addEventListener("change", () => {
       this.onToggle?.(item.id);
       const targetTabId = input.checked
-        ? "resourceslist-ready-tab"
-        : "resourceslist-pending-tab";
+        ? "guestlist-completed-tab"
+        : "guestlist-pending-tab";
       const targetEl = document.getElementById(targetTabId);
       if (targetEl) flashBackground(targetEl);
     });
 
     label.addEventListener("click", () => {
-      // prepara edición inline
+      // Comentario: prepara edición inline
       const currentText = label.textContent.trim();
       visibility.hide(label);
       visibility.show(panel, "d-flex");
       editor.value = currentText;
 
-      // auto-resize
+      // Comentario: auto-resize
       const autoresize = () => {
         editor.style.height = "auto";
         editor.style.height = editor.scrollHeight + "px";
       };
 
-      // sanea saltos de línea → espacios
+      // Comentario: sanea saltos de línea → espacios
       const sanitizeNoNewlines = () => {
         const sanitized = editor.value.replace(/\r?\n+/g, " ");
         if (sanitized !== editor.value) {
           const pos = editor.selectionStart;
           editor.value = sanitized;
-          editor.selectionStart = editor.selectionEnd = Math.min(
-            pos,
-            editor.value.length
-          );
+          editor.selectionStart = editor.selectionEnd = Math.min(pos, editor.value.length);
         }
       };
 
-      // finaliza edición
+      // Comentario: finaliza edición
       const finalize = (mode /* 'commit' | 'cancel' */) => {
         if (finalize._done) return;
         finalize._done = true;
@@ -419,7 +489,7 @@ class View {
       editor.addEventListener("blur", onBlur, { once: true });
       editor.addEventListener("input", onInput);
 
-      // foco inicial
+      // Comentario: foco inicial
       editor.focus();
       const len = editor.value.length;
       editor.setSelectionRange(len, len);
@@ -429,12 +499,12 @@ class View {
     return li;
   }
 
-  // asegura placeholder cuando no hay 'ready'
-  #ensureReadyEmptyState() {
-    const ul = this.readyList;
+  // Comentario: asegura placeholder cuando no hay confirmadas
+  #ensureCompletedEmptyState() {
+    const ul = this.completedList;
     if (!ul) return;
     const hasReal = [...ul.querySelectorAll("li.list-group-item[data-id]")].some(
-      (li) => (li.dataset.id ?? "") !== ""
+      (li) => (li.dataset.id ?? "") !== "",
     );
     const currentPh = ul.querySelector('li.list-group-item[data-id=""]');
 
@@ -443,14 +513,14 @@ class View {
       const li = el("li", {
         className: "list-group-item p-2 d-flex align-items-start",
         attrs: { draggable: "false" },
-        html: "No resources ready.",
+        html: "No guests confirmed.",
       });
       li.dataset.id = "";
       ul.appendChild(li);
     }
   }
 
-  // crea fila de nueva entrada
+  // Comentario: crea fila de nueva entrada
   #renderNewItemEntry() {
     const li = el("li", {
       className: "list-group-item p-2 d-flex align-items-start",
@@ -462,15 +532,15 @@ class View {
       className: "form-control",
       attrs: {
         type: "text",
-        name: "new-resource",
-        placeholder: "Add new resource and press Enter",
-        "aria-label": "Add new resource",
+        name: "new-guest",
+        placeholder: "Add guest and press Enter",
+        "aria-label": "Add guest",
       },
     });
 
     const btnAdd = el("button", {
       className: "btn app-btn-add",
-      attrs: { type: "button", title: "Add new resource", "aria-label": "Add new resource" },
+      attrs: { type: "button", title: "Add guest", "aria-label": "Add guest" },
       html: `<i class="bi bi-plus-square-fill fs-3" aria-hidden="true"></i>`,
     });
 
@@ -489,7 +559,7 @@ class View {
     return li;
   }
 
-  // API para enfocar input nuevo
+  // Comentario: API para enfocar input nuevo
   focusNewEntryInput() {
     const entry = qs(this.pendingList, View.SEL.newEntryInput);
     if (entry) entry.focus({ preventScroll: true });
@@ -501,25 +571,25 @@ class View {
  * ================================ */
 class Controller {
   constructor(containerEl) {
-    // define y almacena el nombre del componente que controla
-    this.COMPONENT_NAME = "resourceslist";
+    // Comentario: define y almacena el nombre del componente que controla
+    this.COMPONENT_NAME = "guestlist";
 
-    // instancia modelo y vista
-    this.model = new Model();
+    // Comentario: instancia modelo y vista
+    this.model = new Model(this.COMPONENT_NAME);
     this.view = new View(containerEl);
 
-    // banderas para UX de creación
+    // Comentario: banderas para UX de creación
     this.createInFlight = false;
     this.shouldRefocusNewEntry = false;
 
-    // render inicial usando el nombre de componente almacenado
-    this.view.render(this.model.getAll(this.COMPONENT_NAME));
+    // Comentario: render inicial
+    this.view.render(this.model.getAll());
 
-    // sincroniza vista ante cambios de modelo del mismo componente
+    // Comentario: sincroniza vista ante cambios del modelo del mismo componente
     this.model.addEventListener("change", (ev) => {
       const changedName = ev?.detail?.name;
       if (!changedName || changedName === this.COMPONENT_NAME) {
-        this.view.render(this.model.getAll(this.COMPONENT_NAME));
+        this.view.render(this.model.getAll());
         if (this.shouldRefocusNewEntry) {
           this.view.focusNewEntryInput();
           this.shouldRefocusNewEntry = false;
@@ -528,20 +598,20 @@ class Controller {
       }
     });
 
-    // conecta handlers de la vista, pasando siempre COMPONENT_NAME
+    // Comentario: conecta handlers de la vista
     this.view.onCreate = (text) => {
       if (this.createInFlight) return;
       this.createInFlight = true;
       this.shouldRefocusNewEntry = true;
-      this.model.add(this.COMPONENT_NAME, text);
+      this.model.add(text);
     };
-    this.view.onToggle = (id) => this.model.toggle(this.COMPONENT_NAME, id);
+    this.view.onToggle = (id) => this.model.toggle(id);
     this.view.onEdit = (id, text) => {
-      if (String(text).trim() === "") this.model.remove(this.COMPONENT_NAME, id);
-      else this.model.updateText(this.COMPONENT_NAME, id, text);
+      if (String(text).trim() === "") this.model.remove(id);
+      else this.model.updateText(id, text);
     };
     this.view.onReorder = (draggedId, toIndex) => {
-      this.model.moveToIndex(this.COMPONENT_NAME, draggedId, toIndex);
+      this.model.moveToIndex(draggedId, toIndex);
     };
   }
 }
@@ -551,15 +621,15 @@ class Controller {
  * ================================ */
 
 /**
- * renderResourceslist(containerEl: HTMLElement)
- * - Called by main.js passing the container where everything must be created.
+ * renderGuestlist(containerEl: HTMLElement)
+ * - Called by coordinator.js passing the container where everything must be created.
  */
-export function renderResourceslist(containerEl) {
-  // valida el contenedor recibido
+export function renderGuestlist(containerEl) {
+  // Comentario: valida el contenedor recibido
   if (!containerEl || !(containerEl instanceof HTMLElement)) {
-    console.error("[resourceslist] invalid container element");
+    console.error("[guestlist] invalid container element");
     return;
   }
-  // crea layout y monta controlador sobre el contenedor
+  // Comentario: crea layout y monta controlador sobre el contenedor
   new Controller(containerEl);
 }

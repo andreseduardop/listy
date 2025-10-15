@@ -404,7 +404,7 @@ svg.bi {
 .type-checkbox .form-check {
   margin-bottom: 0rem;
 }
-// Checkbox
+// Checkbox round
 .type-checkbox input[type="checkbox"] {
   background-color: transparent;
   margin-left: -1.6em;
@@ -414,6 +414,14 @@ svg.bi {
   height: 1.2em;
   width: 1.2em;
   position: relative;
+}
+// Checkbox squared
+input.squarebox[type="checkbox"] {
+  border-radius: 0%;
+}
+// Checkbox squared
+input.squircle[type="checkbox"] {
+  border-radius: 50% 50% 0% 0%;
 }
 .type-checkbox input[type="checkbox"]:focus {
   border-color: $body-color;
@@ -461,12 +469,16 @@ svg.bi {
 button.app-btn-move {
   border-color: transparent;
   border: 0px;
-  color: $body-color-subtle-5;
+  color: $body-color;
   cursor: grab !important;
   padding: 0px 0px 0px 16px;
+  visibility: hidden;
 }
 button.app-btn-move:active {
   cursor: grabbing !important; 
+}
+li:hover .app-btn-move {
+  visibility: visible;
 }
 // Add new task
 .app-btn-add {

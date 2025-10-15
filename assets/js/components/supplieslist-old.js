@@ -1,149 +1,74 @@
 /**
- * @fileoverview Checklist UI module.
- * @module components/checklist
+ * @fileoverview Supplies list UI module.
+ * @module components/supplieslist
  *
  * @description
- * Builds and initializes a checklist inside the given container. It renders items,
- * wires inline editing, creation, completion toggling and drag & drop reordering.
- * Persistence is handled by an internal `Model` class that delegates reads/writes
- * to `core/storage.js`, storing items under `components.<COMPONENT_NAME>.content`.
+ * Builds and initializes a supplieslist inside the received container.
+ * Creates the layout (tabs + lists), renders items from `localStorage`, and wires
+ * inline editing, creation, toggle ready state, and drag & drop reordering.
+ * Persistence: stores items in `localStorage` as part of a root model under
+ * `components.<COMPONENT_NAME>.content`, using the schema imported from `../core/json/model.json`.
  *
- * @version 1.5.0
+ * Code in English; comentarios en español usando tercera persona singular (carga, lee, escribe, borra).
+ * Seguir la guía: https://google.github.io/styleguide/jsguide.html
  *
- * Code style: follows the Google JavaScript Style Guide.
- * https://google.github.io/styleguide/jsguide.html
+ * @requires ../utils/helpers.js
+ *   - `el(tag, opts)`        // Crea nodos HTML
+ *   - `qs(root, sel)`        // Busca un único elemento
+ *   - `qsa(root, sel)`       // Busca múltiples elementos
+ *   - `visibility.{show,hide}` // Cambia visibilidad con clases
+ *   - `flashBackground(el)`  // Destaca visualmente un elemento
  *
- * @exports renderChecklist
+ * @requires ../utils/drag-and-drop.js
+ *   - `attachListReorder(ul, options)` // Habilita reordenamiento con DnD
+ *
+ * @version 1.4.0
+ *
+ * @exports renderSupplies list
+ * Exposes the public function to initialize the module.
+ *
+ * @typedef {Object} Supplies listItem
+ * @property {string} id        - Unique identifier.
+ * @property {string} text      - Visible text of the resource.
+ * @property {boolean} completed - Marks if the resource is ready (true) or pending (false).
+ *
+ * @callback ReorderHandler
+ * @param {string} draggedId - Id of the dragged item.
+ * @param {number} toIndex   - Destination index where the item is inserted.
+ *
+ * @constant
+ * @default
+ * @name STORAGE_KEY
+ * @type {string}
+ * @description
+ * Uses the key `"app.model"` in `localStorage` to persist the root model.
+ *
+ * @function renderSupplies list
+ * @param {HTMLElement} containerEl - Container where the UI is built.
+ * @returns {void}
+ *
+ * @example <caption>Typical usage from main.js</caption>
+ * // Code in English; comentarios en español
+ * import { renderSupplies list } from "./components/supplieslist.js";
+ * const container = document.getElementById("app-container-1"); // Obtiene contenedor
+ * renderSupplies list(container); // Crea el layout y arranca la supplieslist dentro del contenedor
+ *
+ * @remarks
+ * - Accesibilidad: asigna atributos ARIA a tabs y controles; evita saltos de línea en edición inline.
+ * - DnD: `attachListReorder` ignora la fila de “nueva entrada” y reenvía cambios al modelo.
+ * - Persistencia: guarda automáticamente tras crear/editar/toggle/reordenar/eliminar.
+ * - Esquema: los items se escriben en `components.<COMPONENT_NAME>.content` del modelo raíz.
+ *
+ * @since 1.0.0
+ * @updated 1.4.0 - Renombra checklist → supplieslist, task → resource; Completed → Ready; container id y selectores.
+ *
+ * @browser Modern compatibility (ES2020+). Requires `class`, `modules`, and `localStorage` support.
  */
 
 import { el, qs, qsa, visibility, flashBackground } from "../utils/helpers.js";
 import { attachListReorder } from "../utils/drag-and-drop.js";
-import * as storage from "../core/storage.js";
-import { uid } from "../utils/uid.js";
-
-/* ================================
- * Model (component-scoped; delegates to storage.js)
- * ================================ */
-/**
- * @typedef {Object} ChecklistItem
- * @property {string} id
- * @property {string} text
- * @property {boolean} checked
- */
-class Model extends EventTarget {
-  /**
-   * @param {string} componentName
-   */
-  constructor(componentName) {
-    super();
-    /** @private {string} */
-    this._name = componentName; // Comentario: guarda el nombre del componente
-  }
-
-  /** @private */
-  _deepClone(obj) {
-    // Comentario: clona objetos JSON de forma defensiva
-    return JSON.parse(JSON.stringify(obj));
-  }
-
-  /**
-   * Returns all items for this component.
-   * @return {!Array<ChecklistItem>}
-   */
-  getAll() {
-    // Comentario: lee desde storage y normaliza a arreglo de items
-    const content = storage.getComponentContent(this._name);
-    const arr = Array.isArray(content) ? content : [];
-    return arr.map((i) => ({ ...i }));
-  }
-
-  /** @private */
-  _write(nextItems) {
-    // Comentario: escribe items en storage y emite evento de cambio
-    storage.setComponentContent(this._name, nextItems.map((i) => ({ ...i })));
-    this.dispatchEvent(
-      new CustomEvent("change", {
-        detail: { name: this._name, items: this.getAll() },
-      }),
-    );
-  }
-
-  /**
-   * Adds a new item.
-   * @param {string} text
-   * @return {void}
-   */
-  add(text) {
-    // Comentario: agrega item si el texto no está vacío
-    const t = String(text || "").trim();
-    if (!t) return;
-    const items = this.getAll();
-    items.push({ id: uid(), text: t, checked: false });
-    this._write(items);
-  }
-
-  /**
-   * Toggles the `checked` state of an item by id.
-   * @param {string} id
-   * @return {void}
-   */
-  toggle(id) {
-    // Comentario: invierte el estado `checked`
-    const items = this.getAll().map((i) => (i.id === id ? { ...i, checked: !i.checked } : i));
-    this._write(items);
-  }
-
-  /**
-   * Updates the text of an item; removes it if the text becomes empty.
-   * @param {string} id
-   * @param {string} text
-   * @return {void}
-   */
-  updateText(id, text) {
-    // Comentario: actualiza el texto o elimina si queda vacío
-    const t = String(text || "").trim();
-    if (!t) return this.remove(id);
-    const items = this.getAll().map((i) => (i.id === id ? { ...i, text: t } : i));
-    this._write(items);
-  }
-
-  /**
-   * Removes an item by id.
-   * @param {string} id
-   * @return {void}
-   */
-  remove(id) {
-    // Comentario: elimina el item según id
-    const items = this.getAll().filter((i) => i.id !== id);
-    this._write(items);
-  }
-
-  /**
-   * Moves an item to a target index in the same list.
-   * @param {string} id
-   * @param {number} toIndex
-   * @return {void}
-   */
-  moveToIndex(id, toIndex) {
-    // Comentario: reubica el item al índice destino
-    const items = this.getAll();
-    const len = items.length;
-    if (len <= 1) return;
-
-    const from = items.findIndex((i) => i.id === id);
-    if (from === -1) return;
-
-    let dest = Math.max(0, Math.min(len, Number(toIndex)));
-    if (dest === from || dest === from + 1) return;
-
-    const arr = [...items];
-    const [moved] = arr.splice(from, 1);
-    if (dest > from) dest -= 1;
-    arr.splice(dest, 0, moved);
-
-    this._write(arr);
-  }
-}
+// importa modelo:
+import { Model } from "../core/model.js";
 
 /* ================================
  * View (builds full layout inside container)
@@ -151,8 +76,8 @@ class Model extends EventTarget {
 class View {
   // selectores reutilizables
   static SEL = {
-    pendingPane: "#checklist-pending-tab-pane .app-checklist .type-checkbox",
-    completedPane: "#checklist-completed-tab-pane .app-checklist .type-checkbox",
+    pendingPane: "#supplieslist-pending-tab-pane .app-supplieslist .type-checkbox",
+    readyPane: "#supplieslist-ready-tab-pane .app-supplieslist .type-checkbox",
     item: "li.list-group-item",
     newEntry: "li[data-role='new-entry']",
     newEntryInput: "li[data-role='new-entry'] input[type='text']",
@@ -163,109 +88,104 @@ class View {
 
   // crea todo el layout y devuelve referencias clave
   static buildLayout(containerEl) {
-    // limpia contenedor destino
+    // limpia contenedor destino (borra contenido previo)
     containerEl.innerHTML = "";
 
     // crea columna y tarjeta
     const col = el("div", { className: "col-12" });
     const card = el("div", { className: "app-card col" });
-    const h2 = el("h2", { html: "tasks" });
+    const h2 = el("h2", { html: "supplies" });
 
-    // raíz lógica del checklist
-    const checklistRoot = el("div", { attrs: { id: "checklist-container" } });
+    // raíz lógica
+    const root = el("div", { attrs: { id: "supplieslist-container" } });
 
     // tabs
     const tabs = el("ul", {
       className: "nav nav-tabs nav-fill",
-      attrs: { id: "checklist-tabs", role: "tablist" },
+      attrs: { id: "supplieslist-tabs", role: "tablist" },
     });
 
     const liPend = el("li", { className: "nav-item", attrs: { role: "presentation" } });
     const btnPend = el("button", {
       className: "nav-link active",
       attrs: {
-        id: "checklist-pending-tab",
+        id: "supplieslist-pending-tab",
         "data-bs-toggle": "tab",
-        "data-bs-target": "#checklist-pending-tab-pane",
+        "data-bs-target": "#supplieslist-pending-tab-pane",
         type: "button",
         role: "tab",
-        "aria-controls": "checklist-pending-tab-pane",
+        "aria-controls": "supplieslist-pending-tab-pane",
         "aria-selected": "true",
       },
       html: "Pending",
     });
     liPend.append(btnPend);
 
-    const liComp = el("li", { className: "nav-item", attrs: { role: "presentation" } });
-    const btnComp = el("button", {
+    const liReady = el("li", { className: "nav-item", attrs: { role: "presentation" } });
+    const btnReady = el("button", {
       className: "nav-link",
       attrs: {
-        id: "checklist-completed-tab",
+        id: "supplieslist-ready-tab",
         "data-bs-toggle": "tab",
-        "data-bs-target": "#checklist-completed-tab-pane",
+        "data-bs-target": "#supplieslist-ready-tab-pane",
         type: "button",
         role: "tab",
-        "aria-controls": "checklist-completed-tab-pane",
+        "aria-controls": "supplieslist-ready-tab-pane",
         "aria-selected": "false",
         tabindex: "-1",
       },
-      html: "Completed",
+      html: "Ready",
     });
-    liComp.append(btnComp);
+    liReady.append(btnReady);
 
-    tabs.append(liPend, liComp);
+    tabs.append(liPend, liReady);
 
     // contenido de pestañas
     const tabContent = el("div", {
       className: "tab-content",
-      attrs: { id: "checklist-tabs-content" },
+      attrs: { id: "supplieslist-tabs-content" },
     });
 
     const panePend = el("div", {
       className: "tab-pane fade show active",
       attrs: {
-        id: "checklist-pending-tab-pane",
+        id: "supplieslist-pending-tab-pane",
         role: "tabpanel",
-        "aria-labelledby": "checklist-pending-tab",
+        "aria-labelledby": "supplieslist-pending-tab",
         tabindex: "0",
       },
     });
-    const ulPend = el("ul", { className: "app-checklist type-checkbox list-group" });
+    const ulPend = el("ul", { className: "app-supplieslist type-checkbox list-group" });
     panePend.append(ulPend);
 
-    const paneComp = el("div", {
+    const paneReady = el("div", {
       className: "tab-pane fade",
       attrs: {
-        id: "checklist-completed-tab-pane",
+        id: "supplieslist-ready-tab-pane",
         role: "tabpanel",
-        "aria-labelledby": "checklist-completed-tab",
+        "aria-labelledby": "supplieslist-ready-tab",
         tabindex: "0",
       },
     });
-    const ulComp = el("ul", { className: "app-checklist type-checkbox list-group" });
-    paneComp.append(ulComp);
+    const ulReady = el("ul", { className: "app-supplieslist type-checkbox list-group" });
+    paneReady.append(ulReady);
 
-    tabContent.append(panePend, paneComp);
+    tabContent.append(panePend, paneReady);
 
     // ensambla tarjeta
-    const cardHeader = el("div", { className: "d-flex align-items-center justify-content-between mb-2" });
-    cardHeader.append(h2);
-    const headerWrap = el("div", { className: "d-flex flex-column w-100" });
-    headerWrap.append(cardHeader, tabs, tabContent);
-
-    card.append(checklistRoot, headerWrap);
+    card.append(h2, root, tabs, tabContent);
     col.append(card);
     containerEl.append(col);
 
-    return { root: checklistRoot, ulPending: ulPend, ulCompleted: ulComp };
+    return { root, ulPending: ulPend, ulReady };
   }
 
   constructor(containerEl) {
     // construye layout y guarda refs de listas
-    const { root, ulPending, ulCompleted } = View.buildLayout(containerEl);
+    const { root, ulPending, ulReady } = View.buildLayout(containerEl);
     this.root = root;
     this.pendingList = ulPending;
-    this.completedList = ulCompleted;
+    this.readyList = ulReady;
 
     // pool de manejadores DnD para limpieza
     this._dndHandles = [];
@@ -273,16 +193,16 @@ class View {
 
   // renderiza ambas listas
   render(items) {
-    const pending = items.filter((i) => !i.checked);
-    const completed = items.filter((i) => i.checked);
+    const pending = items.filter((i) => !i.completed);
+    const ready = items.filter((i) => i.completed);
 
     this.pendingList.innerHTML = "";
-    this.completedList.innerHTML = "";
+    this.readyList.innerHTML = "";
 
     this.#renderList(this.pendingList, pending, { withNewEntry: true });
-    this.#renderList(this.completedList, completed, { withNewEntry: false });
+    this.#renderList(this.readyList, ready, { withNewEntry: false });
 
-    this.#ensureCompletedEmptyState();
+    this.#ensureReadyEmptyState();
     this.#initDnD(); // Activa DnD tras render
   }
 
@@ -305,7 +225,7 @@ class View {
 
     this._dndHandles.push(
       attachListReorder(this.pendingList, common),
-      attachListReorder(this.completedList, common)
+      attachListReorder(this.readyList, common)
     );
   }
 
@@ -331,9 +251,9 @@ class View {
 
     const input = el("input", {
       className: "form-check-input",
-      attrs: { type: "checkbox", id: `checklist-check-${item.id}` },
+      attrs: { type: "checkbox", id: `supplieslist-check-${item.id}` },
     });
-    input.checked = !!item.checked;
+    input.checked = !!item.completed;
 
     const label = el("label", {
       className: "form-check-label flex-grow-1",
@@ -350,7 +270,7 @@ class View {
       className: "form-control",
       attrs: {
         "data-role": "inline-editor",
-        "aria-label": "Edit task text",
+        "aria-label": "Edit resource text",
         name: "inline-editor",
         rows: "1",
         id: `textarea-for-${item.id}`,
@@ -359,6 +279,7 @@ class View {
 
     const actions = el("div", { className: "d-flex flex-column mt-2 small" });
     const actionDefs = [
+      // [key, text, hint, icono (opcional, default false)]
       ["save", "Save", "[Enter]"],
       ["discard", "Discard", "[Esc]"],
       ["delete", "Delete", "[Shift+Del]"],
@@ -368,12 +289,17 @@ class View {
     ];
 
     actionDefs.forEach(([key, text, hint, icono = false]) => {
+      // Clase base para el elemento <a> (ancla).
       const anchorClassName = "text-decoration-none fw-bold mb-2 d-flex justify-content-between";
+      
+      // Clase condicional para el primer <span>. Si 'icono' es true, se establece 'app-icono'.
       const spanClassName = icono ? "app-icono" : "";
       actions.append(
         el("a", {
+          // La clase del <a> se mantiene constante.
           className: anchorClassName,
           attrs: { href: "#", "data-action": key },
+          // El contenido HTML ahora inyecta la clase condicional en el primer <span>
           html: `<span class="${spanClassName}">${text}</span><span class="text-muted">${hint}</span>`,
         })
       );
@@ -401,8 +327,8 @@ class View {
     input.addEventListener("change", () => {
       this.onToggle?.(item.id);
       const targetTabId = input.checked
-        ? "checklist-completed-tab"
-        : "checklist-pending-tab";
+        ? "supplieslist-ready-tab"
+        : "supplieslist-pending-tab";
       const targetEl = document.getElementById(targetTabId);
       if (targetEl) flashBackground(targetEl);
     });
@@ -426,7 +352,10 @@ class View {
         if (sanitized !== editor.value) {
           const pos = editor.selectionStart;
           editor.value = sanitized;
-          editor.selectionStart = editor.selectionEnd = Math.min(pos, editor.value.length);
+          editor.selectionStart = editor.selectionEnd = Math.min(
+            pos,
+            editor.value.length
+          );
         }
       };
 
@@ -500,9 +429,9 @@ class View {
     return li;
   }
 
-  // asegura placeholder cuando no hay completadas
-  #ensureCompletedEmptyState() {
-    const ul = this.completedList;
+  // asegura placeholder cuando no hay 'ready'
+  #ensureReadyEmptyState() {
+    const ul = this.readyList;
     if (!ul) return;
     const hasReal = [...ul.querySelectorAll("li.list-group-item[data-id]")].some(
       (li) => (li.dataset.id ?? "") !== ""
@@ -514,7 +443,7 @@ class View {
       const li = el("li", {
         className: "list-group-item p-2 d-flex align-items-start",
         attrs: { draggable: "false" },
-        html: "No tasks completed.",
+        html: "No supplies ready.",
       });
       li.dataset.id = "";
       ul.appendChild(li);
@@ -533,15 +462,15 @@ class View {
       className: "form-control",
       attrs: {
         type: "text",
-        name: "new-task",
-        placeholder: "Add new task and press Enter",
-        "aria-label": "Add new task",
+        name: "new-resource",
+        placeholder: "Add new resource and press Enter",
+        "aria-label": "Add new resource",
       },
     });
 
     const btnAdd = el("button", {
       className: "btn app-btn-add",
-      attrs: { type: "button", title: "Add new task", "aria-label": "Add new task" },
+      attrs: { type: "button", title: "Add new resource", "aria-label": "Add new resource" },
       html: `<i class="bi bi-plus-square-fill fs-3" aria-hidden="true"></i>`,
     });
 
@@ -573,24 +502,24 @@ class View {
 class Controller {
   constructor(containerEl) {
     // define y almacena el nombre del componente que controla
-    this.COMPONENT_NAME = "checklist";
+    this.COMPONENT_NAME = "supplieslist";
 
     // instancia modelo y vista
-    this.model = new Model(this.COMPONENT_NAME);
+    this.model = new Model();
     this.view = new View(containerEl);
 
     // banderas para UX de creación
     this.createInFlight = false;
     this.shouldRefocusNewEntry = false;
 
-    // render inicial
-    this.view.render(this.model.getAll());
+    // render inicial usando el nombre de componente almacenado
+    this.view.render(this.model.getAll(this.COMPONENT_NAME));
 
-    // sincroniza vista ante cambios del modelo del mismo componente
+    // sincroniza vista ante cambios de modelo del mismo componente
     this.model.addEventListener("change", (ev) => {
       const changedName = ev?.detail?.name;
       if (!changedName || changedName === this.COMPONENT_NAME) {
-        this.view.render(this.model.getAll());
+        this.view.render(this.model.getAll(this.COMPONENT_NAME));
         if (this.shouldRefocusNewEntry) {
           this.view.focusNewEntryInput();
           this.shouldRefocusNewEntry = false;
@@ -599,20 +528,20 @@ class Controller {
       }
     });
 
-    // conecta handlers de la vista
+    // conecta handlers de la vista, pasando siempre COMPONENT_NAME
     this.view.onCreate = (text) => {
       if (this.createInFlight) return;
       this.createInFlight = true;
       this.shouldRefocusNewEntry = true;
-      this.model.add(text);
+      this.model.add(this.COMPONENT_NAME, text);
     };
-    this.view.onToggle = (id) => this.model.toggle(id);
+    this.view.onToggle = (id) => this.model.toggle(this.COMPONENT_NAME, id);
     this.view.onEdit = (id, text) => {
-      if (String(text).trim() === "") this.model.remove(id);
-      else this.model.updateText(id, text);
+      if (String(text).trim() === "") this.model.remove(this.COMPONENT_NAME, id);
+      else this.model.updateText(this.COMPONENT_NAME, id, text);
     };
     this.view.onReorder = (draggedId, toIndex) => {
-      this.model.moveToIndex(draggedId, toIndex);
+      this.model.moveToIndex(this.COMPONENT_NAME, draggedId, toIndex);
     };
   }
 }
@@ -622,13 +551,13 @@ class Controller {
  * ================================ */
 
 /**
- * renderChecklist(containerEl: HTMLElement)
- * - Called by coordinator.js passing the container where everything must be created.
+ * renderSupplies list(containerEl: HTMLElement)
+ * - Called by main.js passing the container where everything must be created.
  */
-export function renderChecklist(containerEl) {
+export function renderSupplieslist(containerEl) {
   // valida el contenedor recibido
   if (!containerEl || !(containerEl instanceof HTMLElement)) {
-    console.error("[checklist] invalid container element");
+    console.error("[supplieslist] invalid container element");
     return;
   }
   // crea layout y monta controlador sobre el contenedor

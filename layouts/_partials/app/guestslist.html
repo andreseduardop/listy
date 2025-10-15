@@ -1,25 +1,25 @@
 <div class="col-12">
   <div class="app-card col">
-    <h2>tasks</h2>
-    <div id="checklist-container">
+    <h2>guests</h2>
+    <div id="guestlist-container">
     </div>
-    <ul class="nav nav-tabs nav-fill" id="checklist-tabs" role="tablist">
+    <ul class="nav nav-tabs nav-fill" id="guestlist-tabs" role="tablist">
       <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="checklist-pending-tab" data-bs-toggle="tab" data-bs-target="#checklist-pending-tab-pane" type="button" role="tab" aria-controls="checklist-pending-tab-pane" aria-selected="true" style="">Pending</button>
+        <button class="nav-link active" id="guestlist-pending-tab" data-bs-toggle="tab" data-bs-target="#guestlist-pending-tab-pane" type="button" role="tab" aria-controls="guestlist-pending-tab-pane" aria-selected="true" style="">Pending</button>
       </li>
       <li class="nav-item" role="presentation">
-        <button class="nav-link" id="checklist-completed-tab" data-bs-toggle="tab" data-bs-target="#checklist-completed-tab-pane" type="button" role="tab" aria-controls="checklist-completed-tab-pane" aria-selected="false" style="" tabindex="-1">Completed</button>
+        <button class="nav-link" id="guestlist-completed-tab" data-bs-toggle="tab" data-bs-target="#guestlist-completed-tab-pane" type="button" role="tab" aria-controls="guestlist-completed-tab-pane" aria-selected="false" style="" tabindex="-1">Confirmed</button>
       </li>
     </ul>
-    <div class="tab-content" id="checklist-tabs-content">
-      <div class="tab-pane fade active show" id="checklist-pending-tab-pane" role="tabpanel" aria-labelledby="checklist-pending-tab" tabindex="0">
-        <ul class="app-checklist type-checkbox list-group">
+    <div class="tab-content" id="guestlist-tabs-content">
+      <div class="tab-pane fade active show" id="guestlist-pending-tab-pane" role="tabpanel" aria-labelledby="guestlist-pending-tab" tabindex="0">
+        <ul class="app-guestlist type-checkbox list-group">
           <li class="list-group-item p-2 d-flex align-items-start" draggable="true" data-id="1">
             <div class="form-check position-relative d-flex align-items-top flex-grow-1">
-              <input class="form-check-input" type="checkbox" id="checklist-check-1">
-              <label class="form-check-label flex-grow-1" for="textarea-for-1">Pending task example</label>
+              <input class="form-check-input squircle" type="checkbox" id="guestlist-check-1">
+              <label class="form-check-label flex-grow-1" for="textarea-for-1">Pending guest example</label>
               <div class="d-flex flex-column ps-1 flex-grow-1 d-none" data-role="inline-panel">
-                <textarea class="form-control" data-role="inline-editor" aria-label="Edit task text" name="inline-editor" rows="1" id="textarea-for-1">
+                <textarea class="form-control" data-role="inline-editor" aria-label="Edit guest text" name="inline-editor" rows="1" id="textarea-for-1">
                 </textarea>
                 <div class="d-flex flex-column mt-2 small">
                   <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#" data-action="save">
@@ -41,10 +41,6 @@
                   <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#" data-action="ai-improve">
                     <span class="app-icono">Improve writing</span>
                     <span class="text-muted">[Shift+F9]</span>
-                  </a>
-                  <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#" data-action="ai-breakdown">
-                    <span class="app-icono">Break down task</span>
-                    <span class="text-muted">[Shift+F10]</span>
                   </a>
                 </div>
               </div>
@@ -55,22 +51,22 @@
             </button>
           </li>
           <li class="list-group-item p-2 d-flex align-items-start" data-role="new-entry" draggable="false">
-            <input class="form-control" type="text" name="new-task" placeholder="Add new task and press Enter" aria-label="Add new task">
-            <button class="btn app-btn-add" type="button" title="Add new task" aria-label="Add new task">
+            <input class="form-control" type="text" name="new-guest" placeholder="Add new guest and press Enter" aria-label="Add new guest">
+            <button class="btn app-btn-add" type="button" title="Add new guest" aria-label="Add new guest">
               <i class="bi bi-plus-square-fill fs-3" aria-hidden="true">
               </i>
             </button>
           </li>
         </ul>
       </div>
-      <div class="tab-pane fade" id="checklist-completed-tab-pane" role="tabpanel" aria-labelledby="checklist-completed-tab" tabindex="0">
-        <ul class="app-checklist type-checkbox list-group">
+      <div class="tab-pane fade" id="guestlist-completed-tab-pane" role="tabpanel" aria-labelledby="guestlist-completed-tab" tabindex="0">
+        <ul class="app-guestlist type-checkbox list-group">
           <li class="list-group-item p-2 d-flex align-items-start" draggable="true" data-id="2">
             <div class="form-check position-relative d-flex align-items-top flex-grow-1">
-              <input class="form-check-input" type="checkbox" id="checklist-check-2">
-              <label class="form-check-label flex-grow-1" for="textarea-for-2">Completed task example</label>
+              <input class="form-check-input squircle" type="checkbox" id="guestlist-check-2">
+              <label class="form-check-label flex-grow-1" for="textarea-for-2">Confirmed guest example</label>
               <div class="d-flex flex-column ps-1 flex-grow-1 d-none" data-role="inline-panel">
-                <textarea class="form-control" data-role="inline-editor" aria-label="Edit task text" name="inline-editor" rows="1" id="textarea-for-2">
+                <textarea class="form-control" data-role="inline-editor" aria-label="Edit guest text" name="inline-editor" rows="1" id="textarea-for-2">
                 </textarea>
                 <div class="d-flex flex-column mt-2 small">
                   <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#" data-action="save">
@@ -94,7 +90,7 @@
                     <span class="text-muted">[Shift+F9]</span>
                   </a>
                   <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#" data-action="ai-breakdown">
-                    <span class="app-icono">Break down task</span>
+                    <span class="app-icono">Break down guest</span>
                     <span class="text-muted">[Shift+F10]</span>
                   </a>
                 </div>
