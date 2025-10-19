@@ -349,7 +349,7 @@ svg.bi {
   // font-size: .86667rem;
   // font-family: 'Courier Prime';
   // font-weight: 700;
-  margin-top: -12px;
+  margin-top: -10px;
   margin-left: -8px;
   user-select: none;
   // border-bottom: 1px dashed $body-color;
@@ -563,4 +563,10 @@ main img {
 .app-dvh-100 {
   /*! purgecss ignore current */
   min-height: 100dvh;   /* Chrome/Edge/Safari modernos */
+}
+li[data-role="end"]:first-child {
+  display: none !important;
+}
+li[data-role="end"]:first-child+li {
+  border-top: solid 1px;
 }

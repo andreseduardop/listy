@@ -1,26 +1,28 @@
 /**
- * @fileoverview Stepslist UI module.
- * @module components/stepslist
+ * @fileoverview Shedule (activity list with times) UI module.
+ * @module components/shedule
  *
  * @description
- * Construye e inicializa una lista de pasos dentro del contenedor dado. Renderiza ítems,
- * conecta edición en línea, creación y reordenamiento drag & drop.
- * La persistencia la maneja una clase interna `Model` que delega lecturas/escrituras
- * a `core/storage.js`, guardando elementos bajo `components.<COMPONENT_NAME>.content`.
+ * Builds and initializes a schedule list inside the given container based on the
+ * `shedule.html` layout: an unordered list where each item has a time input and
+ * an inline editor for the activity text. Supports inline editing, creation, and
+ * in-list reordering via drag & drop.
+ * Persistence is delegated to `core/storage.js` under the key
+ * `components.<COMPONENT_NAME>.content`.
  *
- * Cambios vs checklist:
- * - Elimina estados Pending/Completed y la propiedad `checked` en el modelo.
- * - Elimina checkbox y `toggle()`; cambia UL→OL con clases numeradas.
- * - Actualiza IDs, nombres, clases y atributos ARIA según el layout stepslist.html.
+ * Differences vs stepslist:
+ * - Uses <ul> with classes "app-shedule type-shedule list-group" (no numbering).
+ * - Item layout adds a leading <input type="time"> block.
+ * - Renames "step" → "activity" in labels, placeholders, and ARIA attributes.
+ * - Data model includes {id, text, time}.
  *
- * @version 2.0.0
+ * @version 3.0.0
  *
  * Code style: follows the Google JavaScript Style Guide.
  * https://google.github.io/styleguide/jsguide.html
  *
- * @exports renderStepslist
+ * @exports renderShedule
  */
-
 import { el, qs, qsa, visibility, flashBackground } from "../utils/helpers.js";
 import { attachListReorder } from "../utils/drag-and-drop.js";
 import * as storage from "../core/storage.js";
@@ -30,9 +32,10 @@ import { uid } from "../utils/uid.js";
  * Model (component-scoped; delegates to storage.js)
  * ================================ */
 /**
- * @typedef {Object} StepslistItem
+ * @typedef {Object} SheduleItem
  * @property {string} id
  * @property {string} text
+ * @property {string} time  // "HH:MM"
  */
 class Model extends EventTarget {
   /**
@@ -52,14 +55,17 @@ class Model extends EventTarget {
 
   /**
    * Returns all items for this component.
-   * @return {!Array<StepslistItem>}
+   * @return {!Array<SheduleItem>}
    */
   getAll() {
-    // Comentario: lee desde storage y normaliza a arreglo de items
+    // Comentario: lee desde storage y normaliza a arreglo de items con 'time'
     const content = storage.getComponentContent(this._name);
     const arr = Array.isArray(content) ? content : [];
-    // Comentario: garantiza que no haya residuos de `checked`
-    return arr.map(({ id, text }) => ({ id, text }));
+    return arr.map(({ id, text, time }) => ({
+      id,
+      text,
+      time: typeof time === "string" && /^\d{2}:\d{2}$/.test(time) ? time : "08:30",
+    }));
   }
 
   /** @private */
@@ -67,7 +73,7 @@ class Model extends EventTarget {
     // Comentario: escribe items en storage y emite evento de cambio
     storage.setComponentContent(
       this._name,
-      nextItems.map(({ id, text }) => ({ id, text })),
+      nextItems.map(({ id, text, time }) => ({ id, text, time })),
     );
     this.dispatchEvent(
       new CustomEvent("change", {
@@ -79,14 +85,15 @@ class Model extends EventTarget {
   /**
    * Adds a new item.
    * @param {string} text
+   * @param {string=} time
    * @return {void}
    */
-  add(text) {
-    // Comentario: agrega item si el texto no está vacío
+  add(text, time = "08:30") {
+    // Comentario: agrega item si el texto no está vacío; fija hora por defecto si no se indica
     const t = String(text || "").trim();
     if (!t) return;
     const items = this.getAll();
-    items.push({ id: uid(), text: t });
+    items.push({ id: uid(), text: t, time });
     this._write(items);
   }
 
@@ -101,6 +108,20 @@ class Model extends EventTarget {
     const t = String(text || "").trim();
     if (!t) return this.remove(id);
     const items = this.getAll().map((i) => (i.id === id ? { ...i, text: t } : i));
+    this._write(items);
+  }
+
+  /**
+   * Updates the time of an item.
+   * @param {string} id
+   * @param {string} time
+   * @return {void}
+   */
+  updateTime(id, time) {
+    // Comentario: actualiza la hora (HH:MM) si es válida
+    const hhmm = String(time || "");
+    if (!/^\d{2}:\d{2}$/.test(hhmm)) return;
+    const items = this.getAll().map((i) => (i.id === id ? { ...i, time: hhmm } : i));
     this._write(items);
   }
 
@@ -146,18 +167,18 @@ class Model extends EventTarget {
  * View (builds full layout inside container)
  * ================================ */
 class View {
-  // selectores reutilizables
+  // Comentario: selectores reutilizables
   static SEL = {
-    // Incluye list-group-numbered para coincidir exactamente con el layout
-    list: "ol.app-stepslist.type-stepslist.list-group.list-group-numbered",
+    list: "ul.app-shedule.type-shedule.list-group",
     item: "li.list-group-item",
     newEntry: "li[data-role='new-entry']",
     newEntryInput: "li[data-role='new-entry'] input[type='text']",
     label: "label.form-label",
+    time: "input[type='time']",
     btnAdd: "button.app-btn-add",
   };
 
-  // crea todo el layout y devuelve referencias clave
+  // Comentario: crea el layout y devuelve referencias clave
   static buildLayout(containerEl) {
     // Comentario: limpia contenedor destino
     containerEl.innerHTML = "";
@@ -166,32 +187,23 @@ class View {
     const col = el("div", { className: "col-12" });
     const card = el("div", { className: "app-card col" });
 
-    // Comentario: título directamente dentro de .app-card (sin wrappers extra)
-    const h2 = el("h2", { html: "steps" });
+    // Comentario: título
+    const h2 = el("h2", { html: "shedule" });
 
-    // Comentario: raíz lógica de stepslist
-    const stepsRoot = el("div", { attrs: { id: "stepslist-container" } });
+    // Comentario: raíz del componente
+    const root = el("div", { attrs: { id: "shedule-container" } });
 
-    // Comentario: única lista ordenada con numeración
-    const ol = el("ol", {
-      className:
-        "app-stepslist type-stepslist list-group list-group-numbered",
+    // Comentario: lista UL principal
+    const ul = el("ul", {
+      className: "app-shedule type-shedule list-group",
     });
 
-    stepsRoot.append(ol);
-
-    const headerWrap = el("div", { className: "d-flex flex-column w-100" });
-    const cardHeader = el("div", {
-      className: "d-flex align-items-center justify-content-between mb-2",
-    });
-    cardHeader.append(h2);
-    headerWrap.append(cardHeader);
-
-    card.append(h2, stepsRoot);
+    root.append(ul);
+    card.append(h2, root);
     col.append(card);
     containerEl.append(col);
 
-    return { root: stepsRoot, listEl: ol };
+    return { root, listEl: ul };
   }
 
   /**
@@ -209,7 +221,7 @@ class View {
 
   /**
    * Renderiza la lista completa.
-   * @param {!Array<StepslistItem>} items
+   * @param {!Array<SheduleItem>} items
    * @return {void}
    */
   render(items) {
@@ -218,7 +230,7 @@ class View {
     this.#initDnD(); // Comentario: activa DnD tras render
   }
 
-  // inicializa drag & drop en la lista única
+  // Comentario: inicializa drag & drop en la lista
   #initDnD() {
     // Comentario: destruye instancias previas
     this._dndHandles.forEach((h) => {
@@ -240,15 +252,15 @@ class View {
     this._dndHandles.push(attachListReorder(this.listEl, common));
   }
 
-  // renderiza una OL completa
-  #renderList(ol, data, { withNewEntry }) {
+  // Comentario: renderiza una UL completa
+  #renderList(ul, data, { withNewEntry }) {
     const frag = document.createDocumentFragment();
     data.forEach((item) => frag.appendChild(this.#renderItem(item)));
     if (withNewEntry) frag.appendChild(this.#renderNewItemEntry());
-    ol.appendChild(frag);
+    ul.appendChild(frag);
   }
 
-  // crea <li> por item
+  // Comentario: crea <li> por item
   #renderItem(item) {
     const li = el("li", {
       className: "list-group-item p-2 d-flex align-items-start",
@@ -256,8 +268,26 @@ class View {
     });
     li.dataset.id = item.id;
 
-    const wrapper = el("div", {
-      className: "position-relative d-flex align-items-top flex-grow-1",
+    // Comentario: columna que contiene el time y el editor
+    const column = el("div", {
+      className: "d-flex flex-column flex-grow-1",
+    });
+
+    // Comentario: fila de hora
+    const timeWrap = el("div", { className: "mb-1" });
+    const timeInput = el("input", {
+      className: "form-control form-control-plaintext fw-bold p-0",
+      attrs: {
+        type: "time",
+        "aria-label": "Activity time",
+        value: item.time || "08:30",
+      },
+    });
+    timeWrap.append(timeInput);
+
+    // Comentario: fila con label + panel de edición (ms-2 para margen)
+    const textWrap = el("div", {
+      className: "position-relative d-flex align-items-top ms-2",
     });
 
     const label = el("label", {
@@ -266,23 +296,21 @@ class View {
     });
     label.textContent = item.text;
 
-    // Panel inline: sin data-role (mantiene solo clases visuales)
-    const panel = el("div", {
-      className: "d-flex flex-column ps-1 flex-grow-1 d-none",
-    });
+    // Comentario: panel inline inicialmente oculto
+    const panel = el("div", { className: "d-flex flex-column ps-1 flex-grow-1 d-none" });
 
-    // Textarea: aria-label "Edit step"; elimina name para coincidir con el layout
+    // Comentario: editor con ARIA para actividad
     const editor = el("textarea", {
       className: "form-control",
       attrs: {
-        "data-role": "inline-editor", // permitido en textarea
-        "aria-label": "Edit step",
+        "data-role": "inline-editor",
+        "aria-label": "Edit activity",
         rows: "1",
         id: `textarea-for-${item.id}`,
       },
     });
 
-    // Comentario: acciones (texto 'Break down step' actualizado)
+    // Comentario: acciones (texto 'Break down activity')
     const actions = el("div", { className: "d-flex flex-column mt-2 small" });
     const actionDefs = [
       ["save", "Save", "[Enter]"],
@@ -290,7 +318,7 @@ class View {
       ["delete", "Delete", "[Shift+Del]"],
       ["ai-spelling", "Fix spelling", "[Shift+F8]", true],
       ["ai-improve", "Improve writing", "[Shift+F9]", true],
-      ["ai-breakdown", "Break down step", "[Shift+F10]", true],
+      ["ai-breakdown", "Break down activity", "[Shift+F10]", true],
     ];
 
     actionDefs.forEach(([key, text, hint, icono = false]) => {
@@ -307,7 +335,7 @@ class View {
     });
 
     panel.append(editor, actions);
-    wrapper.append(label, panel);
+    textWrap.append(label, panel);
 
     const btnMove = el("button", {
       className: "btn app-btn-move",
@@ -322,17 +350,25 @@ class View {
       html: `<i class="bi bi-arrow-down-up" aria-hidden="true"></i>`,
     });
 
-    li.append(wrapper, btnMove);
+    column.append(timeWrap, textWrap);
+    li.append(column, btnMove);
 
-    // Comentario: listeners del item (solo edición inline)
+    // Comentario: listeners de interacción
+    // - Cambios de hora
+    timeInput.addEventListener("change", () => {
+      const next = String(timeInput.value || "").slice(0, 5);
+      this.onTimeChange?.(item.id, next);
+      // Comentario: realza el item al actualizar hora
+      flashBackground(li);
+    });
+
+    // - Edición inline del texto
     label.addEventListener("click", () => {
       // Comentario: prepara edición inline
       const currentText = label.textContent.trim();
       visibility.hide(label);
       visibility.show(panel, "d-flex");
-      // Comentario: el contenido por defecto en el HTML de ejemplo es "Editing step",
-      // aquí se carga el texto actual; si se desea un valor por defecto, se podría usar "Editing step".
-      editor.value = currentText || "Editing step";
+      editor.value = currentText || "Editing activity";
 
       // Comentario: auto-resize
       const autoresize = () => {
@@ -423,7 +459,7 @@ class View {
     return li;
   }
 
-  // crea fila de nueva entrada
+  // Comentario: crea fila de nueva entrada
   #renderNewItemEntry() {
     const li = el("li", {
       className: "list-group-item p-2 d-flex align-items-start",
@@ -436,10 +472,10 @@ class View {
       className: "form-control",
       attrs: {
         type: "text",
-        name: "Add new step",
-        placeholder: "Add new step and press Enter",
-        "aria-label": "Add new step",
-        enterkeyhint:"enter",
+        name: "Add new activity",
+        placeholder: "Add new activity and press Enter",
+        "aria-label": "Add new activity",
+        enterkeyhint: "enter",
       },
     });
 
@@ -447,8 +483,8 @@ class View {
       className: "btn app-btn-add",
       attrs: {
         type: "button",
-        title: "Add new step",
-        "aria-label": "Add new step",
+        title: "Add new activity",
+        "aria-label": "Add new activity",
       },
       html: `<i class="bi bi-plus-square-fill fs-3" aria-hidden="true"></i>`,
     });
@@ -471,7 +507,7 @@ class View {
     return li;
   }
 
-  // API para enfocar input nuevo
+  // Comentario: API para enfocar el input de nueva entrada
   focusNewEntryInput() {
     const entry = qs(this.listEl, View.SEL.newEntryInput);
     if (entry) entry.focus({ preventScroll: true });
@@ -487,7 +523,7 @@ class Controller {
    */
   constructor(containerEl) {
     // Comentario: define y almacena el nombre del componente que controla
-    this.COMPONENT_NAME = "stepslist";
+    this.COMPONENT_NAME = "shedule";
 
     // Comentario: instancia modelo y vista
     this.model = new Model(this.COMPONENT_NAME);
@@ -520,10 +556,12 @@ class Controller {
       this.shouldRefocusNewEntry = true;
       this.model.add(text);
     };
-    // Comentario: onToggle eliminado (no hay estados)
     this.view.onEdit = (id, text) => {
       if (String(text).trim() === "") this.model.remove(id);
       else this.model.updateText(id, text);
+    };
+    this.view.onTimeChange = (id, time) => {
+      this.model.updateTime(id, time);
     };
     this.view.onReorder = (draggedId, toIndex) => {
       this.model.moveToIndex(draggedId, toIndex);
@@ -536,18 +574,20 @@ class Controller {
  * ================================ */
 
 /**
- * renderStepslist(containerEl: HTMLElement)
- * - Called by coordinator.js passing the container where everything must be created.
- * - Reemplaza al antiguo renderChecklist.
+ * renderShedule(containerEl: HTMLElement)
+ * - Called by main.js passing the container where everything must be created.
  * @param {!HTMLElement} containerEl
  * @return {void}
  */
-export function renderStepslist(containerEl) {
+export function renderShedule(containerEl) {
   // Comentario: valida el contenedor recibido
   if (!containerEl || !(containerEl instanceof HTMLElement)) {
-    console.error("[stepslist] invalid container element");
+    console.error("[shedule] invalid container element");
     return;
   }
   // Comentario: crea layout y monta controlador sobre el contenedor
   new Controller(containerEl);
 }
+
+// Comentario: export opcional de compatibilidad, por si algún código antiguo lo invoca
+export const renderSchedule = renderShedule;
