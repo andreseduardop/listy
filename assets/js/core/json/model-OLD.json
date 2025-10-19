@@ -20,6 +20,41 @@
       "content": {}
     },
     {
+      "name": "dashboard",
+      "title": "Dashboard",
+      "position": 3,
+      "state": "unmounted",
+      "content": {}
+    },
+    {
+      "name": "detaileddescription",
+      "title": "Detailed Description",
+      "position": 4,
+      "state": "unmounted",
+      "content": {}
+    },
+    {
+      "name": "notes",
+      "title": "Notes",
+      "position": 5,
+      "state": "unmounted",
+      "content": []
+    },
+    {
+      "name": "countdown",
+      "title": "Countdown",
+      "position": 6,
+      "state": "unmounted",
+      "content": {}
+    },
+    {
+      "name": "timeline",
+      "title": "Project Timeline",
+      "position": 7,
+      "state": "unmounted",
+      "content": []
+    },
+    {
       "name": "schedule",
       "title": "Schedule",
       "position": 8,
@@ -44,6 +79,13 @@
       "name": "teamlist",
       "title": "Team & Roles",
       "position": 11,
+      "state": "unmounted",
+      "content": []
+    },
+    {
+      "name": "coststracker",
+      "title": "Costs",
+      "position": 12,
       "state": "unmounted",
       "content": []
     },

@@ -2,7 +2,7 @@
 date: 2025-10-12
 title: tester
 layout: tester
-draft: true
+draft: false
 description: "tester"
 
 ---

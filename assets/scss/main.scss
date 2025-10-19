@@ -378,7 +378,9 @@ svg.bi {
   border-radius: 0px;
   transition-duration: .8s;
 }
-
+input[type="time"] {
+  width: auto;
+}
 // List item
 /* Resaltado cuando el mouse pase por encima */
 .app-checklist li:hover, 
@@ -549,6 +551,13 @@ main img {
 .app-guide-bottom {
   box-shadow: inset 0 -3px 0 $body-color-subtle-5;
   // border-bottom-color: $body-color-subtle-5;
+}
+/* Esto apunta al ícono de reloj/calendario nativo en navegadores WebKit 
+  (Chrome, Safari, Edge, Opera) y lo oculta.
+*/
+.no-time-icon::-webkit-calendar-picker-indicator {
+  display: none;
+  -webkit-appearance: none; /* Para compatibilidad con versiones antiguas */
 }
 /*! purgecss end ignore */
 .app-dvh-100 {
