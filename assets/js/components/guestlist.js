@@ -320,7 +320,7 @@ class View {
   // Comentario: crea <li> por item
   #renderItem(item) {
     const li = el("li", {
-      className: "list-group-item p-2 d-flex align-items-start",
+      className: "list-group-item p-2 d-flex align-items-center",
       attrs: { draggable: "true" },
     });
     li.dataset.id = item.id;
@@ -511,7 +511,7 @@ class View {
     if (hasReal && currentPh) currentPh.remove();
     if (!hasReal && !currentPh) {
       const li = el("li", {
-        className: "list-group-item p-2 d-flex align-items-start",
+        className: "list-group-item p-2 d-flex align-items-center",
         attrs: { draggable: "false" },
         html: "No guests confirmed.",
       });
@@ -523,7 +523,7 @@ class View {
   // Comentario: crea fila de nueva entrada
   #renderNewItemEntry() {
     const li = el("li", {
-      className: "list-group-item p-2 d-flex align-items-start",
+      className: "list-group-item p-2 d-flex align-items-center",
     });
     li.dataset.role = "new-entry";
     li.draggable = false;

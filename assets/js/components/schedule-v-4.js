@@ -16,9 +16,6 @@
  *   3) If the moved item was the FIRST before DnD, the activity that was SECOND before DnD
  *      takes the old first activity's start time. (Anchor rule.)
  * - END item remains non-draggable, no actions panel, and has editable time.
- * - **v3.6.0**: When a user manually edits the time of any activity or END, activities are
- *   re-sorted by the new times and persisted. END is enforced to be at least 15 minutes
- *   after the last activity; if not, it is automatically adjusted.
  *
  * Persistence is delegated to `core/storage.js` under the key
  * `components.<COMPONENT_NAME>.content`.
@@ -29,7 +26,7 @@
  * - Renames "step" → "activity" in labels, placeholders, and ARIA attributes.
  * - Data model includes {id, text, time}. A special item id "__END__" is reserved for END.
  *
- * @version 3.6.0
+ * @version 3.5.0
  *
  * Code style: follows the Google JavaScript Style Guide.
  * https://google.github.io/styleguide/jsguide.html
@@ -46,8 +43,6 @@ import { uid } from "../utils/uid.js";
  * ================================ */
 // Comentario: define el id reservado para el ítem final "End"
 const END_ID = "__END__";
-// Comentario: define el margen mínimo obligatorio entre la última actividad y END
-const MIN_GAP_MINUTES = 15;
 
 /* ================================
  * Utilidades de tiempo
@@ -212,6 +207,7 @@ class Model extends EventTarget {
     this._write(next);
   }
 
+
   /**
    * Actualiza el texto (END no puede quedar vacío).
    * @param {string} id
@@ -235,72 +231,17 @@ class Model extends EventTarget {
   }
 
   /**
-   * Ordena actividades por hora ascendente de forma estable.
-   * @param {!Array<ScheduleItem>} activities
-   * @return {!Array<ScheduleItem>}
-   */
-  static _stableSortByTime(activities) {
-    // Comentario: implementa orden estable usando índice original como desempate
-    const withIndex = activities.map((it, idx) => ({ it, idx }));
-    withIndex.sort((a, b) => {
-      const ta = toMinutes(a.it.time);
-      const tb = toMinutes(b.it.time);
-      if (ta !== tb) return ta - tb;
-      return a.idx - b.idx;
-    });
-    return withIndex.map(({ it }) => it);
-  }
-
-  /**
-   * Asegura que END sea al menos MIN_GAP_MINUTES después de la última actividad.
-   * @param {string} endTime
-   * @param {!Array<ScheduleItem>} activitiesSorted
-   * @return {string}
-   */
-  static _enforceEndAfterLast(endTime, activitiesSorted) {
-    // Comentario: si no hay actividades, retorna la hora de END sin cambios
-    if (!activitiesSorted.length) return endTime;
-    const lastStart = activitiesSorted[activitiesSorted.length - 1].time;
-    // Comentario: calcula la diferencia hacia adelante y corrige si es insuficiente
-    const gap = diffForward(lastStart, endTime);
-    if (gap < MIN_GAP_MINUTES) return addMinutes(lastStart, MIN_GAP_MINUTES);
-    return endTime;
-  }
-
-  /**
-   * Actualiza la hora (END inclusive) con reordenamiento por horario y ajuste de END.
-   * - Reordena actividades por su hora ascendente cada vez que el usuario edita un time.
-   * - END no puede quedar igual o por debajo de la última actividad; si ocurre, se recalcula
-   *   a +15 minutos desde la última actividad.
-   * - Persiste el nuevo orden.
+   * Actualiza la hora (END inclusive).
    * @param {string} id
    * @param {string} time
    * @return {void}
    */
   updateTime(id, time) {
-    // Comentario: valida HH:MM y normaliza el valor
+    // Comentario: valida HH:MM y persiste
     const hhmm = String(time || "");
     if (!/^\d{2}:\d{2}$/.test(hhmm)) return;
-
-    // Comentario: aplica el cambio de hora al item objetivo
-    const current = this.getAll();
-    const mapped = current.map((i) => (i.id === id ? { ...i, time: hhmm } : i));
-
-    // Comentario: separa actividades y END
-    const end = mapped.find((i) => i.id === END_ID) || null;
-    const activities = mapped.filter((i) => i.id !== END_ID);
-
-    // Comentario: ordena actividades por la nueva hora
-    const sorted = Model._stableSortByTime(activities);
-
-    // Comentario: ajusta END para que esté al menos +15 minutos de la última actividad
-    const nextEndTime = Model._enforceEndAfterLast(end?.time || "23:59", sorted);
-    const endFinal = end
-      ? { ...end, time: nextEndTime }
-      : /** @type {ScheduleItem} */ ({ id: END_ID, text: "End", time: nextEndTime });
-
-    // Comentario: escribe el nuevo orden y END ajustado
-    this._write([...sorted, endFinal]);
+    const items = this.getAll().map((i) => (i.id === id ? { ...i, time: hhmm } : i));
+    this._write(items);
   }
 
   /**
@@ -526,7 +467,7 @@ class View {
 
     // Comentario: fila con label + panel de edición (ms-2 para margen)
     const textWrap = el("div", {
-      className: "position-relative d-flex align-items-top ms-4",
+      className: "position-relative d-flex align-items-top ms-2",
     });
 
     const label = el("label", {
@@ -725,7 +666,7 @@ class View {
     timeWrap.append(timeInput);
 
     const textWrap = el("div", {
-      className: "position-relative d-flex align-items-top ms-4",
+      className: "position-relative d-flex align-items-top ms-2",
     });
 
     const label = el("label", {
@@ -801,9 +742,6 @@ class View {
       };
 
       const onKeyDown = (ke) => {
-        if (ke.key === "Enter") {
-          ke.preventDefault();
-        }
         if (ke.key === "Enter") {
           ke.preventDefault();
           finalize("commit");
@@ -937,7 +875,6 @@ class Controller {
       }
     };
     this.view.onTimeChange = (id, time) => {
-      // Comentario: ahora updateTime también reordena y ajusta END
       this.model.updateTime(id, time);
     };
     this.view.onReorder = (draggedId, toIndex) => {
