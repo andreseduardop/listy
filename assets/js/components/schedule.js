@@ -1,10 +1,10 @@
 /**
- * @fileoverview Shedule (activity list with times) UI module.
- * @module components/shedule
+ * @fileoverview Schedule (activity list with times) UI module.
+ * @module components/schedule
  *
  * @description
  * Builds and initializes a schedule list inside the given container based on the
- * `shedule.html` layout: an unordered list where each item has a time input and
+ * `schedule.html` layout: an unordered list where each item has a time input and
  * an inline editor for the activity text. Supports inline editing, creation, and
  * in-list reordering via drag & drop.
  *
@@ -21,17 +21,17 @@
  * `components.<COMPONENT_NAME>.content`.
  *
  * Differences vs stepslist:
- * - Uses <ul> with classes "app-shedule type-shedule list-group" (no numbering).
+ * - Uses <ul> with classes "app-schedule type-schedule list-group" (no numbering).
  * - Item layout adds a leading <input type="time"> block.
  * - Renames "step" → "activity" in labels, placeholders, and ARIA attributes.
  * - Data model includes {id, text, time}. A special item id "__END__" is reserved for END.
  *
- * @version 3.4.0
+ * @version 3.5.0
  *
  * Code style: follows the Google JavaScript Style Guide.
  * https://google.github.io/styleguide/jsguide.html
  *
- * @exports renderShedule
+ * @exports renderSchedule
  */
 import { el, qs, visibility, flashBackground } from "../utils/helpers.js";
 import { attachListReorder } from "../utils/drag-and-drop.js";
@@ -102,7 +102,7 @@ function addMinutes(hhmm, minutes) {
  * Model (component-scoped; delegates to storage.js)
  * ================================ */
 /**
- * @typedef {Object} SheduleItem
+ * @typedef {Object} ScheduleItem
  * @property {string} id
  * @property {string} text
  * @property {string} time  // "HH:MM"
@@ -119,16 +119,16 @@ class Model extends EventTarget {
 
   /**
    * Lee items desde storage, normaliza y retorna actividades (END opcional al final).
-   * @return {!Array<SheduleItem>}
+   * @return {!Array<ScheduleItem>}
    */
   getAll() {
     // Comentario: obtiene contenido crudo
     const content = storage.getComponentContent(this._name);
     const arr = Array.isArray(content) ? content : [];
 
-    /** @type {!Array<SheduleItem>} */
+    /** @type {!Array<ScheduleItem>} */
     const normal = [];
-    /** @type {SheduleItem|null} */
+    /** @type {ScheduleItem|null} */
     let endItem = null;
 
     for (const it of arr) {
@@ -311,7 +311,7 @@ class Model extends EventTarget {
     }
 
     // Comentario: recalcula tiempos a partir del ancla y las duraciones previas
-    /** @type {!Array<SheduleItem>} */
+    /** @type {!Array<ScheduleItem>} */
     const reflowedActivities = [];
     let currentStart = anchorTime;
 
@@ -329,7 +329,7 @@ class Model extends EventTarget {
     const endAfter =
       endBefore != null
         ? { ...endBefore, time: currentStart }
-        : /** @type {SheduleItem} */ ({ id: END_ID, text: "End", time: currentStart });
+        : /** @type {ScheduleItem} */ ({ id: END_ID, text: "End", time: currentStart });
 
     // Comentario: escribe nuevo estado (actividades reordenadas + END)
     this._write([...reflowedActivities, endAfter]);
@@ -342,7 +342,7 @@ class Model extends EventTarget {
 class View {
   // Comentario: selectores reutilizables
   static SEL = {
-    list: "ul.app-shedule.type-shedule.list-group",
+    list: "ul.app-schedule.type-schedule.list-group",
     item: "li.list-group-item",
     endItem: "li[data-role='end']",
     newEntry: "li[data-role='new-entry']",
@@ -362,14 +362,14 @@ class View {
     const card = el("div", { className: "app-card col" });
 
     // Comentario: título
-    const h2 = el("h2", { html: "shedule" });
+    const h2 = el("h2", { html: "schedule" });
 
     // Comentario: raíz del componente
-    const root = el("div", { attrs: { id: "shedule-container" } });
+    const root = el("div", { attrs: { id: "schedule-container" } });
 
     // Comentario: lista UL principal
     const ul = el("ul", {
-      className: "app-shedule type-shedule list-group",
+      className: "app-schedule type-schedule list-group",
     });
 
     root.append(ul);
@@ -395,7 +395,7 @@ class View {
 
   /**
    * Renderiza la lista completa con orden: actividades → END (si existe) → nueva entrada.
-   * @param {!Array<SheduleItem>} items
+   * @param {!Array<ScheduleItem>} items
    * @return {void}
    */
   render(items) {
@@ -644,7 +644,7 @@ class View {
   // Comentario: crea fila especial "End" no arrastrable ni movible, sin acciones, con <input type="time">
   #renderEndItem(item) {
     const li = el("li", {
-      className: "list-group-item p-2 d-flex align-items-start bg-light-subtle",
+      className: "list-group-item p-2 d-flex align-items-start",
       attrs: { draggable: "false" },
     });
     li.dataset.role = "end";
@@ -670,7 +670,7 @@ class View {
     });
 
     const label = el("label", {
-      className: "form-label flex-grow-1 mb-0 fw-semibold",
+      className: "form-label flex-grow-1 mb-0",
       attrs: { for: `textarea-for-${item.id}` },
     });
     label.textContent = item.text || "End";
@@ -834,7 +834,7 @@ class Controller {
    */
   constructor(containerEl) {
     // Comentario: define y almacena el nombre del componente que controla
-    this.COMPONENT_NAME = "shedule";
+    this.COMPONENT_NAME = "schedule";
 
     // Comentario: instancia modelo y vista
     this.model = new Model(this.COMPONENT_NAME);
@@ -889,20 +889,17 @@ class Controller {
  * ================================ */
 
 /**
- * renderShedule(containerEl: HTMLElement)
+ * renderSchedule(containerEl: HTMLElement)
  * - Called by main.js passing the container where everything must be created.
  * @param {!HTMLElement} containerEl
  * @return {void}
  */
-export function renderShedule(containerEl) {
+export function renderSchedule(containerEl) {
   // Comentario: valida el contenedor recibido
   if (!containerEl || !(containerEl instanceof HTMLElement)) {
-    console.error("[shedule] invalid container element");
+    console.error("[schedule] invalid container element");
     return;
   }
   // Comentario: crea layout y monta controlador sobre el contenedor
   new Controller(containerEl);
 }
-
-// Comentario: export opcional de compatibilidad, por si algún código antiguo lo invoca
-export const renderSchedule = renderShedule;

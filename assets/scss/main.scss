@@ -371,7 +371,7 @@ svg.bi {
 }
 // SIDEBAR (end)
 
-// APP CHECKLIST (start)
+// APP (start)
 // Checklists
 .type-checkbox {
   background-color: transparent;
@@ -383,12 +383,13 @@ input[type="time"] {
 }
 // List item
 /* Resaltado cuando el mouse pase por encima */
-.app-checklist li:hover, 
-.app-stepslist li:hover  {
+ul li:not(:last-child):hover,
+ol li:not(:last-child):hover  {
   background-color: $highlight-subtle;
   & div,
   & button,
   & i,
+  & input,
   & label,
   & a, 
   & span {
@@ -396,7 +397,7 @@ input[type="time"] {
   }
 }
 // Resaltado cuando checked
-.type-checkbox li:has(input[type="checkbox"]:checked) {
+ul li:has(input[type="checkbox"]:checked) {
   background-color: $app-bg;
   & div,
   & button,
@@ -460,9 +461,16 @@ input.squircle[type="checkbox"] {
 .type-checkbox input[type="text"] {
   align-content: center;
 }
-// Stepslist
+// Stepslist component
 .type-stepslist li::before {
   min-width: 1.5em;
+}
+// Shedule component
+li[data-role="end"]:first-child {
+  display: none !important;
+}
+li[data-role="end"]:first-child+li {
+  border-top: solid 1px;
 }
 // Buttons
 // Edit 
