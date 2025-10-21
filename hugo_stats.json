@@ -149,6 +149,7 @@
       "mb-3",
       "me-2",
       "me-auto",
+      "min-vh-100",
       "ms-2",
       "ms-auto",
       "mt-0",
