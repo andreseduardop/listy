@@ -253,17 +253,16 @@ class View {
     const headerWrap = el("div", { className: "d-flex flex-column w-100" });
     headerWrap.append(cardHeader, tabs, tabContent);
 
-    card.append(checklistRoot, headerWrap);
+    card.append(headerWrap);
     col.append(card);
     containerEl.append(col);
 
-    return { root: checklistRoot, ulPending: ulPend, ulCompleted: ulComp };
+    return { ulPending: ulPend, ulCompleted: ulComp };
   }
 
   constructor(containerEl) {
     // construye layout y guarda refs de listas
-    const { root, ulPending, ulCompleted } = View.buildLayout(containerEl);
-    this.root = root;
+    const { ulPending, ulCompleted } = View.buildLayout(containerEl);
     this.pendingList = ulPending;
     this.completedList = ulCompleted;
 
@@ -320,7 +319,7 @@ class View {
   // crea <li> por item
   #renderItem(item) {
     const li = el("li", {
-      className: "list-group-item p-2 d-flex align-items-center",
+      className: "list-group-item p-2 d-flex align-items-start",
       attrs: { draggable: "true" },
     });
     li.dataset.id = item.id;
@@ -336,7 +335,7 @@ class View {
     input.checked = !!item.checked;
 
     const label = el("label", {
-      className: "form-check-label flex-grow-1",
+      className: "form-check-label me-auto",
       attrs: { for: `textarea-for-${item.id}` },
     });
     label.textContent = item.text;
@@ -512,7 +511,7 @@ class View {
     if (hasReal && currentPh) currentPh.remove();
     if (!hasReal && !currentPh) {
       const li = el("li", {
-        className: "list-group-item p-2 d-flex align-items-center",
+        className: "list-group-item p-2 d-flex align-items-start",
         attrs: { draggable: "false" },
         html: "No tasks completed.",
       });
@@ -524,7 +523,7 @@ class View {
   // crea fila de nueva entrada
   #renderNewItemEntry() {
     const li = el("li", {
-      className: "list-group-item p-2 d-flex align-items-center",
+      className: "list-group-item p-2 d-flex align-items-star",
     });
     li.dataset.role = "new-entry";
     li.draggable = false;
@@ -534,7 +533,7 @@ class View {
       attrs: {
         type: "text",
         name: "new-task",
-        placeholder: "Add new task and press Enter",
+        placeholder: "Add task [Enter]",
         "aria-label": "Add new task",
         enterkeyhint:"enter",
       },

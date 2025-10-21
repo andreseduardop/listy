@@ -336,7 +336,7 @@ class View {
     input.checked = !!item.checked;
 
     const label = el("label", {
-      className: "form-check-label flex-grow-1",
+      className: "form-check-label me-auto",
       attrs: { for: `textarea-for-${item.id}` },
     });
     label.textContent = item.text;
@@ -533,7 +533,7 @@ class View {
       attrs: {
         type: "text",
         name: "new-guest",
-        placeholder: "Add guest and press Enter",
+        placeholder: "Add guest [Enter]",
         "aria-label": "Add guest",
         enterkeyhint:"enter",
       },

@@ -8,7 +8,7 @@
 
 
 // $body-color:      #5054ef;
-$font-size-root:    14px;
+$font-size-root:    15px;
 $font-size-base:  1rem;
 $h1-font-size:  1.5rem;
 $h2-font-size:  $font-size-base * 1.4;
@@ -17,7 +17,7 @@ $h4-font-size:  $font-size-base * 1.2;
 $h5-font-size:  $font-size-base * 1.1;
 $h6-font-size:  $font-size-base;
 $headings-font-family:    "Space Mono",  system-ui, sans-serif;
-$font-family-sans-serif:  "Geist Mono", Roboto, Helvetica, Arial, sans-serif;
+$font-family-sans-serif:  "Space Mono", Roboto, Helvetica, Arial, sans-serif;
 // Fuentes disponibles: 
 // Miracode
 // Courier Prime
@@ -333,7 +333,7 @@ svg.bi {
 //   font-weight: 400;
 // }
 
-// CARD (start)
+// COMPONENT CONTAINER (start)
 .app-card {
   border: 1px solid $body-color;
   // border-radius: 4px;
@@ -360,7 +360,7 @@ svg.bi {
   font-family: 'Geist Mono' !important;
   font-weight: 400;
 }
-// CARD (end)
+// COMPONENT CONTAINER (end)
 
 // SIDEBAR (start)
 .offcanvas-start {
@@ -372,19 +372,11 @@ svg.bi {
 // SIDEBAR (end)
 
 // APP (start)
-// Checklists
-.type-checkbox {
-  background-color: transparent;
-  border-radius: 0px;
-  transition-duration: .8s;
-}
-input[type="time"] {
-  width: auto;
-}
-// List item
+// Ajustes generales
 /* Resaltado cuando el mouse pase por encima */
 ul li:not(:last-child):hover,
-ol li:not(:last-child):hover  {
+ol li:not(:last-child):hover, 
+.type-checkbox .card:hover {
   background-color: $highlight-subtle;
   & div,
   & button,
@@ -396,8 +388,21 @@ ol li:not(:last-child):hover  {
     background-color: $highlight-subtle;
   }
 }
+// Cursor pointer
+ul label,
+ol label,
+.type-checkbox .card label {
+  cursor: text;
+}
+// Checklists
+.type-checkbox {
+  background-color: transparent;
+  border-radius: 0px;
+  transition-duration: .8s;
+}
 // Resaltado cuando checked
-ul li:has(input[type="checkbox"]:checked) {
+.type-checkbox li:has(input[type="checkbox"]:checked),
+.type-checkbox .card:has(input[type="checkbox"]:checked) {
   background-color: $app-bg;
   & div,
   & button,
@@ -443,7 +448,6 @@ input.squircle[type="checkbox"] {
 }
 // Label
 .type-checkbox input[type="checkbox"] + label {
-  cursor: default;
   padding-left: 8px;
   padding-top: 1.5px;
 }
@@ -466,11 +470,67 @@ input.squircle[type="checkbox"] {
   min-width: 1.5em;
 }
 // Shedule component
+input[type="time"] {
+  width: auto;
+}
 li[data-role="end"]:first-child {
   display: none !important;
 }
 li[data-role="end"]:first-child+li {
   border-top: solid 1px;
+}
+// Supplies component
+.type-supplies .card {
+  border: none;
+  box-shadow: none;
+  border-radius: 0px;
+}
+.type-supplies .card-body {
+  align-items: center;
+  // aspect-ratio: 2 / 1;
+  border-color: $body-color;
+  // border-radius: .375em;
+  border: 1px solid $body-color;
+  box-shadow: none;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  // align-content: center;
+  // justify-content: center;
+};
+.type-supplies .card input[type="checkbox"] {
+  height: 1.3em;
+  width: 1.3em;
+}
+.type-supplies .card label {
+  // text-wrap: anywhere;
+  word-break: break-word;
+}
+// Supplies component
+.type-team .card {
+  border: none;
+  box-shadow: none;
+  border-radius: 0px;
+}
+.type-team .card-body {
+  align-items: center;
+  aspect-ratio: 1 / 1;
+  border-color: $body-color;
+  border-radius: .5em;
+  border: 1px solid $body-color;
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  // align-content: center;
+  justify-content: space-evenly;
+};
+.type-team .card i::before {
+  font-size: 50px;
+}
+.type-team .card label {
+  // text-wrap: anywhere;
+  word-break: break-word;
 }
 // Buttons
 // Edit 
@@ -493,6 +553,7 @@ button.app-btn-move {
 button.app-btn-move:active {
   cursor: grabbing !important; 
 }
+.card:hover .app-btn-move,
 li:hover .app-btn-move {
   visibility: visible;
 }
@@ -571,10 +632,4 @@ main img {
 .app-dvh-100 {
   /*! purgecss ignore current */
   min-height: 100dvh;   /* Chrome/Edge/Safari modernos */
-}
-li[data-role="end"]:first-child {
-  display: none !important;
-}
-li[data-role="end"]:first-child+li {
-  border-top: solid 1px;
 }

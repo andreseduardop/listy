@@ -17,11 +17,12 @@
         <div class="row g-4">
           <div class="col-12 col-lg-6">
             <div class="row g-4">
+              {{ partial "app/teamlist" . }}
+              {{ partial "app/supplieslist" . }}
               {{ partial "app/schedule" . }}
               {{ partial "app/stepslist" . }}
               {{ partial "app/checklist" . }}
               {{ partial "app/guestslist" . }}
-              {{ partial "app/supplieslist" . }}
             </div>
           </div>
           <div class="col-12 col-lg-6">

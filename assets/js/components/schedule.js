@@ -502,7 +502,7 @@ class View {
   // Comentario: crea <li> por item estándar
   #renderItem(item) {
     const li = el("li", {
-      className: "list-group-item p-2 d-flex align-items-start",
+      className: "list-group-item p-2 d-flex align-items-center",
       attrs: { draggable: "true" },
     });
     li.dataset.id = item.id;
@@ -530,7 +530,7 @@ class View {
     });
 
     const label = el("label", {
-      className: "form-label flex-grow-1 mb-0",
+      className: "form-label me-auto mb-0",
       attrs: { for: `textarea-for-${item.id}` },
     });
     label.textContent = item.text;
@@ -703,7 +703,7 @@ class View {
   // Comentario: crea fila especial "End" no arrastrable ni movible, sin acciones, con <input type="time">
   #renderEndItem(item) {
     const li = el("li", {
-      className: "list-group-item p-2 d-flex align-items-start",
+      className: "list-group-item p-2 d-flex align-items-center",
       attrs: { draggable: "false" },
     });
     li.dataset.role = "end";
@@ -835,7 +835,7 @@ class View {
   // Comentario: crea fila de nueva entrada
   #renderNewItemEntry() {
     const li = el("li", {
-      className: "list-group-item p-2 d-flex align-items-start",
+      className: "list-group-item p-2 d-flex align-items-center",
     });
     li.dataset.role = "new-entry";
     li.draggable = false;
@@ -846,7 +846,7 @@ class View {
       attrs: {
         type: "text",
         name: "Add new activity",
-        placeholder: "Add new activity and press Enter",
+        placeholder: "Add activity [Enter]",
         "aria-label": "Add new activity",
         enterkeyhint: "enter",
       },

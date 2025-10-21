@@ -251,7 +251,7 @@ class View {
   // crea <li> por item
   #renderItem(item) {
     const li = el("li", {
-      className: "list-group-item p-2 d-flex align-items-center",
+      className: "list-group-item p-2 d-flex align-items-start",
       attrs: { draggable: "true" },
     });
     li.dataset.id = item.id;
@@ -261,7 +261,7 @@ class View {
     });
 
     const label = el("label", {
-      className: "form-label flex-grow-1 mb-0",
+      className: "form-label me-auto mb-0",
       attrs: { for: `textarea-for-${item.id}` },
     });
     label.textContent = item.text;
@@ -437,7 +437,7 @@ class View {
       attrs: {
         type: "text",
         name: "Add new step",
-        placeholder: "Add new step and press Enter",
+        placeholder: "Add step [Enter]",
         "aria-label": "Add new step",
         enterkeyhint:"enter",
       },

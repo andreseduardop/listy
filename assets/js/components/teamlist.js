@@ -1,25 +1,28 @@
 /**
- * @fileoverview Supplies list UI module.
- * @module components/supplieslist
+ * @fileoverview Team list UI module.
+ * @module components/teamlist
  *
  * @description
- * Replaces the old tabs+list-group layout with a single grid of Bootstrap cards
- * ("row type-checkbox g-3" with "col-6" columns). Each supply renders as a
- * <div class="card h-100 position-relative" data-id="..."> containing a checkbox,
- * label bound to the checkbox (for="supplieslist-check-<id>"), the editable text,
- * and an inline edit panel. Clicking the label now opens the textarea to edit its content. The move button now lives inside the card and is
- * positioned with utilities: "btn app-btn-move ".
- * The new-entry row sits outside the grid items in a horizontal card and uses
- * name="new-supply" and placeholder "Add supply [Enter]".
+ * Implements the new "team" layout replacing the former supplies-based UI.
+ * Renders a single grid of Bootstrap cards ("row type-checkbox type-team g-3"
+ * with "col-6" columns). Each person renders as a
+ * <div class="card h-100 position-relative" data-id="..."> showing a person icon,
+ * a role block (fw-semibold) and a name block, plus an inline panel for editing
+ * both fields (two textareas: role + name). The new-entry row sits outside the
+ * grid items in a horizontal card with two stacked inputs wrapped in
+ * "d-flex flex-column flex-grow-1 gap-3" and a right-aligned add button titled
+ * "Add new person". There are no checkboxes anymore.
  *
- * Persistence and behavior are unchanged: toggling readiness, inline editing, and creation still work; AI actions were removed from the inline panel.
+ * Persistence and behavior are analogous to the previous component: inline
+ * editing and creation still work; there is no readiness toggle. Move support
+ * remains available via the model.
  *
- * @version 1.13.0
+ * @version 2.1.0
  *
  * Code style: follows the Google JavaScript Style Guide.
  * https://google.github.io/styleguide/jsguide.html
  *
- * @exports renderSuppliesList
+ * @exports renderTeamList
  */
 
 import { el, qs, qsa, visibility, flashBackground } from "../utils/helpers.js";
@@ -30,10 +33,10 @@ import { uid } from "../utils/uid.js";
  * Model (component-scoped; delegates to storage.js)
  * ================================ */
 /**
- * @typedef {Object} SuppliesItem
+ * @typedef {Object} TeamItem
  * @property {string} id
- * @property {string} text
- * @property {boolean} ready
+ * @property {string} role
+ * @property {string} name
  */
 class Model extends EventTarget {
   /**
@@ -53,7 +56,7 @@ class Model extends EventTarget {
 
   /**
    * Returns all items for this component.
-   * @return {!Array<SuppliesItem>}
+   * @return {!Array<TeamItem>}
    */
   getAll() {
     // Comentario: lee desde storage y normaliza a arreglo de items
@@ -74,41 +77,46 @@ class Model extends EventTarget {
   }
 
   /**
-   * Adds a new item.
-   * @param {string} text
+   * Adds a new team entry.
+   * @param {string} role
+   * @param {string} name
    * @return {void}
    */
-  add(text) {
-    // Comentario: agrega item si el texto no está vacío
-    const t = String(text || "").trim();
-    if (!t) return;
+  add(role, name) {
+    // Comentario: agrega item si ambos campos tienen texto
+    const r = String(role || "").trim();
+    const n = String(name || "").trim();
+    if (!r || !n) return;
     const items = this.getAll();
-    items.push({ id: uid(), text: t, ready: false });
+    items.push({ id: uid(), role: r, name: n });
     this._write(items);
   }
 
   /**
-   * Toggles the `ready` state of an item by id.
+   * Updates fields of an item; removes it if both fields become empty.
    * @param {string} id
+   * @param {{role?: string, name?: string}} fields
    * @return {void}
    */
-  toggle(id) {
-    // Comentario: invierte el estado `ready`
-    const items = this.getAll().map((i) => (i.id === id ? { ...i, ready: !i.ready } : i));
-    this._write(items);
-  }
+  updateFields(id, fields) {
+    // Comentario: actualiza rol/nombre; si ambos quedan vacíos, elimina
+    const items = this.getAll();
+    const idx = items.findIndex((i) => i.id === id);
+    if (idx === -1) return;
 
-  /**
-   * Updates the text of an item; removes it if the text becomes empty.
-   * @param {string} id
-   * @param {string} text
-   * @return {void}
-   */
-  updateText(id, text) {
-    // Comentario: actualiza el texto o elimina si queda vacío
-    const t = String(text || "").trim();
-    if (!t) return this.remove(id);
-    const items = this.getAll().map((i) => (i.id === id ? { ...i, text: t } : i));
+    const current = items[idx];
+    const next = {
+      ...current,
+      ...(fields.role !== undefined ? { role: String(fields.role || "").trim() } : {}),
+      ...(fields.name !== undefined ? { name: String(fields.name || "").trim() } : {}),
+    };
+
+    if (!next.role && !next.name) {
+      // Comentario: ambos vacíos → elimina
+      items.splice(idx, 1);
+    } else {
+      items[idx] = next;
+    }
     this._write(items);
   }
 
@@ -156,13 +164,14 @@ class Model extends EventTarget {
 class View {
   // Comentario: selectores reutilizables
   static SEL = {
-    grid: "div.row.type-checkbox.type-supplies.g-3",
+    grid: "div.row.type-checkbox.type-team.g-3",
     itemCol: "div.col-6[data-id]",
     card: ".card[data-id]",
     newEntry: "[data-role='new-entry']",
-    newEntryInput: "[data-role='new-entry'] input[type='text']",
-    checkbox: "input.form-check-input.squarebox",
-    label: "label.form-check-label",
+    newEntryRoleInput: "[data-role='new-entry'] input[name='new-role']",
+    newEntryNameInput: "[data-role='new-entry'] input[name='new-person']",
+    roleText: "[data-role='role']",
+    nameText: "[data-role='name']",
     btnAdd: "button.app-btn-add",
   };
 
@@ -171,16 +180,16 @@ class View {
     // Comentario: limpia contenedor destino
     containerEl.innerHTML = "";
 
-    // Comentario: crea contenedor raíz y encabezado simple
+    // Comentario: crea contenedor raíz y encabezado
     const col = el("div", { className: "col-12" });
     const card = el("div", { className: "app-card col" });
-    const h2 = el("h2", { html: "supplies" });
+    const h2 = el("h2", { html: "team" });
 
     // Comentario: raíz lógica del componente
-    const suppliesRoot = el("div", { attrs: { id: "supplieslist-container" } });
+    const teamRoot = el("div", { attrs: { id: "teamlist-container" } });
 
-    // Comentario: contenedor de grilla (reemplaza ul/list-group y pestañas)
-    const grid = el("div", { className: "row type-checkbox type-supplies g-3" });
+    // Comentario: contenedor de grilla
+    const grid = el("div", { className: "row type-checkbox type-team g-3" });
 
     // Comentario: header y ensamblado
     const header = el("div", { className: "d-flex align-items-center justify-content-between mb-2" });
@@ -189,12 +198,12 @@ class View {
     const headerWrap = el("div", { className: "d-flex flex-column w-100" });
     headerWrap.append(header);
 
-    suppliesRoot.append(grid);
-    card.append(headerWrap, suppliesRoot);
+    teamRoot.append(grid);
+    card.append(headerWrap, teamRoot);
     col.append(card);
     containerEl.append(col);
 
-    return { root: suppliesRoot, grid };
+    return { root: teamRoot, grid };
   }
 
   constructor(containerEl) {
@@ -218,50 +227,56 @@ class View {
     this.root.appendChild(this.#renderNewItemEntry());
   }
 
-  // Comentario: inicializa drag & drop en la grilla
-
   // Comentario: crea columna y tarjeta por item
   #renderItemCol(item) {
     const col = el("div", { className: "col-6" });
     col.dataset.id = item.id;
 
     const card = el("div", { className: "card h-100 position-relative", attrs: { "data-id": item.id } });
-    const body = el("div", { className: "card-body align-items-start p-2" });
+    const body = el("div", { className: "card-body p-2" });
 
-    const formCheck = el("div", { className: "form-check d-flex align-items-start" });
+    // Comentario: icono de persona
+    const iconWrap = el("div");
+    iconWrap.innerHTML = '<i class="bi bi-person"></i>';
 
-    const input = el("input", {
-      className: "form-check-input squarebox",
-      attrs: { type: "checkbox", id: `supplieslist-check-${item.id}` },
-    });
-    input.checked = !!item.ready;
+    // Comentario: bloques de texto estáticos (rol y nombre)
+    const roleDiv = el("div", { className: "fw-semibold", attrs: { "data-role": "role" } });
+    roleDiv.textContent = item.role;
 
-    const label = el("label", {
-      className: "form-check-label ms-2",
-      attrs: { for: `supplieslist-check-${item.id}` },
-    });
+    const nameDiv = el("div", { attrs: { "data-role": "name" } });
+    nameDiv.textContent = item.name;
 
-    // Comentario: contenedor de texto editable (no es label para permitir edición)
-    label.textContent = item.text;
-
-    // Comentario: panel inline de edición (sin acciones AI)
+    // Comentario: panel inline de edición (dos textareas)
     const panel = el("div", {
-      className: "d-flex flex-column d-none",
+      className: "d-flex flex-column gap-3 mt-3 d-none",
       attrs: { "data-role": "inline-panel" },
     });
 
-    const editor = el("textarea", {
+    const roleEditor = el("textarea", {
       className: "form-control",
       attrs: {
         "data-role": "inline-editor",
-        "aria-label": "Edit supply text",
+        "aria-label": "Edit person text",
         name: "inline-editor",
         rows: "1",
-        id: `textarea-for-${item.id}`,
+        id: `textarea-role-for-${item.id}`,
+        placeholder: "Role",
       },
     });
 
-    const actions = el("div", { className: "d-flex flex-column mt-3 small" });
+    const nameEditor = el("textarea", {
+      className: "form-control",
+      attrs: {
+        "data-role": "inline-editor",
+        "aria-label": "Edit person text",
+        name: "inline-editor",
+        rows: "1",
+        id: `textarea-name-for-${item.id}`,
+        placeholder: "Name",
+      },
+    });
+
+    const actions = el("div", { className: "d-flex flex-column small" });
     const actionDefs = [
       ["save", "Save", "[Enter]"],
       ["discard", "Discard", "[Esc]"],
@@ -279,39 +294,33 @@ class View {
       );
     });
 
-    panel.append(editor, actions);
-    formCheck.append(input, label);
-    body.append(formCheck, panel);
+    panel.append(roleEditor, nameEditor, actions);
 
+    body.append(iconWrap, roleDiv, nameDiv, panel);
     card.append(body);
     col.append(card);
 
-    // Comentario: listeners del item (toggle)
-    input.addEventListener("change", () => {
-      this.onToggle?.(item.id);
-      flashBackground(input);
-    });
-
-    // Comentario: inicia edición al activar el texto editable
+    // Comentario: inicia edición al activar cualquiera de los bloques de texto
     const startInlineEdit = () => {
-      const currentText = label.textContent.trim();
-      visibility.hide(label);
+      visibility.hide(roleDiv);
+      visibility.hide(nameDiv);
       visibility.show(panel, "d-flex");
-      editor.value = currentText;
+      roleEditor.value = roleDiv.textContent.trim();
+      nameEditor.value = nameDiv.textContent.trim();
 
       // Comentario: auto-resize
-      const autoresize = () => {
-        editor.style.height = "auto";
-        editor.style.height = editor.scrollHeight + "px";
+      const autoresize = (ta) => {
+        ta.style.height = "auto";
+        ta.style.height = ta.scrollHeight + "px";
       };
 
       // Comentario: sanea saltos de línea → espacios
-      const sanitizeNoNewlines = () => {
-        const sanitized = editor.value.replace(/\r?\n+/g, " ");
-        if (sanitized !== editor.value) {
-          const pos = editor.selectionStart;
-          editor.value = sanitized;
-          editor.selectionStart = editor.selectionEnd = Math.min(pos, editor.value.length);
+      const sanitizeNoNewlines = (ta) => {
+        const sanitized = ta.value.replace(/\r?\n+/g, " ");
+        if (sanitized !== ta.value) {
+          const pos = ta.selectionStart;
+          ta.value = sanitized;
+          ta.selectionStart = ta.selectionEnd = Math.min(pos, ta.value.length);
         }
       };
 
@@ -322,18 +331,23 @@ class View {
 
         panel.removeEventListener("pointerdown", onAction);
         panel.removeEventListener("click", onAction);
-        editor.removeEventListener("keydown", onKeyDown);
-        editor.removeEventListener("input", onInput);
-        editor.removeEventListener("blur", onBlur);
+        panel.removeEventListener("focusout", onFocusOut, true);
+        roleEditor.removeEventListener("keydown", onKeyDown);
+        nameEditor.removeEventListener("keydown", onKeyDown);
+        roleEditor.removeEventListener("input", onInput);
+        nameEditor.removeEventListener("input", onInput);
 
         if (mode === "commit") {
-          const next = editor.value.trim();
-          if (next && next !== currentText) this.onEdit?.(item.id, next);
-          if (!next) this.onEdit?.(item.id, ""); // Comentario: vacío → eliminar
+          const nextRole = roleEditor.value.trim();
+          const nextName = nameEditor.value.trim();
+          if (nextRole || nextName) this.onEdit?.(item.id, { role: nextRole, name: nextName });
+          if (!nextRole && !nextName) this.onEdit?.(item.id, { role: "", name: "" }); // Comentario: vacío → eliminar
         }
 
         visibility.hide(panel);
-        visibility.show(label);
+        visibility.show(roleDiv);
+        visibility.show(nameDiv);
+      ;
       };
 
       const onKeyDown = (ke) => {
@@ -345,16 +359,25 @@ class View {
           finalize("cancel");
         } else if (ke.key === "Delete" && ke.shiftKey) {
           ke.preventDefault();
-          editor.value = "";
+          roleEditor.value = "";
+          nameEditor.value = "";
           finalize("commit");
         }
       };
 
-      const onInput = () => {
-        sanitizeNoNewlines();
-        autoresize();
+      const onInput = (e) => {
+        const ta = e.target;
+        sanitizeNoNewlines(ta);
+        autoresize(ta);
       };
-      const onBlur = () => finalize("commit");
+      // Comentario: confirma al hacer clic fuera del panel (focusout hacia fuera)
+      const onFocusOut = (e) => {
+        const next = e.relatedTarget;
+        // Si el siguiente foco NO está dentro del panel, guarda (commit)
+        if (!panel.contains(next)) {
+          finalize("commit");
+        }
+      };
 
       const onAction = (ev) => {
         const a = ev.target.closest("a[data-action]");
@@ -364,29 +387,39 @@ class View {
         if (act === "save") finalize("commit");
         else if (act === "discard") finalize("cancel");
         else if (act === "delete") {
-          editor.value = "";
+          roleEditor.value = "";
+          nameEditor.value = "";
           finalize("commit");
         }
       };
 
       panel.addEventListener("pointerdown", onAction);
       panel.addEventListener("click", onAction);
-      editor.addEventListener("keydown", onKeyDown);
-      editor.addEventListener("blur", onBlur, { once: true });
-      editor.addEventListener("input", onInput);
+      panel.addEventListener("focusout", onFocusOut, true);
+      roleEditor.addEventListener("keydown", onKeyDown);
+      nameEditor.addEventListener("keydown", onKeyDown);
+      roleEditor.addEventListener("input", onInput);
+      nameEditor.addEventListener("input", onInput);
 
       // Comentario: foco inicial
-      editor.focus();
-      const len = editor.value.length;
-      editor.setSelectionRange(len, len);
-      autoresize();
-    };
-
+      roleEditor.focus();
+      autoresize(roleEditor);
+      autoresize(nameEditor);
     
 
-    // Comentario: permite editar haciendo doble clic en el label completo
-    label.addEventListener("click", (e) => {
-      // Comentario: evita que el clic active el checkbox
+      // Comentario: foco inicial
+      roleEditor.focus();
+      autoresize(roleEditor);
+      autoresize(nameEditor);
+    };
+
+    // Comentario: permite editar haciendo clic en rol o nombre
+    roleDiv.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      startInlineEdit();
+    });
+    nameDiv.addEventListener("click", (e) => {
       e.preventDefault();
       e.stopPropagation();
       startInlineEdit();
@@ -401,42 +434,68 @@ class View {
 
     const wrap = el("div", { className: "card d-flex flex-row border p-2 mt-3" });
 
-    const input = el("input", {
+    const inputsWrap = el("div", { className: "d-flex flex-column flex-grow-1 gap-3" });
+
+    const roleInput = el("input", {
       className: "form-control",
       attrs: {
         type: "text",
-        name: "new-supply",
-        placeholder: "Add supply [Enter]",
-        "aria-label": "Add new supply",
+        name: "new-role",
+        placeholder: "Add role",
+        "aria-label": "Add role",
+        enterkeyhint: "next",
+      },
+    });
+
+    const nameInput = el("input", {
+      className: "form-control",
+      attrs: {
+        type: "text",
+        name: "new-person",
+        placeholder: "Add person [Enter]",
+        "aria-label": "Add new person",
         enterkeyhint: "enter",
       },
     });
 
     const btnAdd = el("button", {
       className: "btn app-btn-add ms-2",
-      attrs: { type: "button", title: "Add new supply", "aria-label": "Add new supply" },
+      attrs: { type: "button", title: "Add new person", "aria-label": "Add new person" },
       html: `<i class="bi bi-plus-square-fill fs-3" aria-hidden="true"></i>`,
     });
 
     const create = () => {
-      const t = input.value.trim();
-      if (!t) return;
-      this.onCreate?.(t);
+      const r = roleInput.value.trim();
+      const n = nameInput.value.trim();
+      if (!r || !n) return; // Comentario: requiere ambos campos
+      this.onCreate?.(r, n);
     };
 
-    input.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") create();
+    roleInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        nameInput.focus();
+      }
     });
+
+    nameInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        create();
+      }
+    });
+
     btnAdd.addEventListener("click", create);
 
-    wrap.append(input, btnAdd);
+    inputsWrap.append(roleInput, nameInput);
+    wrap.append(inputsWrap, btnAdd);
     col.append(wrap);
     return col;
   }
 
-  // Comentario: API para enfocar input nuevo
+  // Comentario: API para enfocar input de nuevo nombre (segundo input)
   focusNewEntryInput() {
-    const entry = qs(this.root, View.SEL.newEntryInput);
+    const entry = qs(this.root, View.SEL.newEntryNameInput);
     if (entry) entry.focus({ preventScroll: true });
   }
 }
@@ -447,7 +506,7 @@ class View {
 class Controller {
   constructor(containerEl) {
     // Comentario: define y almacena el nombre del componente que controla
-    this.COMPONENT_NAME = "supplieslist";
+    this.COMPONENT_NAME = "teamlist";
 
     // Comentario: instancia modelo y vista
     this.model = new Model(this.COMPONENT_NAME);
@@ -474,16 +533,18 @@ class Controller {
     });
 
     // Comentario: conecta handlers de la vista
-    this.view.onCreate = (text) => {
+    this.view.onCreate = (role, name) => {
       if (this.createInFlight) return;
       this.createInFlight = true;
       this.shouldRefocusNewEntry = true;
-      this.model.add(text);
+      this.model.add(role, name);
     };
-    this.view.onToggle = (id) => this.model.toggle(id);
-    this.view.onEdit = (id, text) => {
-      if (String(text).trim() === "") this.model.remove(id);
-      else this.model.updateText(id, text);
+
+    this.view.onEdit = (id, fields) => {
+      const r = String(fields.role ?? "").trim();
+      const n = String(fields.name ?? "").trim();
+      if (!r && !n) this.model.remove(id);
+      else this.model.updateFields(id, { role: r, name: n });
     };
   }
 }
@@ -493,15 +554,15 @@ class Controller {
  * ================================ */
 
 /**
- * renderSuppliesList(containerEl: HTMLElement)
+ * renderTeamList(containerEl: HTMLElement)
  * - Called by coordinator.js passing the container where everything must be created.
  * @param {HTMLElement} containerEl
  * @return {void}
  */
-export function renderSuppliesList(containerEl) {
+export function renderTeamList(containerEl) {
   // Comentario: valida el contenedor recibido
   if (!containerEl || !(containerEl instanceof HTMLElement)) {
-    console.error("[supplieslist] invalid container element");
+    console.error("[teamlist] invalid container element");
     return;
   }
   // Comentario: crea layout y monta controlador sobre el contenedor

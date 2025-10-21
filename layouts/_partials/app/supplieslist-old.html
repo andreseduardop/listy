@@ -1,35 +1,37 @@
 <div class="col-12">
   <div class="app-card col">
-    <h2>tasks</h2>
-    <ul class="nav nav-tabs nav-fill" id="checklist-tabs" role="tablist">
+    <h2>supplies</h2>
+    <div id="supplieslist-container">
+    </div>
+    <ul class="nav nav-tabs nav-fill" id="supplieslist-tabs" role="tablist">
       <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="checklist-pending-tab" data-bs-toggle="tab" data-bs-target="#checklist-pending-tab-pane" type="button" role="tab" aria-controls="checklist-pending-tab-pane" aria-selected="true" style="">Pending</button>
+        <button class="nav-link active" id="supplieslist-pending-tab" data-bs-toggle="tab" data-bs-target="#supplieslist-pending-tab-pane" type="button" role="tab" aria-controls="supplieslist-pending-tab-pane" aria-selected="true">Pending</button>
       </li>
       <li class="nav-item" role="presentation">
-        <button class="nav-link" id="checklist-completed-tab" data-bs-toggle="tab" data-bs-target="#checklist-completed-tab-pane" type="button" role="tab" aria-controls="checklist-completed-tab-pane" aria-selected="false" style="" tabindex="-1">Completed</button>
+        <button class="nav-link" id="supplieslist-ready-tab" data-bs-toggle="tab" data-bs-target="#supplieslist-ready-tab-pane" type="button" role="tab" aria-controls="supplieslist-ready-tab-pane" aria-selected="false" tabindex="-1" style="">Ready</button>
       </li>
     </ul>
-    <div class="tab-content" id="checklist-tabs-content">
-      <div class="tab-pane fade active show" id="checklist-pending-tab-pane" role="tabpanel" aria-labelledby="checklist-pending-tab" tabindex="0">
-        <ul class="app-checklist type-checkbox list-group">
+    <div class="tab-content" id="supplieslist-tabs-content">
+      <div class="tab-pane fade active show" id="supplieslist-pending-tab-pane" role="tabpanel" aria-labelledby="supplieslist-pending-tab" tabindex="0">
+        <ul class="app-supplieslist type-checkbox list-group">
           <li class="list-group-item p-2 d-flex align-items-start" draggable="true" data-id="1">
             <div class="form-check position-relative d-flex align-items-top flex-grow-1">
-              <input class="form-check-input" type="checkbox" id="checklist-check-1">
-              <label class="form-check-label flex-grow-1" for="textarea-for-1">Pending task example</label>
+              <input class="form-check-input squarebox" type="checkbox" id="supplieslist-check-1">
+              <label class="form-check-label flex-grow-1" for="textarea-for-1">Pending resource example</label>
               <div class="d-flex flex-column ps-1 flex-grow-1 d-none" data-role="inline-panel">
-                <textarea class="form-control" data-role="inline-editor" aria-label="Edit task text" name="inline-editor" rows="1" id="textarea-for-1">
+                <textarea class="form-control" data-role="inline-editor" aria-label="Edit resource text" name="inline-editor" rows="1" id="textarea-for-1">
                 </textarea>
                 <div class="d-flex flex-column mt-2 small">
                   <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#" data-action="save">
-                    <span>Save</span>
+                    <span class="">Save</span>
                     <span class="text-muted">[Enter]</span>
                   </a>
                   <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#" data-action="discard">
-                    <span>Discard</span>
+                    <span class="">Discard</span>
                     <span class="text-muted">[Esc]</span>
                   </a>
                   <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#" data-action="delete">
-                    <span>Delete</span>
+                    <span class="">Delete</span>
                     <span class="text-muted">[Shift+Del]</span>
                   </a>
                   <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#" data-action="ai-spelling">
@@ -40,10 +42,6 @@
                     <span class="app-icono">Improve writing</span>
                     <span class="text-muted">[Shift+F9]</span>
                   </a>
-                  <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#" data-action="ai-breakdown">
-                    <span class="app-icono">Break down task</span>
-                    <span class="text-muted">[Shift+F10]</span>
-                  </a>
                 </div>
               </div>
             </div>
@@ -53,34 +51,34 @@
             </button>
           </li>
           <li class="list-group-item p-2 d-flex align-items-start" data-role="new-entry" draggable="false">
-            <input class="form-control" type="text" name="new-task" placeholder="Add new task and press Enter" aria-label="Add new task">
-            <button class="btn app-btn-add" type="button" title="Add new task" aria-label="Add new task">
+            <input class="form-control" type="text" name="new-resource" placeholder="Add new resource and press Enter" aria-label="Add new resource">
+            <button class="btn app-btn-add" type="button" title="Add new resource" aria-label="Add new resource">
               <i class="bi bi-plus-square-fill fs-3" aria-hidden="true">
               </i>
             </button>
           </li>
         </ul>
       </div>
-      <div class="tab-pane fade" id="checklist-completed-tab-pane" role="tabpanel" aria-labelledby="checklist-completed-tab" tabindex="0">
-        <ul class="app-checklist type-checkbox list-group">
+      <div class="tab-pane fade" id="supplieslist-ready-tab-pane" role="tabpanel" aria-labelledby="supplieslist-ready-tab" tabindex="0">
+        <ul class="app-supplieslist type-checkbox list-group">
           <li class="list-group-item p-2 d-flex align-items-start" draggable="true" data-id="2">
             <div class="form-check position-relative d-flex align-items-top flex-grow-1">
-              <input class="form-check-input" type="checkbox" id="checklist-check-2">
-              <label class="form-check-label flex-grow-1" for="textarea-for-2">Completed task example</label>
+              <input class="form-check-input squarebox" type="checkbox" id="supplieslist-check-2">
+              <label class="form-check-label flex-grow-1" for="textarea-for-2">Ready resource example</label>
               <div class="d-flex flex-column ps-1 flex-grow-1 d-none" data-role="inline-panel">
-                <textarea class="form-control" data-role="inline-editor" aria-label="Edit task text" name="inline-editor" rows="1" id="textarea-for-2">
+                <textarea class="form-control" data-role="inline-editor" aria-label="Edit resource text" name="inline-editor" rows="1" id="textarea-for-2">
                 </textarea>
                 <div class="d-flex flex-column mt-2 small">
                   <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#" data-action="save">
-                    <span>Save</span>
+                    <span class="">Save</span>
                     <span class="text-muted">[Enter]</span>
                   </a>
                   <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#" data-action="discard">
-                    <span>Discard</span>
+                    <span class="">Discard</span>
                     <span class="text-muted">[Esc]</span>
                   </a>
                   <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#" data-action="delete">
-                    <span>Delete</span>
+                    <span class="">Delete</span>
                     <span class="text-muted">[Shift+Del]</span>
                   </a>
                   <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#" data-action="ai-spelling">
