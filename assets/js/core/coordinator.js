@@ -12,11 +12,12 @@
  * https://google.github.io/styleguide/jsguide.html
  */
 
+import { renderDescription } from "../components/description.js";      // importa el inicializador de description
 import { renderChecklist } from "../components/checklist.js";      // importa el inicializador de checklist
 import { renderSuppliesList } from "../components/supplieslist.js"; // importa el inicializador de supplieslist
 import { renderStepslist } from "../components/stepslist.js";      // importa el inicializador de stepslist
-import { renderSchedule } from "../components/schedule.js";     // importa el inicializador de guestslist
-import { renderTeamList } from "../components/teamlist.js";     // importa el inicializador de guestslist
+import { renderSchedule } from "../components/schedule.js";     // importa el inicializador de schedule
+import { renderTeamList } from "../components/teamlist.js";     // importa el inicializador de teamlist
 import { el } from "../utils/helpers.js";                          // crea elementos HTML
 import { getModel } from "./storage.js";                                // recupera el modelo raíz (getModel)
 
@@ -32,11 +33,12 @@ const CONTAINER_2 = "app-container-2";
 
 /** @const {!Record<string, !ComponentRender>} */
 const RENDERERS = {
+  description:    { render: renderDescription },
   schedule:       { render: renderSchedule },
   checklist:      { render: renderChecklist },
   supplieslist:   { render: renderSuppliesList },
   stepslist:      { render: renderStepslist },
-  teamlist:      { render: renderTeamList },
+  teamlist:       { render: renderTeamList },
   // Nota: se pueden mapear más nombres del modelo cuando existan inicializadores.
 };
 

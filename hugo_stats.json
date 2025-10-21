@@ -127,9 +127,11 @@
       "g-4",
       "gap-2",
       "gap-3",
+      "h",
       "h-100",
       "h-3",
       "h4",
+      "hj",
       "invisible",
       "justify-content-",
       "justify-content-between",
@@ -230,6 +232,7 @@
       "checklist-pending-tab-pane",
       "checklist-tabs",
       "checklist-tabs-content",
+      "description-container",
       "error-message-1",
       "guestlist-check-1",
       "guestlist-check-2",
@@ -245,6 +248,7 @@
       "schedule-container",
       "sideMenu",
       "stepslist-container",
+      "summary-container",
       "supplieslist-check-",
       "supplieslist-check-1",
       "supplieslist-check-195b154e0824",
@@ -272,6 +276,7 @@
       "teamlist-new-role",
       "teamlist-role-for-1",
       "teamlistnew-role",
+      "textarea-for-",
       "textarea-for-1",
       "textarea-for-195b154e0824",
       "textarea-for-2",
@@ -281,7 +286,10 @@
       "textarea-for-c12d82fbf4f1",
       "textarea-for-c21cb612a8dc",
       "textarea-for-d9fb1dbc89f1",
+      "textarea-for-description",
+      "textarea-for-description-edit",
       "textarea-for-e66a79b13576",
+      "textarea-for-editdescription",
       "textarea-for-fa5dd69b2413",
       "textarea-for-id",
       "textarea-for-id1",
@@ -291,7 +299,9 @@
       "textarea-rol-for-1",
       "textarea-role-for-",
       "textarea-role-for-1",
-      "textarea-role-for-2"
+      "textarea-role-for-2",
+      "textarea-to-edit-description",
+      "textarea-todescription"
     ]
   }
 }
