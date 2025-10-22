@@ -3,7 +3,7 @@
  * Follows MVC organization and exposes a single public function: renderDescription(containerEl).
  * Persists state under components.description.content using storage.js.
  *
- * @version 1.9.0
+ * @version 1.8.0
  *
  * Style: Google JavaScript Style Guide — https://google.github.io/styleguide/jsguide.html
  */
@@ -80,7 +80,7 @@ class View {
     // (comentario) Contenedor de lectura.
     this.container_ = el("div", { className: "row", attrs: { id: "description-container" } });
     const article = el("article", { className: "col-12 mb-4", attrs: { "data-role": "article" } });
-    const aside = el("aside", { className: "small text-end text-primary text-opacity-75" });
+    const aside = el("aside", { className: "small text-center text-primary text-opacity-75" });
     // (comentario) Inserta nodos simples de texto + <br>.
     aside.append(
       document.createTextNode("Generated with local AI."),
@@ -145,14 +145,13 @@ class View {
     this.root_.append(card);
     this.host_.append(this.root_);
 
-    // (comentario) Click en lectura → entra a edición SOLO si ocurre dentro de <article>.
+    // (comentario) Click en lectura (article/aside) → entra a edición.
     this.container_.addEventListener("click", (ev) => {
       const t = /** @type {HTMLElement} */ (ev.target);
-      if (t.closest("article")) {
+      if (t.tagName === "ASIDE" || t.closest("article")) {
         ev.preventDefault();
         this.handlers_.onEnterEdit();
       }
-      // (comentario) Clics en <aside> ya no activan edición.
     });
 
     // (comentario) Acciones del panel.

@@ -228,7 +228,7 @@ class View {
     const card = el("div", { className: "card h-100 position-relative", attrs: { "data-id": item.id } });
     const body = el("div", { className: "card-body align-items-start p-2" });
 
-    const formCheck = el("div", { className: "form-check d-flex align-items-start" });
+    const formCheck = el("div", { className: "form-check d-flex align-items-start flex-grow-1" });
 
     const input = el("input", {
       className: "form-check-input squarebox",
@@ -237,7 +237,7 @@ class View {
     input.checked = !!item.ready;
 
     const label = el("label", {
-      className: "form-check-label ms-2",
+      className: "form-check-label flex-grow-1 ms-2",
       attrs: { for: `supplieslist-check-${item.id}` },
     });
 

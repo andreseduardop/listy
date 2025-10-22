@@ -3,7 +3,7 @@
  * Follows MVC organization and exposes a single public function: renderDescription(containerEl).
  * Persists state under components.description.content using storage.js.
  *
- * @version 1.9.0
+ * @version 1.7.0
  *
  * Style: Google JavaScript Style Guide — https://google.github.io/styleguide/jsguide.html
  */
@@ -21,7 +21,7 @@ class Model {
   /** @return {DescriptionModelState} */
   get() {
     // (comentario) Lee contenido existente y normaliza estructura.
-    const content = storage.getComponentContent("description");
+    const content = storage.getComponentContent("description"); 
     if (!content || typeof content !== "object") {
       return { text: "Description text." };
     }
@@ -36,7 +36,7 @@ class Model {
   set(next) {
     // (comentario) Escribe objeto completo y notifica cambio.
     const payload = { text: String(next?.text ?? "") };
-    storage.setComponentContent("description", payload);
+    storage.setComponentContent("description", payload); 
     document.dispatchEvent(new CustomEvent("description:change"));
   }
 }
@@ -59,20 +59,8 @@ class View {
   constructor(host, handlers) {
     /** @private @const */ this.host_ = host;
     /** @private @const */ this.handlers_ = handlers;
-    /** @private */ this.isEditing_ = false; // (comentario) Flag local para saber si está en modo edición.
-    /** @private */ this.onDocPointerDown_ = (ev) => {
-      // (comentario) Maneja commit por clic fuera del textarea durante la edición.
-      if (!this.isEditing_) return;
-      const t = /** @type {HTMLElement} */ (ev.target);
-      // (comentario) Si hace clic en el propio textarea, no hace nada.
-      if (t === this.textarea_ || this.textarea_.contains(t)) return;
-      // (comentario) Si hace clic en una acción del panel (<a data-action>), no auto-commitea.
-      if (t.closest?.('a[data-action]')) return;
-      // (comentario) Cualquier otro clic (dentro o fuera del panel) dispara commit.
-      this.handlers_.onSave(this.getDraft_());
-    };
 
-    // (comentario) Crea columna y tarjeta (estructura como en description.html).
+    // (comentario) Crea columna y tarjeta (estructura como en description.html). 
     this.root_ = el("div", { className: "col-12" });
     const card = el("div", { className: "app-card col" });
     const title = el("h2", { html: "description" });
@@ -80,7 +68,7 @@ class View {
     // (comentario) Contenedor de lectura.
     this.container_ = el("div", { className: "row", attrs: { id: "description-container" } });
     const article = el("article", { className: "col-12 mb-4", attrs: { "data-role": "article" } });
-    const aside = el("aside", { className: "small text-end text-primary text-opacity-75" });
+    const aside = el("aside", { className: "small text-center text-primary text-opacity-75" });
     // (comentario) Inserta nodos simples de texto + <br>.
     aside.append(
       document.createTextNode("Generated with local AI."),
@@ -145,14 +133,13 @@ class View {
     this.root_.append(card);
     this.host_.append(this.root_);
 
-    // (comentario) Click en lectura → entra a edición SOLO si ocurre dentro de <article>.
+    // (comentario) Click en lectura (article/aside) → entra a edición.
     this.container_.addEventListener("click", (ev) => {
       const t = /** @type {HTMLElement} */ (ev.target);
-      if (t.closest("article")) {
+      if (t.tagName === "ASIDE" || t.closest("article")) {
         ev.preventDefault();
         this.handlers_.onEnterEdit();
       }
-      // (comentario) Clics en <aside> ya no activan edición.
     });
 
     // (comentario) Acciones del panel.
@@ -201,9 +188,6 @@ class View {
       }
     });
 
-    // (comentario) Listener global para commit por clic fuera del textarea (usa captura para fiabilidad).
-    document.addEventListener("mousedown", this.onDocPointerDown_, true);
-
     // (comentario) Autoresize del textarea.
     this.textarea_.addEventListener("input", () => this.autosize_());
   }
@@ -214,13 +198,12 @@ class View {
    * @return {void}
    */
   render(state) {
-    // (comentario) Usa qs(root, selector) en el orden correcto.
+    // (comentario) Usa qs(root, selector) en el orden correcto. 
     const article = qs(this.container_, '[data-role="article"]');
     article.textContent = state.text ?? "";
-    // (comentario) Conmuta visibilidad mediante el módulo visibility.
+    // (comentario) Conmuta visibilidad mediante el módulo visibility. 
     visibility.setVisible(this.container_, true);
     visibility.setVisible(this.editor_, false);
-    this.isEditing_ = false; // (comentario) Sale de edición si estaba en ella.
   }
 
   /**
@@ -231,9 +214,8 @@ class View {
   enterEdit(text) {
     this.setDraft_(text ?? "");
     this.autosize_();
-    visibility.setVisible(this.container_, false); //
+    visibility.setVisible(this.container_, false); // 
     visibility.setVisible(this.editor_, true);
-    this.isEditing_ = true; // (comentario) Marca estado de edición.
     // (comentario) Foco y cursor al final.
     this.textarea_.focus();
     const len = this.textarea_.value.length;
@@ -242,9 +224,8 @@ class View {
 
   /** Sale de edición (vuelve a lectura). */
   exitEdit() {
-    visibility.setVisible(this.container_, true); //
+    visibility.setVisible(this.container_, true);  // 
     visibility.setVisible(this.editor_, false);
-    this.isEditing_ = false; // (comentario) Desmarca estado de edición.
   }
 
   /** @private */
@@ -328,7 +309,7 @@ class Controller {
 }
 
 /**
- * Public API — renderDescription para compatibilidad con coordinator.js.
+ * Public API — renderDescription para compatibilidad con coordinator.js. 
  * @param {!HTMLElement} containerEl Mount point provided by coordinator.
  * @return {{ destroy: () => void }} Optional cleanup handle.
  */
@@ -337,11 +318,7 @@ export function renderDescription(containerEl) {
   const controller = new Controller(containerEl);
   return {
     destroy() {
-      // (comentario) Limpia listeners globales agregados por la vista.
-      const v = controller?.view_;
-      if (v && v.onDocPointerDown_) {
-        document.removeEventListener("mousedown", v.onDocPointerDown_, true);
-      }
+      // (comentario) No hay listeners globales que limpiar por ahora.
       void controller;
     },
   };
