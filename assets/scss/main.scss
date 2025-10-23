@@ -113,7 +113,7 @@ $modal-backdrop-opacity:            .3;
 // Style anchor elements.
 $link-color:                        $primary;
 $link-decoration:                   none;
-$link-hover-color:                  $secondary;
+$link-hover-color:                  $primary;
 $link-hover-decoration:             underline;
 
 // Borders
@@ -286,7 +286,20 @@ h1, h2, h3, h4, h5, h6 {
 a {
   overflow-wrap: anywhere;
   word-break: normal;
-  font-weight: 500;
+  font-weight: 600;
+}
+a.external::after {
+  content: "\2002\f1c5";
+  display: inline-block;
+  font-family: icons !important;
+  font-style: normal;
+  font-weight: normal !important;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  vertical-align: -.125em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 // Entradas de texto
 input {
@@ -374,9 +387,8 @@ svg.bi {
 // APP (start)
 // Ajustes generales
 /* Resaltado cuando el mouse pase por encima */
-ul li:not(:last-child):hover,
-ol li:not(:last-child):hover, 
-.type-checkbox .card:hover {
+ul li:not(:last-child).list-group-item:hover,
+ol li:not(:last-child).list-group-item:hover {
   background-color: $highlight-subtle;
   & div,
   & button,

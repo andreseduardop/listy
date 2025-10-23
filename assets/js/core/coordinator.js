@@ -18,6 +18,7 @@ import { renderSuppliesList } from "../components/supplieslist.js"; // importa e
 import { renderStepslist } from "../components/stepslist.js";      // importa el inicializador de stepslist
 import { renderSchedule } from "../components/schedule.js";     // importa el inicializador de schedule
 import { renderTeamList } from "../components/teamlist.js";     // importa el inicializador de teamlist
+import { renderSearchNext } from "../components/searchnext.js";     // importa el inicializador de teamlist
 import { el } from "../utils/helpers.js";                          // crea elementos HTML
 import { getModel } from "./storage.js";                                // recupera el modelo raíz (getModel)
 
@@ -39,6 +40,7 @@ const RENDERERS = {
   supplieslist:   { render: renderSuppliesList },
   stepslist:      { render: renderStepslist },
   teamlist:       { render: renderTeamList },
+  searchnext:     { render: renderSearchNext },
   // Nota: se pueden mapear más nombres del modelo cuando existan inicializadores.
 };
 
@@ -103,6 +105,7 @@ export function startApp() {
     const hostId = `host-${String(position).padStart(2, "0")}-${name}`;
     const host = createHost(parent, hostId);
 
+    console.log(`llamando a ${name}`);
     try {
       RENDERERS[name].render(host); // invoca el render del componente
     } catch (err) {

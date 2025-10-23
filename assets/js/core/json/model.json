@@ -62,8 +62,8 @@
       "content": []
     },
     {
-      "name": "suggestedsearches",
-      "title": "Suggested Searches",
+      "name": "searchnext",
+      "title": "Search Next",
       "position": 9,
       "state": "unmounted",
       "content": []
