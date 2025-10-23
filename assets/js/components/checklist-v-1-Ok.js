@@ -8,7 +8,7 @@
  * Persistence is handled by an internal `Model` class that delegates reads/writes
  * to `core/storage.js`, storing items under `components.<COMPONENT_NAME>.content`.
  *
- * @version 1.6.0
+ * @version 1.5.0
  *
  * Code style: follows the Google JavaScript Style Guide.
  * https://google.github.io/styleguide/jsguide.html
@@ -257,16 +257,14 @@ class View {
     col.append(card);
     containerEl.append(col);
 
-    return { ulPending: ulPend, ulCompleted: ulComp, btnPending: btnPend, btnCompleted: btnComp };
+    return { ulPending: ulPend, ulCompleted: ulComp };
   }
 
   constructor(containerEl) {
-    // construye layout y guarda refs de listas y botones
-    const { ulPending, ulCompleted, btnPending, btnCompleted } = View.buildLayout(containerEl);
+    // construye layout y guarda refs de listas
+    const { ulPending, ulCompleted } = View.buildLayout(containerEl);
     this.pendingList = ulPending;
     this.completedList = ulCompleted;
-    this.btnPending = btnPending; // Comentario: guarda referencia al botón de pestaña "Pending"
-    this.btnCompleted = btnCompleted; // Comentario: guarda referencia al botón de pestaña "Completed"
 
     // pool de manejadores DnD para limpieza
     this._dndHandles = [];
@@ -284,7 +282,6 @@ class View {
     this.#renderList(this.completedList, completed, { withNewEntry: false });
 
     this.#ensureCompletedEmptyState();
-    this.#setTabLabels({ pending: pending.length, completed: completed.length, total: items.length }); // Comentario: actualiza los rótulos de pestañas con conteos
     this.#initDnD(); // Activa DnD tras render
   }
 
@@ -521,17 +518,6 @@ class View {
       li.dataset.id = "";
       ul.appendChild(li);
     }
-  }
-
-  // actualiza etiquetas de pestañas con conteos
-  #setTabLabels({ pending, completed, total }) {
-    // Comentario: formatea los textos de pestaña con el patrón solicitado
-    const fmt = (label, num, tot) => `${label} ${num}/${tot}`;
-    if (this.btnPending) this.btnPending.textContent = fmt("Pending", pending, total);
-    if (this.btnCompleted) this.btnCompleted.textContent = fmt("Completed", completed, total);
-    // Comentario: sincroniza atributos accesibles aria-label
-    if (this.btnPending) this.btnPending.setAttribute("aria-label", this.btnPending.textContent);
-    if (this.btnCompleted) this.btnCompleted.setAttribute("aria-label", this.btnCompleted.textContent);
   }
 
   // crea fila de nueva entrada
