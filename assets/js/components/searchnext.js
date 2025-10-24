@@ -123,7 +123,6 @@ class Controller {
  */
 export function renderSearchNext(containerEl) {
   // (comentario) Crea controlador; no registra listeners globales adicionales
-  console.log("llamado a renderSearchNext");
   const controller = new Controller(containerEl);
   return {
     destroy() {

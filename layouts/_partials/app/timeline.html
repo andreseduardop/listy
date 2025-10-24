@@ -1,54 +1,57 @@
 <div class="col-12">
   <div class="app-card col">
     <h2>timeline</h2>
-    <div id="stepslist-container">
-      <ul class="app-stepslist type-stepslist list-group">
-        <li class="list-group-item p-2 d-flex align-items-start" draggable="true" data-id="1">
-          <div class="me-2">
-            <input type="date" class="form-control form-control-sm" aria-label="Step date" style="width: auto;">
-          </div>
-          <div class="position-relative d-flex align-items-top flex-grow-1">
-            <label class="form-label flex-grow-1 mb-0" for="textarea-for-1">Step example</label>
-            <div class="d-flex flex-column ps-1 flex-grow-1 d-none"> 
-              <textarea class="form-control" data-role="inline-editor" aria-label="Edit step" name="inline-editor" rows="1" id="textarea-for-1">Editing step</textarea>
-              <div class="d-flex flex-column mt-2 small">
-                <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#" data-action="save">
-                  <span>Save</span>
-                  <span class="text-muted">[Enter]</span>
-                </a>
-                <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#" data-action="discard">
-                  <span>Discard</span>
-                  <span class="text-muted">[Esc]</span>
-                </a>
-                <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#" data-action="delete">
-                  <span>Delete</span>
-                  <span class="text-muted">[Shift+Del]</span>
-                </a>
-                <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#" data-action="ai-spelling">
-                  <span class="app-icono">Fix spelling</span>
-                  <span class="text-muted">[Shift+F8]</span>
-                </a>
-                <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#" data-action="ai-improve">
-                  <span class="app-icono">Improve writing</span>
-                  <span class="text-muted">[Shift+F9]</span>
-                </a>
-                <a class="text-decoration-none fw-bold mb-2 d-flex justify-content-between" href="#" data-action="ai-breakdown">
-                  <span class="app-icono">Break down step</span>
-                  <span class="text-muted">[Shift+F10]</span>
-                </a>
-              </div>
+    <div class="col">
+      <ul class="app-timeline" role="presentation">
+        <li data-id="1">
+          <h3 class="fw-semibold fs-6 mb-0" href="#!" data-role="heading">Activity 1</h3>
+          <p class="mt-2" data-role="description">Activity 1 description text.</p>
+          <div class="d-flex flex-column gap-3 mt-3 d-none" data-role="inline-panel">
+            <textarea class="form-control" data-role="inline-editor" aria-label="Edit activity heading" name="inline-editor" rows="1" id="textarea-heading-for-1" placeholder="Activity"></textarea>
+            <textarea class="form-control" data-role="inline-editor" aria-label="Edit activity description" name="inline-editor" rows="1" id="textarea-description-for-1" placeholder="Description"></textarea>
+            <div class="d-flex flex-column small">
+              <a class="text-decoration-none fw-bold mb-2" href="#" data-action="save">
+                <span>Save</span>
+                <br>
+                <span class="text-muted">[Enter]</span>
+              </a>
+              <a class="text-decoration-none fw-bold mb-2" href="#" data-action="discard">
+                <span>Discard</span>
+                <br>
+                <span class="text-muted">[Esc]</span>
+              </a>
+              <a class="text-decoration-none fw-bold mb-2" href="#" data-action="delete">
+                <span>Delete</span>
+                <br>
+                <span class="text-muted">[Shift+Del]</span>
+              </a>
             </div>
           </div>
-          <button class="btn app-btn-move" type="button" aria-label="Move" title="Move" aria-hidden="true" tabindex="-1" draggable="false">
-            <i class="bi bi-arrow-down-up" aria-hidden="true"></i>
-          </button>
         </li>
-        <li class="list-group-item p-2 d-flex align-items-start" data-role="new-entry" draggable="false">
-          <input type="text" class="form-control" placeholder="Add new step and press Enter" aria-label="Add new step" name="Add new step">
-          <button type="button" class="btn app-btn-add" title="Add new step" aria-label="Add new step">
-            <i class="bi bi-plus-square-fill fs-3" aria-hidden="true">
-            </i>
-          </button>
+        <li data-id="2">
+          <h3 class="fw-semibold fs-6 mb-0" href="#!" data-role="heading">Activity 2</h3>
+          <p class="mt-2" data-role="description">Activity 2 description text.</p>
+          <div class="d-flex flex-column gap-3 mt-3 d-none" data-role="inline-panel">
+            <textarea class="form-control" data-role="inline-editor" aria-label="Edit activity heading" name="inline-editor" rows="1" id="textarea-heading-for-2" placeholder="Activity"></textarea>
+            <textarea class="form-control" data-role="inline-editor" aria-label="Edit activity description" name="inline-editor" rows="1" id="textarea-description-for-2" placeholder="Description"></textarea>
+            <div class="d-flex flex-column small">
+              <a class="text-decoration-none fw-bold mb-2" href="#" data-action="save">
+                <span>Save</span>
+                <br>
+                <span class="text-muted">[Enter]</span>
+              </a>
+              <a class="text-decoration-none fw-bold mb-2" href="#" data-action="discard">
+                <span>Discard</span>
+                <br>
+                <span class="text-muted">[Esc]</span>
+              </a>
+              <a class="text-decoration-none fw-bold mb-2" href="#" data-action="delete">
+                <span>Delete</span>
+                <br>
+                <span class="text-muted">[Shift+Del]</span>
+              </a>
+            </div>
+          </div>
         </li>
       </ul>
     </div>

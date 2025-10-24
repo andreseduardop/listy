@@ -19,6 +19,7 @@ import { renderStepslist } from "../components/stepslist.js";      // importa el
 import { renderSchedule } from "../components/schedule.js";     // importa el inicializador de schedule
 import { renderTeamList } from "../components/teamlist.js";     // importa el inicializador de teamlist
 import { renderSearchNext } from "../components/searchnext.js";     // importa el inicializador de teamlist
+import { renderTimeline } from "../components/timeline.js";     // importa el inicializador de teamlist
 import { el } from "../utils/helpers.js";                          // crea elementos HTML
 import { getModel } from "./storage.js";                                // recupera el modelo raíz (getModel)
 
@@ -35,6 +36,7 @@ const CONTAINER_2 = "app-container-2";
 /** @const {!Record<string, !ComponentRender>} */
 const RENDERERS = {
   description:    { render: renderDescription },
+  timeline:       { render: renderTimeline },
   schedule:       { render: renderSchedule },
   checklist:      { render: renderChecklist },
   supplieslist:   { render: renderSuppliesList },

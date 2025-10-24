@@ -15,7 +15,7 @@
 import modelTemplate from "./json/model.json" assert { type: "json" };
 
 /** @const {string} */
-export const STORAGE_KEY = "app.model.4";
+export const STORAGE_KEY = "app.model.5";
 
 /** @private */
 function deepClone(obj) {

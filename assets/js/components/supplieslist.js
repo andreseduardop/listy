@@ -413,9 +413,9 @@ class View {
     });
 
     const btnAdd = el("button", {
-      className: "btn app-btn-add ms-2",
+      className: "btn app-btn-add",
       attrs: { type: "button", title: "Add new supply", "aria-label": "Add new supply" },
-      html: `<i class="bi bi-plus-square-fill fs-3" aria-hidden="true"></i>`,
+      html: `<i class="bi bi-plus-lg fs-2" aria-hidden="true"></i>`,
     });
 
     const create = () => {

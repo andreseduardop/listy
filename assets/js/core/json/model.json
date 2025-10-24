@@ -67,6 +67,13 @@
       "position": 9,
       "state": "unmounted",
       "content": []
+    },
+    {
+      "name": "timeline",
+      "title": "Timeline",
+      "position": 10,
+      "state": "unmounted",
+      "content": []
     }
   ]
 }

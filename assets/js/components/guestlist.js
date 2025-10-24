@@ -542,7 +542,7 @@ class View {
     const btnAdd = el("button", {
       className: "btn app-btn-add",
       attrs: { type: "button", title: "Add guest", "aria-label": "Add guest" },
-      html: `<i class="bi bi-plus-square-fill fs-3" aria-hidden="true"></i>`,
+      html: `<i class="bi bi-plus-lg fs-2" aria-hidden="true"></i>`,
     });
 
     const create = () => {

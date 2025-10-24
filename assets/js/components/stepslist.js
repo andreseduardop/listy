@@ -450,7 +450,7 @@ class View {
         title: "Add new step",
         "aria-label": "Add new step",
       },
-      html: `<i class="bi bi-plus-square-fill fs-3" aria-hidden="true"></i>`,
+      html: `<i class="bi bi-plus-lg fs-2" aria-hidden="true"></i>`,
     });
 
     const create = () => {
