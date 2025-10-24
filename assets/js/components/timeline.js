@@ -1,15 +1,23 @@
 /**
- * @fileoverview UI module for an editable timeline component (list of activities).
+ * @fileoverview Editable timeline component with drag-and-drop reordering.
  * MVC structure + public API renderTimeline(containerEl).
  * Persists state under components.timeline.content using storage.js.
- * Model follows teamlist's EventTarget-based change notifications.
+ * Drag & Drop behavior mirrors stepslist via utils/drag-and-drop.js.
  *
- * @version 2.1.0
+ * @version 2.2.0
+ *
+ * Changes in 2.2.0:
+ * - Adds drag-and-drop reorder using attachListReorder (same pattern as stepslist).
+ * - Introduces Model.moveToIndex(id, toIndex) for stable in-model reordering.
+ * - View: initializes DnD after render; keeps disposers; cleans up on destroy.
+ * - List items: now include class 'list-group-item' and draggable="true".
+ * - Public destroy() also removes the document-level edit commit listener.
  */
 
 import { el, qs, visibility } from "../utils/helpers.js";
 import * as storage from "../core/storage.js";
 import { uid } from "../utils/uid.js";
+import { attachListReorder } from "../utils/drag-and-drop.js"; // Comentario: importa helper DnD
 
 /**
  * @typedef {{ id: string, heading: string, description: string }} TimelineItem
@@ -114,6 +122,32 @@ class Model extends EventTarget {
     const items = this.getAll().filter((x) => x.id !== id);
     this._write(items);
   }
+
+  /**
+   * Moves an item to a target index in the same list.
+   * @param {string} id
+   * @param {number} toIndex
+   * @return {void}
+   */
+  moveToIndex(id, toIndex) {
+    // (comentario) Reubica el item de forma estable (igual que stepslist)
+    const items = this.getAll();
+    const len = items.length;
+    if (len <= 1) return;
+
+    const from = items.findIndex((i) => i.id === id);
+    if (from === -1) return;
+
+    let dest = Math.max(0, Math.min(len, Number(toIndex)));
+    if (dest === from || dest === from + 1) return;
+
+    const arr = [...items];
+    const [moved] = arr.splice(from, 1);
+    if (dest > from) dest -= 1;
+    arr.splice(dest, 0, moved);
+
+    this._write(arr);
+  }
 }
 
 /* ============================
@@ -135,7 +169,8 @@ class View {
    *   onSave: (id:string, heading:string, description:string) => void,
    *   onDiscard: () => void,
    *   onDelete: (id:string) => void,
-   *   onCreate: (heading:string, description:string) => void
+   *   onCreate: (heading:string, description:string) => void,
+   *   onReorder: (id:string, toIndex:number) => void
    * }} handlers
    */
   constructor(host, handlers) {
@@ -159,6 +194,9 @@ class View {
     this.root_.append(card);
     this.host_.append(this.root_);
 
+    // (comentario) Pool de manejadores DnD para limpieza
+    this._dndDisposers_ = [];
+
     // (comentario) Listener global para commit por clic fuera cuando está editando
     this.onDocPointerDown_ = (ev) => {
       if (this.editingId_ == null) return;
@@ -177,7 +215,8 @@ class View {
    * @param {TimelineState} state
    */
   render(state) {
-    // (comentario) Limpia lista
+    // (comentario) Limpia lista y DnD previos
+    this._destroyDnD_();
     this.ul_.innerHTML = "";
 
     // (comentario) Genera ítems
@@ -186,13 +225,38 @@ class View {
       this.ul_.append(li);
     }
 
-    // (comentario) Coloca bloque de nueva entrada debajo de la lista (como teamlist)
+    // (comentario) Coloca bloque de nueva entrada debajo de la lista
     const prevNew = this.col_.querySelector(View.SEL.newEntry);
     if (prevNew) prevNew.remove();
     this.col_.append(this.renderNewEntry_());
 
+    // (comentario) Inicializa DnD tras render
+    this._initDnD_();
+
     // (comentario) Asegura visibilidad
     visibility.setVisible(this.root_, true);
+  }
+
+  // (comentario) Inicializa Drag & Drop similar a stepslist
+  _initDnD_() {
+    const common = {
+      // (comentario) No hay fila "new-entry" dentro del UL; no hace falta ignorar
+      allowGlobalEdges: true,
+      onReorder: (draggedId, toIndex) => this.handlers_.onReorder?.(draggedId, toIndex),
+    };
+    this._dndDisposers_.push(attachListReorder(this.ul_, common));
+  }
+
+  // (comentario) Destruye instancias DnD activas
+  _destroyDnD_() {
+    this._dndDisposers_.forEach((d) => {
+      try {
+        d?.destroy?.();
+      } catch {
+        /* no-op */
+      }
+    });
+    this._dndDisposers_ = [];
   }
 
   /**
@@ -202,7 +266,11 @@ class View {
    * @private
    */
   renderItem_(item) {
-    const li = el("li", { attrs: { "data-id": String(item.id) } });
+    const li = el("li", {
+      // (comentario) Añade clases para que el helper seleccione por defecto
+      className: "list-group-item",
+      attrs: { "data-id": String(item.id), draggable: "true" },
+    });
 
     // (comentario) Modo lectura
     const h3 = el("h3", {
@@ -252,7 +320,11 @@ class View {
         attrs: { href: "#", "data-action": key },
         html: `<span>${text}</span><br><span class="text-muted">${hint}</span>`,
       });
-    toolbar.append(mk("save", "Save", "[Enter]"), mk("discard", "Discard", "[Esc]"), mk("delete", "Delete", "[Shift+Del]"));
+    toolbar.append(
+      mk("save", "Save", "[Enter]"),
+      mk("discard", "Discard", "[Esc]"),
+      mk("delete", "Delete", "[Shift+Del]"),
+    );
 
     panel.append(taHeading, taDesc, toolbar);
     li.append(h3, p, panel);
@@ -472,6 +544,18 @@ class View {
     const inp = this.col_.querySelector(View.SEL.newHeading);
     if (inp) inp.focus({ preventScroll: true });
   }
+
+  /**
+   * Limpia listeners y disposers de la vista.
+   */
+  destroy() {
+    // (comentario) Remueve listener global de commit por clic fuera
+    if (this.onDocPointerDown_) {
+      document.removeEventListener("mousedown", this.onDocPointerDown_, true);
+    }
+    // (comentario) Limpia DnD
+    this._destroyDnD_();
+  }
 }
 
 /* ============================
@@ -501,6 +585,10 @@ class Controller {
         this._shouldRefocusNew = true;
         this.model.add(heading, description);
       },
+      onReorder: (draggedId, toIndex) => {
+        // (comentario) Aplica reordenamiento del modelo
+        this.model.moveToIndex(draggedId, toIndex);
+      },
     });
 
     this._createInFlight = false;
@@ -523,6 +611,17 @@ class Controller {
     };
     this.model.addEventListener("change", this.onModelChange_);
   }
+
+  /**
+   * Limpia recursos del controlador.
+   */
+  destroy() {
+    // (comentario) Limpia listener del modelo y vista
+    if (this.onModelChange_) {
+      this.model.removeEventListener("change", this.onModelChange_);
+    }
+    this.view?.destroy?.();
+  }
 }
 
 /* ============================
@@ -538,15 +637,7 @@ export function renderTimeline(containerEl) {
   const controller = new Controller(containerEl);
   return {
     destroy() {
-      // (comentario) Limpia listener global de la vista
-      const v = controller?.view;
-      if (v?.onDocPointerDown_) {
-        document.removeEventListener("mousedown", v.onDocPointerDown_, true);
-      }
-      // (comentario) Limpia listener del modelo
-      if (controller?.onModelChange_) {
-        controller.model.removeEventListener("change", controller.onModelChange_);
-      }
+      controller?.destroy?.();
     },
   };
 }

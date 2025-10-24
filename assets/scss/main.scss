@@ -391,19 +391,30 @@ svg.bi {
 ul li:not(:last-child).list-group-item:hover,
 ol li:not(:last-child).list-group-item:hover {
   background-color: $highlight-subtle;
-  & div,
+  & a, 
   & button,
+  & div,
+  & h3,
   & i,
   & input,
   & label,
-  & a, 
+  & p,
   & span {
+    background-color: $highlight-subtle;
+  }
+}
+.app-timeline li:last-child:hover {
+  background-color: $highlight-subtle;
+  & h3,
+  & p {
     background-color: $highlight-subtle;
   }
 }
 // Cursor pointer
 ul label,
 ol label,
+ul p,
+ul h3,
 .type-checkbox .card label {
   cursor: text;
 }
@@ -669,11 +680,15 @@ ul.app-timeline > li:before {
   content: " ";
   background: $body-color-subtle-7;
   display: inline-block;
-  position: absolute;
+  position: absolute !important;
   border-radius: 50%;
   border: 3px solid $primary;
-  left: 20px;
+  left: -10px;
   width: 20px;
   height: 20px;
   z-index: 400;
+  cursor: grab;
+}
+ul.app-timeline > li:active {
+  cursor: grabbing !important;
 }
